@@ -1,9 +1,39 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Home from './pages/Home'
+import Layout from './Layout'
+import RegisterStudent from './pages/Students/RegisterStudent'
+import UploadDocuments from './pages/Students/UploadDocuments'
+// import Layout from './components/Sidebar'
+// import { Signin } from './pages/Signin'
+// import { Home } from './pages/Home'
+// import { RoomDetails } from './pages/Room'
+// import CreateRoom from './pages/CreateRoom'
+// import BookingPage from './pages/BookingPage'
+// import Bookings from './pages/Bookings'
+// import Footer from './components/Footer'
+// Protected Route wrapper component
+// const ProtectedRoute = ({ children }:any) => {
+//   const id = localStorage.getItem('id')
+  
+//   if (!id) {
+//     return <Navigate to="/signin" replace />
+//   }
+  
+//   return children
+// }
 
-const App = () => {
+function App() {
   return (
-    <div>
-      Hello
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Wrap pages with the Layout */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="register-student" element={<RegisterStudent />} />
+          <Route path="upload-document" element={<UploadDocuments />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
