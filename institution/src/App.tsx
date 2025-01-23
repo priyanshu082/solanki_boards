@@ -3,6 +3,9 @@ import Home from './pages/Home'
 import Layout from './Layout'
 import RegisterStudent from './pages/Students/RegisterStudent'
 import UploadDocuments from './pages/Students/UploadDocuments'
+import ShowStudents from './pages/Students/ShowStudents'
+import Profile from './pages/Profile'
+import FeePayment from './pages/Students/FeePayment'
 // import Layout from './components/Sidebar'
 // import { Signin } from './pages/Signin'
 // import { Home } from './pages/Home'
@@ -31,6 +34,9 @@ function App() {
           <Route index element={<Home />} />
           <Route path="register-student" element={<RegisterStudent />} />
           <Route path="upload-document" element={<UploadDocuments />} />
+          <Route path="show-students" element={<ShowStudents />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="fee-payment" element={<FeePayment />} />
         </Route>
       </Routes>
     </BrowserRouter>

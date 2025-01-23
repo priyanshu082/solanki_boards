@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronRight, LayoutDashboard, Package, Users, Settings } from 'lucide-react';
+import { ChevronDown, ChevronRight, Package, Settings } from 'lucide-react';
+import logo from "../assets/logo.png"
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Link } from 'react-router-dom';
 
 interface MenuItem {
   name: string;
@@ -26,17 +28,6 @@ const Sidebar = () => {
 
   const menuItems: MenuSection[] = [
     {
-      title: "Dashboard",
-      path: "/dashboard",
-      icon: <LayoutDashboard className="h-5 w-5" />,
-      items: [
-        { name: "Analytics", path: "register-student" },
-        { name: "Reports", path: "/dashboard/reports" },
-        { name: "Statistics", path: "/dashboard/statistics" },
-        { name: "Real-time", path: "/dashboard/realtime" }
-      ]
-    },
-    {
       title: "Students",
       path: "/students",
       icon: <Package className="h-5 w-5" />,
@@ -44,28 +35,26 @@ const Sidebar = () => {
         { name: "Register Student", path: "/register-student" },
         { name: "Upload Document", path: "/upload-document" },
         { name: "Show Students", path: "/show-students" },
+        { name: "Fee Payment", path: "/fee-payment" },
       ]
     },
-    {
-      title: "Accounts",
-      path: "/accounts",
-      icon: <Users className="h-5 w-5" />,
-      items: [
-        { name: "My Wallet", path: "/accounts/my-wallet" },
-        { name: "My Account", path: "/accounts/my-account" },
-        { name: "Fee Payment", path: "/accounts/fee-payment" },
-        { name: "Short Payments", path: "/accounts/short-payments" }
-      ]
-    },
+    // {
+    //   title: "Accounts",
+    //   path: "/accounts",
+    //   icon: <Users className="h-5 w-5" />,
+    //   items: [
+    //     { name: "My Wallet", path: "/accounts/my-wallet" },
+    //     { name: "My Account", path: "/accounts/my-account" },
+    //     { name: "Fee Payment", path: "/accounts/fee-payment" },
+    //     { name: "Short Payments", path: "/accounts/short-payments" }
+    //   ]
+    // },
     {
       title: "Settings",
       path: "/settings",
       icon: <Settings className="h-5 w-5" />,
       items: [
-        { name: "Profile", path: "/settings/profile" },
-        { name: "Security", path: "/settings/security" },
-        { name: "Notifications", path: "/settings/notifications" },
-        { name: "Preferences", path: "/settings/preferences" }
+        { name: "Profile", path: "profile" },
       ]
     }
   ];
@@ -129,14 +118,16 @@ const Sidebar = () => {
   return (
     <div className="flex flex-col h-full bg-white border-r border-gray-200">
       <div className="p-4 border-b border-gray-200">
+          <Link to="/profile">
         <div className="h-8 flex items-center space-x-2">
           <img 
-            src="/api/placeholder/200/80" 
+            src={logo} 
             alt="Logo" 
             className="h-full object-contain"
           />
           <span className="font-semibold text-xl text-gray-800">Dashboard</span>
         </div>
+          </Link>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">

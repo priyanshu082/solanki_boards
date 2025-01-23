@@ -113,7 +113,6 @@ interface FormData {
 
   // Sample options for dropdowns
   const centers = ["Center 1", "Center 2", "Center 3"];
-  const subCenters = ["Sub Center 1", "Sub Center 2", "Sub Center 3"];
   const admissionTypes = ["Regular", "Management", "NRI"];
   const sessions = ["2024-25", "2025-26"];
   const courses = ["Course 1", "Course 2", "Course 3"];
