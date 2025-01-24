@@ -147,7 +147,7 @@ const Profile = () => {
 //   if (!userData) return <div>Loading...</div>;
 
   return (
-    <Card className="w-[83vw] h-full mx-auto">
+    <Card className="w-[80vw] rounded-none h-full mx-auto">
       <CardHeader>
         <CardTitle>User Details</CardTitle>
       </CardHeader>

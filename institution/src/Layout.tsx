@@ -1,6 +1,6 @@
-// Layout.jsx
 import { Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
+import Navbar from './components/Navbar'; // Import Navbar component
 
 const Layout = () => {
   return (
@@ -11,10 +11,18 @@ const Layout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-[20vw] overflow-auto ">
-        <main className="">
-          <Outlet />
-        </main>
+      <div className="flex-1 ml-[20vw]">
+        {/* Fixed Navbar */}
+        <div className="fixed left-[20vw] right-0 top-0 z-20">
+          <Navbar />
+        </div>
+
+        {/* Main Content Below Navbar */}
+        <div className="mt-16 overflow-auto">
+          <main>
+            <Outlet />
+          </main>
+        </div>
       </div>
     </div>
   );
