@@ -3,9 +3,7 @@ import { Button } from './ui/button';
 import avatar from "../assets/dummy.jpeg"
 import { 
   Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
+  CardContent
 } from "@/components/ui/card"
 import {
   Select,
