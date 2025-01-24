@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronRight, Package, Settings } from 'lucide-react';
+import { 
+  ChevronDown, 
+  ChevronRight, 
+  Package, 
+  Settings, 
+  Menu, 
+  X 
+} from 'lucide-react';
 import logo from "../assets/logo.png"
 import {
   Collapsible,
@@ -24,7 +31,8 @@ interface MenuSection {
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({});
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const menuItems: MenuSection[] = [
     {
@@ -38,17 +46,6 @@ const Sidebar = () => {
         { name: "Fee Payment", path: "/fee-payment" },
       ]
     },
-    // {
-    //   title: "Accounts",
-    //   path: "/accounts",
-    //   icon: <Users className="h-5 w-5" />,
-    //   items: [
-    //     { name: "My Wallet", path: "/accounts/my-wallet" },
-    //     { name: "My Account", path: "/accounts/my-account" },
-    //     { name: "Fee Payment", path: "/accounts/fee-payment" },
-    //     { name: "Short Payments", path: "/accounts/short-payments" }
-    //   ]
-    // },
     {
       title: "Settings",
       path: "/settings",
@@ -73,7 +70,10 @@ const Sidebar = () => {
           ? 'bg-blue-50 text-blue-600 font-medium' 
           : 'text-gray-600 hover:translate-x-1'
         }`}
-      onClick={() => navigate(item.path)}
+      onClick={() => {
+        navigate(item.path);
+        setIsMobileSidebarOpen(false);
+      }}
       type="button"
     >
       {item.name}
@@ -90,7 +90,7 @@ const Sidebar = () => {
         className="mb-2"
       >
         <CollapsibleTrigger 
-          className={`flex items-center w-[15vw] p-3 hover:bg-blue-50 rounded-lg transition-all duration-200
+          className={`flex items-center w-full p-3 hover:bg-blue-50 rounded-lg transition-all duration-200
             ${isMenuActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
           onClick={() => toggleMenu(section.title)}
         >
@@ -116,28 +116,58 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white border-r border-gray-200">
-      <div className="p-4 border-b border-gray-200">
-          <Link to="/profile">
-        <div className="h-8 flex items-center space-x-2">
-          <img 
-            src={logo} 
-            alt="Logo" 
-            className="h-full object-contain"
-          />
-          <span className="font-semibold text-xl text-gray-800">Dashboard</span>
-        </div>
-          </Link>
-      </div>
+    <>
+      {/* Mobile Hamburger Button */}
+      <button 
+        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg shadow-md"
+        onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+      >
+        {isMobileSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+      </button>
 
-      <div className="flex-1 overflow-y-auto p-4">
-        <nav className="space-y-2">
-          {menuItems.map(section => (
-            <MenuSection key={section.title} section={section} />
-          ))}
-        </nav>
+      {/* Overlay for Mobile */}
+      {isMobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Desktop and Mobile */}
+      <div 
+        className={`
+          fixed top-0 left-0 h-full w-[80vw] max-w-[300px] bg-white border-r border-gray-200 
+          transform transition-transform duration-300 z-50
+          md:relative md:translate-x-0
+          ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+          <Link to="/profile" className="flex items-center space-x-2">
+            <img 
+              src={logo} 
+              alt="Logo" 
+              className="h-8 object-contain"
+            />
+            <span className="font-semibold text-xl text-gray-800">Dashboard</span>
+          </Link>
+          <button 
+            className="md:hidden"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4">
+          <nav className="space-y-2">
+            {menuItems.map(section => (
+              <MenuSection key={section.title} section={section} />
+            ))}
+          </nav>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

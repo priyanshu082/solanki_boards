@@ -124,14 +124,11 @@ interface FormData {
   const cities = ["City 1", "City 2", "City 3"];
 
   return (
-    <Card className="w-[80vw] flex flex-col mx-auto ">
-      <CardHeader>
-        <CardTitle>Register Student</CardTitle>
-      </CardHeader>
-
+    <Card className=" flex flex-col mx-auto ">
+      
       <CardContent>
         <div className='flex flex-col '>
-        <div className="py-2 h-fit">
+        <div className="py-2">
             <div className="flex flex-col sm:flex-row items-center md:items-start gap-6">
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-[150px] h-[150px] border-2 border-gray-200 rounded-md overflow-hidden">

@@ -6,6 +6,8 @@ import UploadDocuments from './pages/Students/UploadDocuments'
 import ShowStudents from './pages/Students/ShowStudents'
 import Profile from './pages/Profile'
 import FeePayment from './pages/Students/FeePayment'
+import { LogIn } from 'lucide-react'
+import { Auth } from './pages/Login'
 // import Layout from './components/Sidebar'
 // import { Signin } from './pages/Signin'
 // import { Home } from './pages/Home'
@@ -38,6 +40,7 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="fee-payment" element={<FeePayment />} />
         </Route>
+        <Route path="/login" element={<Auth/>}/>
       </Routes>
     </BrowserRouter>
   )
