@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import dummy from "../assets/dummy.jpeg"
 
 // Define TypeScript interfaces for type safety
 interface PersonalDetails {
@@ -100,7 +101,7 @@ const StudentProfile: React.FC = () => {
         <CardHeader className="bg-gradient-to-r from-blue-400 to-indigo-900 text-white p-6">
           <div className="grid md:grid-cols-[auto_1fr] items-center gap-6">
             <img 
-              src={personalDetails.profileImage} 
+              src={dummy} 
               alt={personalDetails.name} 
               className="w-56 h-56 mx-auto md:mx-0 rounded-full object-cover border-6 border-white shadow-lg"
             />

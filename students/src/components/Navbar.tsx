@@ -23,7 +23,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="relative flex items-center justify-between p-4 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-800 shadow-md z-50">
+    <nav className="relative flex items-center justify-between py-2 px-8 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-800 shadow-md z-50">
       {/* Logo and Heading Section */}
       <div className="flex items-center flex-col space-x-2 justify-center">
         <img 
