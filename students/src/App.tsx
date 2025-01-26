@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 
 import Navbar from './components/Navbar'
+import StudentIDCard from './pages/IDCard'
 // import Layout from './components/Sidebar'
 // import { Signin } from './pages/Signin'
 // import { Home } from './pages/Home'
@@ -27,6 +28,7 @@ function App() {
     <Navbar/>
       <Routes>
         <Route path="/" element={<Home />}/>
+        <Route path="/id-card" element={<StudentIDCard/>}/>
       </Routes>
     </BrowserRouter>
   )

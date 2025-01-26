@@ -17,6 +17,7 @@ import {
   AccordionTrigger 
 } from "@/components/ui/accordion";
 import { Menu } from "lucide-react";
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,14 +39,18 @@ const Navbar = () => {
         <NavigationMenu>
           <NavigationMenuList className="flex space-x-4">
             <NavigationMenuItem>
+              <Link to="/">
               <Button variant="ghost" className="text-slate-700 hover:bg-slate-200">Dashboard</Button>
+              </Link>
             </NavigationMenuItem>
             
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-slate-700 hover:bg-slate-200">I-Card</NavigationMenuTrigger>
               <NavigationMenuContent className="z-50 bg-white text-slate-800 shadow-lg rounded-md">
                 <div className="p-2 space-y-2 w-[15vw] items-center">
+                  <Link to="/id-card">
                   <NavigationMenuLink className="block  hover:bg-slate-100 p-2 rounded">View I-Card</NavigationMenuLink>
+                  </Link>
                   <NavigationMenuLink className="block hover:bg-slate-100 p-2 rounded">Download I-Card</NavigationMenuLink>
                 </div>
               </NavigationMenuContent>
