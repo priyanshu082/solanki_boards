@@ -8,14 +8,8 @@ import { Navbar } from "./components/Navbar";
 import { ReactNode } from 'react';
 import ChildPolicy from "./pages/policyPages/ChildPolicy";
 import WhySBCODL from "./pages/WhySBCODL";
+import ChairmanMessage from "./pages/ChairmanMessage";
 
-
-const Services = () => (
-  <div className="min-h-screen p-8">
-    <h1 className="text-3xl font-bold">Our Services</h1>
-    <p className="mt-4">Explore our services.</p>
-  </div>
-);
 
 interface LayoutProps {
   children: ReactNode;
@@ -70,7 +64,7 @@ function App() {
             path="/services"
             element={
               <Layout>
-                <Services />
+                <ChairmanMessage />
               </Layout>
             }
           />

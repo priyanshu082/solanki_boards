@@ -1,150 +1,107 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
-// import { ScrollArea } from "@/components/ui/scroll-area";
-import SBCODLAdditionalSections from "../components/SBCODLAdditionalSections";
-import campus from "../assets/images/img10.jpeg"
-import board from "../assets/images/img12.jpeg"
+import React, { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import img from "../assets/images/img3.jpeg"
 
-const WhySBCODL = () => {
+interface DropdownItem {
+  title: string;
+  content: string;
+}
+
+const dropdowns: DropdownItem[] = [
+  {
+    title: "Our Mission",
+    content: "To provide world-class education that empowers students to become global citizens and lifelong learners."
+  },
+  {
+    title: "Our Vision",
+    content: "To be the leading educational institution that nurtures innovative thinkers and compassionate leaders."
+  },
+  {
+    title: "Our Values",
+    content: "Excellence, Innovation, Integrity, Collaboration, and Global Mindedness guide everything we do."
+  }
+];
+
+const WhySBCODL: React.FC = () => {
+  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+
+  const toggleDropdown = (index: number): void => {
+    setOpenDropdown(openDropdown === index ? null : index);
+  };
+
   return (
-    <div className=" mx-auto px-4 pt-8 bg-white text-white">
-      {/* Hero Section */}
-      <div className="relative w-full h-64 mb-8 bg-blue-100 rounded-lg overflow-hidden">
-        <img 
-          src={campus} 
-          alt="SBCODL Campus"
-          className="object-cover w-full h-full"
-        />
-        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <h1 className="text-4xl font-bold text-white text-center">
-            Solanki Brothers Council for Open and Distance Learning
-          </h1>
+    <div className="flex flex-col bg-white text-gray-800 px-4 lg:px-8 mx-auto w-full">
+      {/* Top Section */}
+      <div className="flex flex-col lg:flex-row">
+        {/* heading */}
+        <div className="p-4 lg:p-12 w-full lg:w-[25vw] text-xl lg:text-2xl font-serif text-blue-800 font-light leading-8 lg:leading-10">
+          ABOUT THE <br/>
+          Solanki brother solanki brother soalnki brother
+        </div>
+        
+        {/* content of top */}
+        <div className="p-4 lg:p-12 w-full lg:w-[50vw] text-sm lg:text-base">
+          The International Baccalaureate (IB) is a global leader in international education—
+          developing inquiring, knowledgeable, confident, and caring young people. Our programmes 
+          empower school-aged students to take ownership in their own learning and help them 
+          develop future-ready skills to make a difference and thrive in a world that changes fast.
         </div>
       </div>
 
-      {/* Board Profile Section */}
-      <Card className="mb-8">
-        <CardHeader >
-          <CardTitle>Board Profile</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <p >
-                Established in 2022, the Solanki Brothers Council for Open and Distance Learning (SBCODL) 
-                is a pioneering autonomous educational body committed to advancing quality education through 
-                innovative teaching methodologies. As an ISO 9001:2015 certified institute operating under 
-                Section 8 of the Companies Act, 2013, SBCODL is dedicated to fostering a learning environment 
-                that promotes academic excellence, inclusivity, and lifelong learning.
-              </p>
-            </div>
-            <div className="relative h-48">
-              <img 
-                src={board} 
-                alt="Board Members"
-                className="rounded-lg object-cover w-full h-full"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Lower Section */}
+      <div className="flex flex-col lg:flex-row mt-4 lg:mt-8">
+        {/* Left Content Section */}
+        <div className="w-full lg:w-[50vw] p-4 lg:p-12">
+          {/* Lower Section Heading */}
+          <h2 className="text-xl lg:text-2xl font-serif text-blue-950 font-semibold mb-4 lg:mb-4">
+          Delivering a powerful continuum of student-centric learning for students aged 3-19 years.
+          </h2>
 
-      {/* Vision and Mission */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Vision</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="">
-              SBCODL envisions becoming a global leader in open and distance education, 
-              empowering students with the knowledge, skills, and confidence to succeed 
-              in a dynamic world.
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Mission</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="">
-              To bridge educational gaps and provide quality education accessible to all learners, 
-              irrespective of geographical or socioeconomic constraints.
-            </p>
-          </CardContent>
-        </Card>
+          {/* Lower Section Content */}
+          <p className="mb-4 lg:mb-8 text-sm lg:text-base text-gray-700">
+            Our commitment to educational excellence spans decades, with a proven track record
+            of nurturing students who go on to achieve remarkable success in their chosen fields.
+            We believe in a holistic approach to education that combines academic rigor with
+            personal development.
+          </p>
+
+          {/* Dropdowns */}
+          <div className="space-y-3 lg:space-y-4">
+            {dropdowns.map((dropdown: DropdownItem, index: number) => (
+              <div key={index} className="border border-gray-200 rounded-lg">
+                <button
+                  onClick={() => toggleDropdown(index)}
+                  className="w-full flex justify-between items-center p-3 lg:p-4 text-left hover:bg-gray-50 text-sm lg:text-base"
+                  type="button"
+                >
+                  <span className="font-medium">{dropdown.title}</span>
+                  {openDropdown === index ? (
+                    <ChevronUp className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500" />
+                  )}
+                </button>
+                {openDropdown === index && (
+                  <div className="p-3 lg:p-4 bg-gray-50 text-sm lg:text-base">
+                    {dropdown.content}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Image Section */}
+        <div className="w-full lg:w-[50vw] p-4 lg:p-12 mt-4 lg:mt-0">
+          <div className="h-[50vh] lg:h-full w-full bg-gray-200 rounded-lg overflow-hidden">
+            <img
+              src={img}
+              alt="Educational Environment"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
       </div>
-
-      {/* Global Recognition */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Global Recognition and Memberships</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[
-              "American Montessori Society",
-              "Association of Business Administrators of Christian Colleges",
-              "Australian Boarding Schools Association",
-              "Mediterranean Association of International Schools (MAIS)",
-              "Global Education Accrediting Commission (GEAC)",
-              "Society for Mining, Metallurgy & Exploration",
-              "The American Ceramic Society",
-              "International Association of University Presidents (IAUP)",
-              "The Council of International Schools India (TCISI)",
-              "International Association for College Admission Counseling (ACAC)"
-            ].map((membership, index) => (
-              <Badge key={index} variant="secondary" className="p-2 text-center">
-                {membership}
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Why Choose SBCODL */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Why Choose SBCODL?</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Global Standards",
-                description: "Adherence to internationally recognized academic practices"
-              },
-              {
-                title: "Diverse Programs",
-                description: "A wide range of academic and skill-based courses"
-              },
-              {
-                title: "International Memberships",
-                description: "Partnerships with leading global educational organizations"
-              },
-              {
-                title: "Student Support",
-                description: "Comprehensive resources for academic success and personal growth"
-              },
-              {
-                title: "Innovative Learning",
-                description: "Integration of technology to deliver engaging, interactive educational experiences"
-              }
-            ].map((reason, index) => (
-              <Card key={index} className="bg-secondary">
-                <CardHeader>
-                  <CardTitle className="text-lg ">{reason.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="">{reason.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-        <SBCODLAdditionalSections/>
     </div>
   );
 };
