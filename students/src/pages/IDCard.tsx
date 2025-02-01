@@ -1,155 +1,114 @@
 import { useState, useEffect } from 'react';
-import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import logo from '../assets/logo.png';
-import idcard from "../assets/idcard.jpg"
+import frontCardBg from '../assets/idfront.png'; // You'll need to add these images
+import backCardBg from '../assets/idback.png';  // You'll need to add these images
+import dummy from "../assets/idcard.jpg"
 
-type StudentData = {
+interface StudentData {
     name: string;
     enrollmentNumber: string;
-    examination: string;
+    course: string;
     address: string;
-    contact: string;
-    campusAddress: string;
-    photo: string;
-};
+}
 
 const StudentIDCard = () => {
     const [studentData, setStudentData] = useState<StudentData | null>(null);
 
-    const fetchData = async () => {
-        try {
-            const response = await fetch('YOUR_API_ENDPOINT_HERE');
-            const data = await response.json();
-            setStudentData(data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            // Fallback dummy data
-            setStudentData({
-                name: "Virendra Singh",
-                enrollmentNumber: "10124002324",
-                examination: "Secondary School Examination",
-                address: "Sudan Khera Alampur, Lalganj, Raebareli, Uttar Pradesh, 229206",
-                contact: "+91 7392851721",
-                campusAddress: "Sikkim (BOSSE), Amdo Golai, NH-10, Near RBI Bank, Gangtok, Sikkim - 737102",
-                photo: "https://via.placeholder.com/100"
-            });
-        }
-    };
-
     useEffect(() => {
-        fetchData();
+        const fetchStudentData = async () => {
+            try {
+                const response = await fetch('YOUR_API_ENDPOINT');
+                const data: StudentData = await response.json();
+                setStudentData(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                // Fallback dummy data
+                setStudentData({
+                    name: "Virendra Singh",
+                    enrollmentNumber: "10124002324",
+                    course: "Secondary School Examination",
+                    address: "Sudan Khera Alampur, Lalganj, Raebareli, Uttar Pradesh, 229206"
+                });
+            }
+        };
+
+        fetchStudentData();
     }, []);
 
-    const handleDownloadPDF = async () => {
-        const frontElement = document.getElementById("id-card-front") as HTMLElement;
-        const backElement = document.getElementById("id-card-back") as HTMLElement;
+    const handleDownloadImage = (elementId: string, fileName: string): void => {
+        const element = document.getElementById(elementId);
+        if (!element) return;
 
-        try {
-            const frontCanvas = await html2canvas(frontElement, {
-                // Add this option to resolve color parsing issues
-                useCORS: true,
-                scale: 2,
-                logging: false
-            });
-            const frontImage = frontCanvas.toDataURL("image/png");
-
-            const backCanvas = await html2canvas(backElement, {
-                // Same options for back side
-                useCORS: true,
-                scale: 2,
-                logging: false
-            });
-            const backImage = backCanvas.toDataURL("image/png");
-
-            const doc = new jsPDF('landscape', 'mm', [85.6, 53.98]);
-
-            // Add front side to PDF
-            doc.addImage(frontImage, 'PNG', 0, 0, 85.6, 53.98);
-            doc.save(`${studentData?.name || 'Student'}_ID_Card_Front.pdf`);
-
-            // Add back side to PDF (create a new document)
-            const backDoc = new jsPDF('landscape', 'mm', [85.6, 53.98]);
-            backDoc.addImage(backImage, 'PNG', 0, 0, 85.6, 53.98);
-            backDoc.save(`${studentData?.name || 'Student'}_ID_Card_Back.pdf`);
-
-        } catch (error) {
-            console.error("Error generating PDF:", error);
-        }
-    };
+        // Create a canvas from the element
+        html2canvas(element, {
+            useCORS: true,
+            scale: 2,
+            logging: false
+        }).then((canvas: HTMLCanvasElement) => {
+            // Convert to image and trigger download
+            const link = document.createElement('a');
+            link.download = `${fileName}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
             {studentData ? (
-                <div className="flex flex-col gap-4 md:flex-row">
-                    {/* Front of ID Card */}
-                    <div id="id-card-front" className="w-[100.6mm] h-[120.98mm] rounded-lg shadow-lg border border-gray-300 flex flex-col items-center justify-between p-4 relative">
-                        <div className="absolute inset-0">
-                            <img
-                                src={logo}
-                                alt="School Background"
-                                className="w-full h-full object-cover opacity-20" // Changed opacity to a standard value
-                            />
-                        </div>
-                        <div className="text-center relative z-10">
-                            <img src={logo} alt="School Logo" className="h-12 mx-auto" />
-                            <h1 className="text-lg font-extrabold text-black mt-2">SBCODL</h1>
+                <div className="flex flex-col gap-8 md:flex-row">
+                    {/* Front Card */}
+                    <div
+                        id="front-card"
+                        className="relative w-[82.6mm] h-[140.98mm] rounded-lg shadow-lg overflow-hidden"
+                        style={{ backgroundImage: `url(${frontCardBg})`, backgroundSize: 'cover' }}>  
+
+                        <div className="absolute mt-[330px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                            <img src={dummy} alt="pik" className='h-32 w-32 rounded-sm mx-auto' />
+                            <h2 className="text-lg font-bold text-white">{studentData.name}</h2>
+                            <p className="text-sm text-white">{studentData.course}</p>
                         </div>
 
-                        <div className="flex flex-col items-center">
-                            <img src={idcard} alt="Student" className="h-20 w-20 rounded-full border-2 z-20 border-gray-300 mb-2" />
-                            <h2 className="text-lg font-bold text-blue-900">{studentData.name}</h2>
-                            <p className="text-sm text-blue-900">{studentData.examination}</p>
-                        </div>
-
-                        <div className="text-xs text-blue-900 text-center">
-                            <p>{studentData.enrollmentNumber}</p>
-                            <p>Enrollment No.</p>
-                        </div>
-
-                        <div className="w-full text-right text-xs text-blue-900">
-                            <p>Co-ordinator</p>
+                        {/* Bottom left content */}
+                        <div className="absolute bottom-6 left-2 text-white font-medium" >
+                            <p className=' text-sm'>ENROLLMENT NO:</p>
+                            <p className="text-sm ">{studentData.enrollmentNumber}</p>
                         </div>
                     </div>
 
-                    {/* Back of ID Card */}
-                    <div id="id-card-back" className="w-[100.6mm] h-[120.98mm] bg-white rounded-lg shadow-lg border border-gray-300 flex flex-col p-4 relative">
-                        <div className="absolute inset-0">
-                            <img
-                                src={logo}
-                                alt="School Background"
-                                className="w-full h-full object-cover opacity-20" // Changed opacity to a standard value
-                            />
-                        </div>
-                        <h2 className="text-base font-bold text-blue-800 border-b pb-1 mb-2">Student's Address:</h2>
-                        <p className="text-sm text-gray-700 mb-2">{studentData.address}</p>
-                        <h2 className="text-base font-bold text-blue-800 border-b pb-1 mb-2">Campus Address:</h2>
-                        <p className="text-sm text-gray-700 mb-4">{studentData.campusAddress}</p>
-                        <h2 className="text-base font-bold text-blue-800 border-b pb-1 mb-2">Contact:</h2>
-                        <p className="text-sm text-gray-700 mb-4">{studentData.contact}</p>
-
-                        <h2 className="text-base font-bold text-blue-800 border-b pb-1 mb-2">Instructions:</h2>
-                        <ul className="text-sm text-gray-700 list-decimal list-inside space-y-1">
-                            <li>This card is non-transferable and must be surrendered at the time of leaving the Board.</li>
-                            <li>Loss of this card must be reported to the issuing authority and nearest police station immediately.</li>
-                        </ul>
-
-                        <div className="flex justify-center items-center mt-4">
-                            <img src={logo} alt="School Logo" className="h-10" />
-                        </div>
+                    {/* Back Card */}
+                    <div
+                        id="back-card"
+                        className="relative w-[82.6mm] h-[140.98mm] rounded-lg shadow-lg overflow-hidden"
+                        style={{ backgroundImage: `url(${backCardBg})`, backgroundSize: 'cover' }}
+                    >
+                         <div className="absolute top-16 ml-[20px] px-4 text-black">
+              <h3 className="text-[10px] font-bold ml-[65px]">STUDENT ADDRESS:</h3>
+              <p className="text-[10px] text-center break-words font-bold ml-[8px] w-[230px]">
+                {studentData.address}
+              </p>
+            </div>
                     </div>
                 </div>
             ) : (
-                <p>Loading student data...</p>
+                <div className="text-gray-600">Loading student data...</div>
             )}
 
             {studentData && (
-                <button
-                    onClick={handleDownloadPDF}
-                    className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
-                >
-                    Download ID Card as PDF
-                </button>
+                <div className="flex gap-4 mt-6">
+                    <button
+                        onClick={() => handleDownloadImage('front-card', `${studentData.name}_front_card`)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
+                    >
+                        Download Front Card
+                    </button>
+                    <button
+                        onClick={() => handleDownloadImage('back-card', `${studentData.name}_back_card`)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
+                    >
+                        Download Back Card
+                    </button>
+                </div>
             )}
         </div>
     );

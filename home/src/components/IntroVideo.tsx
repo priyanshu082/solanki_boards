@@ -1,5 +1,6 @@
 import { Button } from "./ui/button";
 import video from "../assets/videos/introVideo.mp4"
+import { Link } from "react-router-dom";
 const IntroVideo = () => {
   return (
     <div className="relative w-[100vw] h-[50vw] md:h-[55vw] overflow-hidden  md:mt-[0vw] lg:mt-[0vw]">
@@ -25,9 +26,11 @@ const IntroVideo = () => {
           <p className="text-lg md:text-md mt-4 w-[65vw]">
           The Solanki Brothers Council for Open and Distance Learning is committed to shaping lifelong learners who not only thrive in their pursuits but also contribute meaningfully to building a better, more inclusive world
           </p>
+          <Link to="/why-sbcodl">
           <Button className="mt-2 w-fit mx-auto text-xl bg-blue-500" >
            Why SBCODL is Unique ?
           </Button>
+          </Link>
         </div>
       </div>
     </div>

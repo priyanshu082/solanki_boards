@@ -64,6 +64,9 @@ const Footer = () => {
                             <p>Email: contact@solankiboard.com</p>
                             <p>Phone: +91 9876543210</p>
                             <div className="space-x-4">
+                                <a href="/child-policy" className="hover:text-foreground">Child Policy</a>
+                                <a href="#" className="hover:text-foreground">Privacy Policy</a>
+                                <a href="#" className="hover:text-foreground">Privacy Policy</a>
                                 <a href="#" className="hover:text-foreground">Privacy Policy</a>
                                 <a href="#" className="hover:text-foreground">Terms of Service</a>
                             </div>

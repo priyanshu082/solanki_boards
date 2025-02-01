@@ -186,7 +186,7 @@ export function Navbar() {
     }
   
     return (
-      <div className="flex flex-col pt-[5.5vw] z-[10] bg-blue-900 text-white">
+      <div className="flex flex-col pt-[5.5vw] z-[10]">
         <NavigationMenu className="container mx-auto hidden lg:block">
      
           <NavigationMenuList>

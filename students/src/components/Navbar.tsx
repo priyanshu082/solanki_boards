@@ -25,6 +25,7 @@ const Navbar = () => {
   return (
     <nav className="relative flex items-center justify-between py-2 px-8 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-800 shadow-md z-50">
       {/* Logo and Heading Section */}
+      <Link to="/">
       <div className="flex items-center flex-col space-x-2 justify-center">
         <img 
           src={logo} 
@@ -33,6 +34,8 @@ const Navbar = () => {
         />
         <h1 className="text-sm font-bold text-blue-950">SBCODL</h1>
       </div>
+      </Link>
+      
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex space-x-2 items-center">
@@ -45,15 +48,9 @@ const Navbar = () => {
             </NavigationMenuItem>
             
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-slate-700 hover:bg-slate-200">I-Card</NavigationMenuTrigger>
-              <NavigationMenuContent className="z-50 bg-white text-slate-800 shadow-lg rounded-md">
-                <div className="p-2 space-y-2 w-[15vw] items-center">
-                  <Link to="/id-card">
-                  <NavigationMenuLink className="block  hover:bg-slate-100 p-2 rounded">View I-Card</NavigationMenuLink>
-                  </Link>
-                  <NavigationMenuLink className="block hover:bg-slate-100 p-2 rounded">Download I-Card</NavigationMenuLink>
-                </div>
-              </NavigationMenuContent>
+              <Link to="/id-card">
+              <Button variant="ghost" className="text-slate-700 hover:bg-slate-200">ID-CARD</Button>
+              </Link>
             </NavigationMenuItem>
             
             <NavigationMenuItem>

@@ -4,8 +4,7 @@ import logo from "../assets/logo.png";
 import background from "../assets/bg.jpg";
 import axios from "axios";
 import { BACKEND_URL } from "@/Config";
-import { User, KeyRound, Shield, Eye,EyeOff } from "lucide-react";
-
+import { User, KeyRound, Shield, Eye, EyeOff } from "lucide-react";
 export enum alertTypeEnum {
     success = "success",
     error = "error",
@@ -14,33 +13,33 @@ export enum alertTypeEnum {
 }
 
 interface LoginInput {
-    registrationNumber: string;
+    enrollmentNumber: string;
     dateOfBirth: string;
 }
 
 export const Auth = () => {
     const navigate = useNavigate();
     const [loginInputs, setLoginInputs] = useState<LoginInput>({
-        registrationNumber: "",
+        enrollmentNumber: "",
         dateOfBirth: "",
     });
 
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertType, setAlertType] = useState<alertTypeEnum>();
-    const [showPassword, setShowPassword] = useState(false); 
+    const [showPassword, setShowPassword] = useState(false);
 
     async function sendRequest() {
         try {
             const response = await axios.post(
-                `${BACKEND_URL}/api/v1/user/login`,
+                `${BACKEND_URL}/api/v1/student/login`,
                 loginInputs
             );
 
-            const user = response.data.user;
+            const student = response.data.student;
 
-            localStorage.setItem("id", user.id);
-            localStorage.setItem("name", user.name);
-            localStorage.setItem("role", user.role);
+            localStorage.setItem("id", student.id);
+            localStorage.setItem("name", student.name);
+            localStorage.setItem("role", "student");
 
             setAlertMessage("Login Successful");
             setAlertType(alertTypeEnum.success);
@@ -68,7 +67,7 @@ export const Auth = () => {
             {/* Main Content */}
             <div className="relative z-10 flex flex-col lg:flex-row w-full max-w-6xl mx-auto rounded-lg shadow-lg  ">
                 {/* Left Side */}
-                <div className="hidden lg:flex w-1/2 bg-blue-950 bg-opacity-50 p-8 flex-col rounded-l-lg justify-center items-center">
+                <div className="hidden lg:flex w-1/2 bg-blue-300 bg-opacity-50 p-8 flex-col rounded-l-lg justify-center items-center">
                     <img
                         src={logo}
                         alt="School Logo"
@@ -76,11 +75,11 @@ export const Auth = () => {
                     />
                     <Shield className="h-16 w-16 text-yellow-400 mb-6" />
                     <h1 className="text-3xl font-bold text-yellow-400 mb-4">
-                        Welcome to Institution Portal
+                        Welcome to Student Portal
                     </h1>
                     <p className="text-gray-100 text-lg text-center">
                         Secure access to your personalized dashboard.
-                        Enter your LoginID number and Password to
+                        Enter your Enrollment Number and Date of Birth to
                         continue.
                     </p>
                 </div>
@@ -90,7 +89,7 @@ export const Auth = () => {
                     <div className="max-w-md mx-auto">
                         <div className="text-center mb-8">
                             <h2 className="text-2xl font-bold text-yellow-200">
-                                Institute Login
+                                Student Login
                             </h2>
                             <p className="text-gray-400 mt-2 text-sm">
                                 Enter your credentials to continue.
@@ -98,20 +97,20 @@ export const Auth = () => {
                         </div>
 
                         <div className="space-y-4">
-                            {/* Registration Number Input */}
+                            {/* Enrollment Number Input */}
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <User className="h-5 w-5 text-yellow-200" />
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Login ID"
+                                    placeholder="Enrollment Number"
                                     className="w-full pl-10 pr-3 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                                    value={loginInputs.registrationNumber}
+                                    value={loginInputs.enrollmentNumber}
                                     onChange={(e) =>
                                         setLoginInputs({
                                             ...loginInputs,
-                                            registrationNumber: e.target.value,
+                                            enrollmentNumber: e.target.value,
                                         })
                                     }
                                 />
@@ -119,35 +118,34 @@ export const Auth = () => {
 
                             {/* Date of Birth Input */}
                             <div className="space-y-4">
-  
-    <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <User className="h-5 w-5 text-yellow-200" />
-        </div>
-        <input
-            type={showPassword ? "text" : "password"} // Toggle between text and password
-            placeholder="Password"
-            className="w-full pl-10 pr-10 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
-            value={loginInputs.dateOfBirth} // Example field, replace with the correct password field
-            onChange={(e) =>
-                setLoginInputs({
-                    ...loginInputs,
-                    dateOfBirth: e.target.value, // Example, replace as necessary
-                })
-            }
-        />
-        <div
-            className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-            onClick={() => setShowPassword((prev) => !prev)} // Toggle visibility
-        >
-            {showPassword ? (
-                <EyeOff className="h-5 w-5 text-yellow-200" />
-            ) : (
-                <Eye className="h-5 w-5 text-yellow-200" />
-            )}
-        </div>
-    </div>
-</div>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <User className="h-5 w-5 text-yellow-200" />
+                                    </div>
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Date of Birth"
+                                        className="w-full pl-10 pr-10 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                                        value={loginInputs.dateOfBirth}
+                                        onChange={(e) =>
+                                            setLoginInputs({
+                                                ...loginInputs,
+                                                dateOfBirth: e.target.value,
+                                            })
+                                        }
+                                    />
+                                    <div
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="h-5 w-5 text-yellow-200" />
+                                        ) : (
+                                            <Eye className="h-5 w-5 text-yellow-200" />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
 
                             {/* Login Button */}
                             <button

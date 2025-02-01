@@ -1,160 +1,214 @@
-import  { useState } from 'react';
+import React from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { 
+  formDataState, 
+  centersState, 
+  coursesState,
+  countriesState,
+  statesState,
+  citiesState,
+  admissionTypesState,
+  sessionsState,
+  mediumsState,
+  gendersState,
+  categoriesState,
+} from '../store/atoms/formDataAtoms';
 import { Button } from './ui/button';
-import avatar from "../assets/dummy.jpeg"
 import { 
   Card,
   CardContent
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useEffect } from 'react';
+import axios from 'axios';
 
-
+// Define FormData interface
 interface FormData {
-    center: string;
-    admissionType: string;
-    session: string;
-    course: string;
-    mediumOfInstruction: string;
-    name: string;
-    fatherName: string;
-    motherName: string;
-    gender: string;
-    dateOfBirth: string;
-    contactNumber: string;
-    email: string;
-    adhaarNumber: string;
-    category: string;
-    permanentAddress: string;
-    country: string;
-    state: string;
-    city: string;
-    pincode: string;
-    sameAsPermenant: boolean;
-    corrAddress: string;
-    corrCountry: string;
-    corrState: string;
-    corrCity: string;
-    corrPincode: string;
-  }
+  center: string;
+  admissionType: string;
+  session: string;
+  course: string;
+  mediumOfInstruction: string;
+  name: string;
+  fatherName: string;
+  motherName: string;
+  gender: string;
+  dateOfBirth: string;
+  contactNumber: string;
+  email: string;
+  adhaarNumber: string;
+  category: string;
+  permanentAddress: string;
+  country: string;
+  state: string;
+  city: string;
+  pincode: string;
+  sameAsPermenant: boolean;
+  corrAddress: string;
+  corrCountry: string;
+  corrState: string;
+  corrCity: string;
+  corrPincode: string;
+}
+
+interface FormFieldProps {
+  label: string;
+  children: React.ReactNode;
+  required?: boolean;
+}
+
+const FormField: React.FC<FormFieldProps> = ({ label, children, required }) => (
+  <div className="mb-2">
+    <Label className="block text-sm font-medium mb-0 text-gray-600">
+      {label} {required && <span className="text-red-500">*</span>}
+    </Label>
+    {children}
+  </div>
+);
+
+const RegisterStudentForm: React.FC = () => {
+  const [formData, setFormData] = useRecoilState(formDataState);
+  const setCenters = useSetRecoilState(centersState);
+  const setCourses = useSetRecoilState(coursesState);
+  const setCountries = useSetRecoilState(countriesState);
+  const setStates = useSetRecoilState(statesState);
+  const setCities = useSetRecoilState(citiesState);
+
+  const centers = useRecoilValue(centersState);
+  const courses = useRecoilValue(coursesState);
+  const countries = useRecoilValue(countriesState);
+  const states = useRecoilValue(statesState);
+  const cities = useRecoilValue(citiesState);
   
-  // Interface for FormField props
-  interface FormFieldProps {
-    label: string;
-    children: React.ReactNode;
-    required?: boolean;
-  }
-  
-  const FormField: React.FC<FormFieldProps> = ({ label, children, required }) => (
-    <div className="mb-2">
-      <Label className="block text-sm font-medium mb-0 text-gray-600">
-        {label} {required && <span className="text-red-500">*</span>}
-      </Label>
-      {children}
-    </div>
-  );
-  
-  const RegisterStudentForm: React.FC = () => {
-    const [formData, setFormData] = useState<FormData>({
-      center: '',
-      admissionType: '',
-      session: '',
-      course: '',
-      mediumOfInstruction: '',
-      name: '',
-      fatherName: '',
-      motherName: '',
-      gender: '',
-      dateOfBirth: '',
-      contactNumber: '',
-      email: '',
-      adhaarNumber: '',
-      category: '',
-      permanentAddress: '',
-      country: '',
-      state: '',
-      city: '',
-      pincode: '',
-      sameAsPermenant: false,
-      corrAddress: '',
-      corrCountry: '',
-      corrState: '',
-      corrCity: '',
-      corrPincode: '',
-    });
-  
-    const handleInputChange = <K extends keyof FormData>(field: K, value: FormData[K]): void => {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    };
-  
-    const handleSameAddressChange = (checked: boolean): void => {
-      setFormData(prev => ({
-        ...prev,
-        sameAsPermenant: checked,
-        corrAddress: checked ? prev.permanentAddress : '',
-        corrCountry: checked ? prev.country : '',
-        corrState: checked ? prev.state : '',
-        corrCity: checked ? prev.city : '',
-        corrPincode: checked ? prev.pincode : '',
-      }));
+  const admissionTypes = useRecoilValue(admissionTypesState);
+  const sessions = useRecoilValue(sessionsState);
+  const mediums = useRecoilValue(mediumsState);
+  const genders = useRecoilValue(gendersState);
+  const categories = useRecoilValue(categoriesState);
+
+  // Fetch initial data
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const [centersRes, coursesRes, countriesRes] = await Promise.all([
+          axios.get('/api/centers'),
+          axios.get('/api/courses'),
+          axios.get('/api/countries')
+        ]);
+        
+        setCenters(centersRes.data);
+        setCourses(coursesRes.data);
+        setCountries(countriesRes.data);
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+      }
     };
 
-  // Sample options for dropdowns
-  const centers = ["Center 1", "Center 2", "Center 3"];
-  const admissionTypes = ["Regular", "Management", "NRI"];
-  const sessions = ["2024-25", "2025-26"];
-  const courses = ["Course 1", "Course 2", "Course 3"];
-  const mediums = ["English", "Hindi"];
-  const genders = ["Male", "Female", "Other"];
-  const categories = ["General", "OBC", "SC", "ST"];
-  const countries = ["India", "Other"];
-  const states = ["State 1", "State 2", "State 3"];
-  const cities = ["City 1", "City 2", "City 3"];
+    loadInitialData();
+  }, [setCenters, setCourses, setCountries]);
 
+  // Fetch states when country changes
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (formData.country) {
+        try {
+          const response = await axios.get(`/api/states/${formData.country}`);
+          setStates(response.data);
+        } catch (error) {
+          console.error('Error fetching states:', error);
+        }
+      }
+    };
+
+    fetchStates();
+  }, [formData.country, setStates]);
+
+  // Fetch cities when state changes
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (formData.state) {
+        try {
+          const response = await axios.get(`/api/cities/${formData.state}`);
+          setCities(response.data);
+        } catch (error) {
+          console.error('Error fetching cities:', error);
+        }
+      }
+    };
+
+    fetchCities();
+  }, [formData.state, setCities]);
+
+  const handleInputChange = <K extends keyof FormData>(field: K, value: FormData[K]): void => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+      // Reset dependent fields when parent field changes
+      ...(field === 'country' && {
+        state: '',
+        city: '',
+        corrState: prev.sameAsPermenant ? '' : prev.corrState,
+        corrCity: prev.sameAsPermenant ? '' : prev.corrCity,
+      }),
+      ...(field === 'state' && {
+        city: '',
+        corrCity: prev.sameAsPermenant ? '' : prev.corrCity,
+      }),
+    }));
+  };
+
+  const handleSameAddressChange = (checked: boolean): void => {
+    setFormData(prev => ({
+      ...prev,
+      sameAsPermenant: checked,
+      corrAddress: checked ? prev.permanentAddress : '',
+      corrCountry: checked ? prev.country : '',
+      corrState: checked ? prev.state : '',
+      corrCity: checked ? prev.city : '',
+      corrPincode: checked ? prev.pincode : '',
+    }));
+  };
+
+  // Rest of your JSX remains the same...
   return (
-    <Card className=" flex flex-col mx-auto ">
-      
+    <Card className="flex flex-col mx-auto">
       <CardContent>
-        <div className='flex flex-col '>
-        <div className="py-2">
+        <div className='flex flex-col'>
+          <div className="py-2">
             <div className="flex flex-col sm:flex-row items-center md:items-start gap-6">
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-[150px] h-[150px] border-2 border-gray-200 rounded-md overflow-hidden">
                   <img
-                    src={avatar}
-                    alt=""
+                    src="/api/placeholder/150/150"
+                    alt="Student Photo"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                
               </div>
 
               <div className="flex flex-col justify-center">
-
                 <div className='flex flex-col justify-center items-center md:items-start'>
-                <h3 className="text-lg font-normal mb-2">Student Photo</h3>
-                <Button 
-                  variant="outline" 
-                  className="bg-blue-500 text-white hover:bg-blue-600 w-fit ">
-                  Change
-                </Button>
+                  <h3 className="text-lg font-normal mb-2">Student Photo</h3>
+                  <Button 
+                    variant="outline" 
+                    className="bg-blue-500 text-white hover:bg-blue-600 w-fit">
+                    Change
+                  </Button>
                 </div>
 
                 <div className='text-purple-800 font-bold text-sm mt-[4vw] flex flex-col justify-center items-center md:items-start'>
-                NOTE:-BOARDS IN THE LIST OF MOE WILL BE ACCEPTED.CHECK YOUR BOARD BEFORE PLACING ADMISSIONS.
+                  NOTE: BOARDS IN THE LIST OF MOE WILL BE ACCEPTED. CHECK YOUR BOARD BEFORE PLACING ADMISSIONS.
                 </div>
               </div>
-              
             </div>
           </div>
         <form className="space-y-2">

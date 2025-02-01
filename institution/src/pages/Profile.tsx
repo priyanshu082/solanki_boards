@@ -70,6 +70,7 @@ interface UserData {
 
 const Profile = () => {
     const [userData, setUserData] = useState<UserData | null>(null);
+    //@ts-ignore
   const [profileImage, setProfileImage] = useState(null);
 
   // Fetch user data on component mount
