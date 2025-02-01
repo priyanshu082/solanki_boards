@@ -7,6 +7,7 @@ import middleYearsImage from '../../assets/images/img4.jpeg'
 import upperYearsImage from '../../assets/images/img2.jpeg'
 import diplomaProgrammeImage from '../../assets/images/img6.jpeg'
 import certificateProgrammeImage from '../../assets/images/img1.jpeg'
+import { Link } from 'react-router-dom'
 
 const SCHOOL_SECTIONS = [
     {
@@ -59,9 +60,12 @@ Our vision is to transform individual lives and, by extension, create a more jus
     </p>
                 </div>
                 <div className='flex flex-col gap-2 mt-5'>
+                    <Link to="/chairman">
                     <Button variant='outline' className='text-white px-5 py-5 text-lg w-fit'>
                         Chairman Message
                     </Button>
+                    </Link>
+                    
                     <Button variant='outline' className='text-white px-5 py-5 text-lg w-fit'>
                         Learn More
                     </Button>

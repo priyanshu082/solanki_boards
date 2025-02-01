@@ -9,6 +9,10 @@ import { ReactNode } from 'react';
 import ChildPolicy from "./pages/policyPages/ChildPolicy";
 import WhySBCODL from "./pages/WhySBCODL";
 import ChairmanMessage from "./pages/ChairmanMessage";
+import CookiePolicy from "./pages/policyPages/CookiePolicy";
+import PrivacyPolicy from "./pages/policyPages/PrivacyPolicy";
+import SafeguardingPolicy from "./pages/policyPages/SafeGuardingPolicy";
+import SaferRecruitmentPolicy from "./pages/policyPages/SaferRecruitmentPolicy";
 
 
 interface LayoutProps {
@@ -53,6 +57,38 @@ function App() {
             }
           />
           <Route
+            path="/cookie-policy"
+            element={
+              <Layout>
+                <CookiePolicy />
+              </Layout>
+            }
+          />
+          <Route
+            path="/privacy-policy"
+            element={
+              <Layout>
+                <PrivacyPolicy />
+              </Layout>
+            }
+          />
+          <Route
+            path="/safeguarding-policy"
+            element={
+              <Layout>
+                <SafeguardingPolicy />
+              </Layout>
+            }
+          />
+          <Route
+            path="/saferrecruitment-policy"
+            element={
+              <Layout>
+                <SaferRecruitmentPolicy />
+              </Layout>
+            }
+          />
+          <Route
             path="/why-sbcodl"
             element={
               <Layout>
@@ -61,7 +97,7 @@ function App() {
             }
           />
           <Route
-            path="/services"
+            path="/chairman"
             element={
               <Layout>
                 <ChairmanMessage />

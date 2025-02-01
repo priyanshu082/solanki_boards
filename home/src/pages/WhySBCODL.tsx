@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import img from "../assets/images/img3.jpeg"
+import ContentComponent from '../components/ContentComponent';
 
 interface DropdownItem {
   title: string;
@@ -34,13 +35,13 @@ const WhySBCODL: React.FC = () => {
       {/* Top Section */}
       <div className="flex flex-col lg:flex-row">
         {/* heading */}
-        <div className="p-4 lg:p-12 w-full lg:w-[25vw] text-xl lg:text-2xl font-serif text-blue-800 font-light leading-8 lg:leading-10">
+        <div className="p-4 lg:p-12 w-full lg:w-[45vw] text-xl lg:text-3xl font-serif text-blue-800 font-light leading-8 lg:leading-[4vw]">
           ABOUT THE <br/>
           Solanki brother solanki brother soalnki brother
         </div>
         
         {/* content of top */}
-        <div className="p-4 lg:p-12 w-full lg:w-[50vw] text-sm lg:text-base">
+        <div className="p-4 lg:p-12 w-full leading-10 text-xl">
           The International Baccalaureate (IB) is a global leader in international education—
           developing inquiring, knowledgeable, confident, and caring young people. Our programmes 
           empower school-aged students to take ownership in their own learning and help them 
@@ -49,7 +50,7 @@ const WhySBCODL: React.FC = () => {
       </div>
 
       {/* Lower Section */}
-      <div className="flex flex-col lg:flex-row mt-4 lg:mt-8">
+      <div className="flex flex-col lg:flex-row mt-4 lg:mt-8 bg-blue-200 rounded-tr-[7vw] rounded-lg">
         {/* Left Content Section */}
         <div className="w-full lg:w-[50vw] p-4 lg:p-12">
           {/* Lower Section Heading */}
@@ -68,10 +69,10 @@ const WhySBCODL: React.FC = () => {
           {/* Dropdowns */}
           <div className="space-y-3 lg:space-y-4">
             {dropdowns.map((dropdown: DropdownItem, index: number) => (
-              <div key={index} className="border border-gray-200 rounded-lg">
+              <div key={index} className="border border-gray-800 rounded-lg">
                 <button
                   onClick={() => toggleDropdown(index)}
-                  className="w-full flex justify-between items-center p-3 lg:p-4 text-left hover:bg-gray-50 text-sm lg:text-base"
+                  className="w-full flex justify-between items-center p-3 lg:p-4 text-left hover:bg-blue-50 text-sm lg:text-base rounded-lg"
                   type="button"
                 >
                   <span className="font-medium">{dropdown.title}</span>
@@ -92,7 +93,7 @@ const WhySBCODL: React.FC = () => {
         </div>
 
         {/* Right Image Section */}
-        <div className="w-full lg:w-[50vw] p-4 lg:p-12 mt-4 lg:mt-0">
+        <div className="w-full lg:w-[50vw] p-4 lg:p-12 mt-4 lg:mt-0 rounded-4xl">
           <div className="h-[50vh] lg:h-full w-full bg-gray-200 rounded-lg overflow-hidden">
             <img
               src={img}
@@ -102,6 +103,14 @@ const WhySBCODL: React.FC = () => {
           </div>
         </div>
       </div>
+
+<div className='bg-white w-full '>
+<ContentComponent/>
+<ContentComponent/>
+<ContentComponent/>
+<ContentComponent/>
+</div>
+
     </div>
   );
 };

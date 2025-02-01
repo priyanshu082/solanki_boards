@@ -1,4 +1,4 @@
-
+import chairman from "../assets/images/chairman2.jpeg"
 const ChairmanMessage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -11,56 +11,46 @@ const ChairmanMessage = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Image Column */}
-          <div className="md:w-1/3">
-            <div className="sticky top-8">
+          <div className="md:w-1/5">
+            <div className="sticky top-28">
               <img
-                src="/api/placeholder/400/500"
+                src={chairman}
                 alt="Chairman"
-                className="w-full rounded-lg shadow-lg mb-4"
+                className="h-[20vw] rounded-lg shadow-lg mb-4"
               />
               <div className="text-center">
-                <h2 className="text-xl font-semibold text-gray-800">John Smith</h2>
-                <p className="text-gray-600">Chairman & CEO</p>
+                <h2 className="text-xl font-semibold text-gray-800">SBCODL Chairman</h2>
+                <p className="text-gray-600">Chairman</p>
               </div>
             </div>
           </div>
 
           {/* Message Column */}
-          <div className="md:w-2/3">
+          <div className="md:w-2/3 text-black">
             <div className="prose max-w-none">
-              <p className="text-lg mb-6">
-                Dear Stakeholders,
+              <p className="mb-6">
+                The founders established Solanki Brothers Council for Open and Distance Learning in its effort to contribute toward open accessibility for the opportunity to provide student learners, students unable to follow regular class attending sessions, by opening easy-access instructional delivery avenues which is conveniently just as productive as those availed during physical class delivery by conventional instruction methodology.
               </p>
               <p className="mb-6">
-                It is with great pleasure that I address you as the Chairman of our esteemed organization. As we reflect on our journey and look towards the future, I am filled with immense pride in what we have accomplished together and excitement for what lies ahead.
+                Utilizing online platforms has enabled us to overcome geographical constraints and deliver educational resources effectively. Guided by the National Policy on Education, SBCODL aims at strengthening and expanding open learning opportunities at pre-nursery, senior secondary, diploma, postgraduate diploma, and certificate levels both within and outside India. This independent education system is based on its own curriculum and examinations and issues valid certificates that meet the needs of diverse students and working professionals worldwide.
               </p>
               <p className="mb-6">
-                Over the past year, we have demonstrated remarkable resilience in the face of unprecedented challenges. Our commitment to innovation, sustainability, and excellence has not only enabled us to weather the storm but has also positioned us strongly for future growth and success.
+                At SBCODL, we offer education in a very practical and convenient manner. Students get instant access to comprehensive study materials after they complete a simple online admission process. Our language-neutral instructional resources allow students to choose their preferred language for learning, ensuring inclusivity and flexibility. Moreover, the results of successful students are verified online, maintaining transparency and trust in our educational processes.
               </p>
               <p className="mb-6">
-                Our achievements this year have been nothing short of extraordinary. We have expanded our market presence, launched groundbreaking initiatives, and strengthened our relationships with stakeholders across the globe. Our financial performance reflects the robustness of our business model and the dedication of our team.
+                This project is in line with the National Policy on Education's vision to make education accessible and convenient by using online portals. By embracing this revolutionary concept, SBCODL aims to expand its reach and enable online education for learners across the globe.
               </p>
               <p className="mb-6">
-                Looking ahead, we remain focused on our strategic objectives: driving sustainable growth, fostering innovation, and creating value for all our stakeholders. We are investing heavily in new technologies, enhancing our operational efficiency, and developing our talent pool to ensure we remain at the forefront of our industry.
+                Students are free to choose subjects from a comprehensive scheme of studies. To be eligible for certification, students must pass at least five subjects, of which at least one should be a language or up to two languages, as per the prescribed norms.
               </p>
               <p className="mb-6">
-                Sustainability continues to be at the heart of everything we do. We are committed to reducing our environmental footprint, promoting social responsibility, and maintaining the highest standards of corporate governance. Our efforts in these areas have been recognized internationally, and we continue to raise the bar for ourselves.
+                We are proud of our strides in building a global network of accessible education and remain committed to furthering the cause of learning for students across borders.
               </p>
               <p className="mb-6">
-                None of these achievements would have been possible without the unwavering support of our employees, customers, partners, and shareholders. Your trust and confidence in our vision have been instrumental in our success.
-              </p>
-              <p className="mb-6">
-                As we move forward, I am confident that our strong foundation, clear strategy, and dedicated team will enable us to achieve even greater heights. We remain committed to delivering value to our shareholders while making a positive impact on society.
-              </p>
-              <p className="mb-6">
-                Thank you for your continued support and trust in our organization. Together, we will continue to build a stronger, more sustainable future for generations to come.
-              </p>
-              <p className="mb-6">
-                Best regards,
+                Yours sincerely,
               </p>
               <p className="font-semibold">
-                John Smith<br />
-                Chairman & CEO
+                Chairman, SBCODL
               </p>
             </div>
           </div>

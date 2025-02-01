@@ -65,10 +65,10 @@ const Footer = () => {
                             <p>Phone: +91 9876543210</p>
                             <div className="space-x-4">
                                 <a href="/child-policy" className="hover:text-foreground">Child Policy</a>
-                                <a href="#" className="hover:text-foreground">Privacy Policy</a>
-                                <a href="#" className="hover:text-foreground">Privacy Policy</a>
-                                <a href="#" className="hover:text-foreground">Privacy Policy</a>
-                                <a href="#" className="hover:text-foreground">Terms of Service</a>
+                                <a href="/cookie-policy" className="hover:text-foreground">Cookie Policy</a>
+                                <a href="/privacy-policy" className="hover:text-foreground">Privacy Policy</a>
+                                <a href="/saferrecruitment-policy" className="hover:text-foreground">Safer Recruitment Policy</a>
+                                <a href="/safeguarding-policy" className="hover:text-foreground">Sage Guarding Policy</a>
                             </div>
                             <p className="text-sm">©2025 Solanki Brother Boards. All rights reserved.</p>
                         </div>
