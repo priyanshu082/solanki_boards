@@ -1,194 +1,192 @@
-import React from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import React, { useState, useEffect } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { 
-  formDataState, 
-  centersState, 
-  coursesState,
-  countriesState,
-  statesState,
-  citiesState,
-  admissionTypesState,
-  sessionsState,
-  mediumsState,
-  gendersState,
-  categoriesState,
-} from '../store/atoms/formDataAtoms';
-import { Button } from './ui/button';
+  admissionFormState,
+  AdmissionType,
+  StudentCategory,
+  Gender,
+  BatchType,
+  IndianState,
+  Country,
+  sameAsPermanentState,
+  LastPassedExam,
+  SubjectType,
+  staticDataAtoms,
+  lastPassedExamState // Import the lastPassedExamState atom
+} from '@/store/atoms/formDataAtoms';
+
+import dummyAvatar from '../assets/dummy.jpeg'; // Updated import for dummy image
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { 
-  Card,
-  CardContent
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useEffect } from 'react';
-import axios from 'axios';
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 
-// Define FormData interface
-interface FormData {
-  center: string;
-  admissionType: string;
-  session: string;
-  course: string;
-  mediumOfInstruction: string;
-  name: string;
-  fatherName: string;
-  motherName: string;
-  gender: string;
-  dateOfBirth: string;
-  contactNumber: string;
-  email: string;
-  adhaarNumber: string;
-  category: string;
-  permanentAddress: string;
-  country: string;
-  state: string;
-  city: string;
-  pincode: string;
-  sameAsPermenant: boolean;
-  corrAddress: string;
-  corrCountry: string;
-  corrState: string;
-  corrCity: string;
-  corrPincode: string;
-}
-
-interface FormFieldProps {
+// Reusable Form Field Component
+const FormField: React.FC<{
   label: string;
   children: React.ReactNode;
   required?: boolean;
-}
-
-const FormField: React.FC<FormFieldProps> = ({ label, children, required }) => (
-  <div className="mb-2">
-    <Label className="block text-sm font-medium mb-0 text-gray-600">
+  error?: string;
+}> = ({ label, children, required = false, error }) => (
+  <div className="space-y-2">
+    <label className="text-sm font-medium">
       {label} {required && <span className="text-red-500">*</span>}
-    </Label>
+    </label>
     {children}
+    {error && <p className="text-sm text-red-500">{error}</p>}
   </div>
 );
 
+// Main Registration Form Component
 const RegisterStudentForm: React.FC = () => {
-  const [formData, setFormData] = useRecoilState(formDataState);
-  const setCenters = useSetRecoilState(centersState);
-  const setCourses = useSetRecoilState(coursesState);
-  const setCountries = useSetRecoilState(countriesState);
-  const setStates = useSetRecoilState(statesState);
-  const setCities = useSetRecoilState(citiesState);
-
-  const centers = useRecoilValue(centersState);
-  const courses = useRecoilValue(coursesState);
-  const countries = useRecoilValue(countriesState);
-  const states = useRecoilValue(statesState);
-  const cities = useRecoilValue(citiesState);
+  const [formData, setFormData] = useRecoilState(admissionFormState);
+  const [sameAddress, setSameAddress] = useRecoilState(sameAsPermanentState);
+  const [avatar, setAvatar] = useState<string | ArrayBuffer | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [lastPassedExams, setLastPassedExams] = useRecoilState(lastPassedExamState); // Use the atom for last passed exams
+  const [showLastPassedExamForm, setShowLastPassedExamForm] = useState(false); // State to control visibility of last passed exam form
   
-  const admissionTypes = useRecoilValue(admissionTypesState);
-  const sessions = useRecoilValue(sessionsState);
-  const mediums = useRecoilValue(mediumsState);
-  const genders = useRecoilValue(gendersState);
-  const categories = useRecoilValue(categoriesState);
+  const [newSubject, setNewSubject] = useState<LastPassedExam>({
+    subjectType: SubjectType.LANGUAGE, // Default value, adjust as necessary
+    subject: '',
+    practicalMarks: 0,
+    assignmentMarks: 0,
+    theoryMarks: 0,
+    obtainedMarks: 0,
+    maximumMarks: 0,
+  });
 
-  // Fetch initial data
+  const handleAddLastPassedExam = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedExams = [...lastPassedExams, newSubject];
+    setLastPassedExams(updatedExams);
+    setFormData(prev => ({ ...prev, lastPassedExam: updatedExams }));
+    
+    // Reset the form
+    setNewSubject({
+      subjectType: SubjectType.LANGUAGE,
+      subject: '',
+      practicalMarks: 0,
+      assignmentMarks: 0,
+      theoryMarks: 0,
+      obtainedMarks: 0,
+      maximumMarks: 0,
+    });
+  };
+
+  const courses = useRecoilValue(staticDataAtoms.coursesAtom); // Fetching courses from atoms
+  const subjects = useRecoilValue(staticDataAtoms.subjectsAtom); // Fetching subjects from atoms
+
   useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        const [centersRes, coursesRes, countriesRes] = await Promise.all([
-          axios.get('/api/centers'),
-          axios.get('/api/courses'),
-          axios.get('/api/countries')
-        ]);
-        
-        setCenters(centersRes.data);
-        setCourses(coursesRes.data);
-        setCountries(countriesRes.data);
-      } catch (error) {
-        console.error('Error loading initial data:', error);
-      }
-    };
+    // Set the avatar to the dummy image if no image is uploaded
+    if (!imageFile) {
+      setAvatar(dummyAvatar);
+    }
+  }, [imageFile]);
 
-    loadInitialData();
-  }, [setCenters, setCourses, setCountries]);
+  const admissionTypes = Object.entries(AdmissionType).map(([key, value]) => ({
+    id: value.toString(),
+    name: key.replace(/_/g, ' ')
+  }));
 
-  // Fetch states when country changes
-  useEffect(() => {
-    const fetchStates = async () => {
-      if (formData.country) {
-        try {
-          const response = await axios.get(`/api/states/${formData.country}`);
-          setStates(response.data);
-        } catch (error) {
-          console.error('Error fetching states:', error);
-        }
-      }
-    };
+  const genders = Object.entries(Gender).map(([key, value]) => ({
+    id: value.toString(),
+    name: key
+  }));
 
-    fetchStates();
-  }, [formData.country, setStates]);
+  const categories = Object.entries(StudentCategory).map(([key, value]) => ({
+    id: value.toString(),
+    name: key.replace(/_/g, ' ')
+  }));
 
-  // Fetch cities when state changes
-  useEffect(() => {
-    const fetchCities = async () => {
-      if (formData.state) {
-        try {
-          const response = await axios.get(`/api/cities/${formData.state}`);
-          setCities(response.data);
-        } catch (error) {
-          console.error('Error fetching cities:', error);
-        }
-      }
-    };
+  const batches = Object.entries(BatchType).map(([key, value]) => ({
+    id: value.toString(),
+    name: key.replace(/_/g, ' ')
+  }));
 
-    fetchCities();
-  }, [formData.state, setCities]);
+  const states = Object.entries(IndianState).map(([key, value]) => ({
+    id: value.toString(),
+    name: key.replace(/_/g, ' ')
+  }));
 
-  const handleInputChange = <K extends keyof FormData>(field: K, value: FormData[K]): void => {
+  const countries = Object.entries(Country).map(([key, value]) => ({
+    id: value.toString(),
+    name: key
+  }));
+
+  // Handle form updates
+  const updateField = (field: keyof typeof formData, value: any) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value,
-      // Reset dependent fields when parent field changes
-      ...(field === 'country' && {
-        state: '',
-        city: '',
-        corrState: prev.sameAsPermenant ? '' : prev.corrState,
-        corrCity: prev.sameAsPermenant ? '' : prev.corrCity,
-      }),
-      ...(field === 'state' && {
-        city: '',
-        corrCity: prev.sameAsPermenant ? '' : prev.corrCity,
-      }),
+      [field]: value
     }));
   };
 
-  const handleSameAddressChange = (checked: boolean): void => {
+  // Handle address updates
+  const updateAddress = (
+    addressType: 'permanentAddress' | 'correspondenceAddress',
+    field: keyof typeof formData.permanentAddress,
+    value: string
+  ) => {
     setFormData(prev => ({
       ...prev,
-      sameAsPermenant: checked,
-      corrAddress: checked ? prev.permanentAddress : '',
-      corrCountry: checked ? prev.country : '',
-      corrState: checked ? prev.state : '',
-      corrCity: checked ? prev.city : '',
-      corrPincode: checked ? prev.pincode : '',
+      [addressType]: {
+        ...prev[addressType],
+        [field]: value
+      }
     }));
   };
 
-  // Rest of your JSX remains the same...
+  // Handle same address checkbox
+  const handleSameAddressCheckbox = (checked: boolean) => {
+    setSameAddress(checked);
+    if (checked) {
+      setFormData(prev => ({
+        ...prev,
+        correspondenceAddress: { ...prev.permanentAddress }
+      }));
+    }
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result);
+        setImageFile(file);
+        updateField('studentPhoto', file); // Save the uploaded image in the form data
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAdmissionTypeChange = (value: string) => {
+    updateField('admissionType', value);
+    setShowLastPassedExamForm(value === AdmissionType.TOC.toString()); // Show form if TOC is selected
+  };
+
   return (
-    <Card className="flex flex-col mx-auto">
+    <Card className="w-full mx-auto">
+      <CardHeader>
+        <CardTitle>School Registration Form</CardTitle>
+      </CardHeader>
       <CardContent>
-        <div className='flex flex-col'>
-          <div className="py-2">
+        <div className='flex flex-col '>
+          <div className="py-2 h-fit">
             <div className="flex flex-col sm:flex-row items-center md:items-start gap-6">
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-[150px] h-[150px] border-2 border-gray-200 rounded-md overflow-hidden">
                   <img
-                    src="/api/placeholder/150/150"
+                    src={avatar as string}
                     alt="Student Photo"
                     className="w-full h-full object-cover"
                   />
@@ -200,9 +198,18 @@ const RegisterStudentForm: React.FC = () => {
                   <h3 className="text-lg font-normal mb-2">Student Photo</h3>
                   <Button 
                     variant="outline" 
-                    className="bg-blue-500 text-white hover:bg-blue-600 w-fit">
+                    className="bg-blue-500 text-white hover:bg-blue-600 w-fit"
+                    onClick={() => document.getElementById('fileInput')?.click()} // Open file dialog on button click
+                  >
                     Change
                   </Button>
+                  <Input 
+                    id="fileInput" // Hidden file input
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageChange} 
+                    className="hidden"
+                  />
                 </div>
 
                 <div className='text-purple-800 font-bold text-sm mt-[4vw] flex flex-col justify-center items-center md:items-start'>
@@ -211,298 +218,400 @@ const RegisterStudentForm: React.FC = () => {
               </div>
             </div>
           </div>
-        <form className="space-y-2">
-          {/* Academic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormField label="Center" required>
-              <Select onValueChange={(value) => handleInputChange('center', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select center" />
-                </SelectTrigger>
-                <SelectContent>
-                  {centers.map(center => (
-                    <SelectItem key={center} value={center}>{center}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
 
+          <form className="space-y-6">
+            {/* Basic Details */}
+            <section>
+              <h3 className="text-lg font-semibold mb-4">Basic Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            <FormField label="Admission Type" required>
-              <Select onValueChange={(value) => handleInputChange('admissionType', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select admission type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {admissionTypes.map(type => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-
-            <FormField label="Session" required>
-              <Select onValueChange={(value) => handleInputChange('session', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select session" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sessions.map(session => (
-                    <SelectItem key={session} value={session}>{session}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-
-            <FormField label="Course" required>
-              <Select onValueChange={(value) => handleInputChange('course', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select course" />
-                </SelectTrigger>
-                <SelectContent>
-                  {courses.map(course => (
-                    <SelectItem key={course} value={course}>{course}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-
-            <FormField label="Medium of Instruction" required>
-              <Select onValueChange={(value) => handleInputChange('mediumOfInstruction', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select medium" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mediums.map(medium => (
-                    <SelectItem key={medium} value={medium}>{medium}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-          </div>
-
-          {/* Personal Information */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormField label="Name" required>
-              <Input
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-              />
-            </FormField>
-
-            <FormField label="Father's Name" required>
-              <Input
-                type="text"
-                value={formData.fatherName}
-                onChange={(e) => handleInputChange('fatherName', e.target.value)}
-              />
-            </FormField>
-
-            <FormField label="Mother's Name" required>
-              <Input
-                type="text"
-                value={formData.motherName}
-                onChange={(e) => handleInputChange('motherName', e.target.value)}
-              />
-            </FormField>
-
-            <FormField label="Gender" required>
-              <Select onValueChange={(value) => handleInputChange('gender', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  {genders.map(gender => (
-                    <SelectItem key={gender} value={gender}>{gender}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-
-            <FormField label="Date of Birth" required>
-              <Input
-                type="date"
-                value={formData.dateOfBirth}
-                onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-              />
-            </FormField>
-
-            <FormField label="Contact Number" required>
-              <Input
-                type="tel"
-                value={formData.contactNumber}
-                onChange={(e:any) => handleInputChange('contactNumber', e.target.value)}
-              />
-            </FormField>
-
-            <FormField label="Email" required>
-              <Input
-                type="email"
-                value={formData.email}
-                onChange={(e:any) => handleInputChange('email', e.target.value)}
-              />
-            </FormField>
-
-            <FormField label="Aadhaar Number" required>
-              <Input
-                type="number"
-                value={formData.adhaarNumber}
-                onChange={(e:any) => handleInputChange('adhaarNumber', e.target.value)}
-              />
-            </FormField>
-
-            <FormField label="Category" required>
-              <Select onValueChange={(value) => handleInputChange('category', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map(category => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-          </div>
-
-          {/* Permanent Address */}
-          <div className="  border-black border-2 rounded-md p-[1vw] bg-blue-50">
-            <h3 className="text-lg font-semibold">Permanent Address</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField label="Address" required>
-                <Input
-                  type="text"
-                  value={formData.permanentAddress}
-                  onChange={(e:any) => handleInputChange('permanentAddress', e.target.value)}
-                />
-              </FormField>
-
-              <FormField label="Country" required>
-                <Select onValueChange={(value) => handleInputChange('country', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countries.map(country => (
-                      <SelectItem key={country} value={country}>{country}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-
-              <FormField label="State" required>
-                <Select onValueChange={(value) => handleInputChange('state', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select state" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {states.map(state => (
-                      <SelectItem key={state} value={state}>{state}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-
-              <FormField label="City" required>
-                <Select onValueChange={(value) => handleInputChange('city', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select city" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map(city => (
-                      <SelectItem key={city} value={city}>{city}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-
-              <FormField label="Pincode" required>
-                <Input
-                  type="number"
-                  value={formData.pincode}
-                  onChange={(e:any) => handleInputChange('pincode', e.target.value)}
-                />
-              </FormField>
-            </div>
-          </div>
-
-          {/* Correspondence Address */}
-          <div className=" border-black border-2 rounded-md p-[1vw] bg-blue-50">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="sameAddress"
-                checked={formData.sameAsPermenant}
-                onCheckedChange={handleSameAddressChange}
-              />
-              <label htmlFor="sameAddress" className="text-sm font-medium">
-                Same as Permanent Address
-              </label>
-            </div>
-
-            {!formData.sameAsPermenant && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormField label="Address" required>
-                  <Input
-                    type="text"
-                    value={formData.corrAddress}
-                    onChange={(e:any) => handleInputChange('corrAddress', e.target.value)}
+                <FormField label="Full Name" required>
+                  <Input 
+                    value={formData.name}
+                    onChange={(e) => updateField('name', e.target.value)}
+                    placeholder="Enter full name"
                   />
                 </FormField>
 
-                <FormField label="Country" required>
-                  <Select onValueChange={(value) => handleInputChange('corrCountry', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countries.map(country => (
-                        <SelectItem key={country} value={country}>{country}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-
-                <FormField label="State" required>
-                  <Select onValueChange={(value) => handleInputChange('corrState', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select state" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {states.map(state => (
-                        <SelectItem key={state} value={state}>{state}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-
-                <FormField label="City" required>
-                  <Select onValueChange={(value) => handleInputChange('corrCity', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select city" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cities.map(city => (
-                        <SelectItem key={city} value={city}>{city}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-
-                <FormField label="Pincode" required>
+                <FormField label="Date of Birth" required>
                   <Input
-                    type="number"
-                    value={formData.corrPincode}
-                    onChange={(e:any) => handleInputChange('corrPincode', e.target.value)}
+                    type="date"
+                    value={formData.dob}
+                    onChange={(e) => updateField('dob', e.target.value)}
+                  />
+                </FormField>
+
+                <FormField label="Father's Name" required>
+                  <Input
+                    value={formData.fatherName}
+                    onChange={(e) => updateField('fatherName', e.target.value)}
+                    placeholder="Enter father's name"
+                  />
+                </FormField>
+
+                <FormField label="Mother's Name" required>
+                  <Input
+                    value={formData.motherName}
+                    onChange={(e) => updateField('motherName', e.target.value)}
+                    placeholder="Enter mother's name"
+                  />
+                </FormField>
+
+                <FormField label="Gender" required>
+                  <Select 
+                    value={formData.gender.toString()}
+                    onValueChange={(value) => updateField('gender', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {genders.map(({ id, name }) => (
+                        <SelectItem key={id} value={id}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+
+                <FormField label="Category" required>
+                  <Select 
+                    value={formData.category.toString()}
+                    onValueChange={(value) => updateField('category', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(({ id, name }) => (
+                        <SelectItem key={id} value={id}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+
+                <FormField label="Email" required>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => updateField('email', e.target.value)}
+                    placeholder="Enter email address"
+                  />
+                </FormField>
+                <FormField label="Phone Number" required>
+                  <Input
+                    type="tel"
+                    value={formData.phoneNumber}
+                    onChange={(e) => updateField('phoneNumber', e.target.value)}
+                    placeholder="Enter phone number"
+                  />
+                </FormField>
+                <FormField label="Nationality" required>
+                  <Input
+                    value={formData.nationality}
+                    onChange={(e) => updateField('nationality', e.target.value)}
+                    placeholder="Enter nationality"
                   />
                 </FormField>
               </div>
-            )}
-          </div>
+            </section>
 
-        </form>
+            {/* Academic Details */}
+            <section>
+              <h3 className="text-lg font-semibold mb-4">Academic Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="Admission Type" required>
+                  <Select 
+                    value={formData.admissionType.toString()}
+                    onValueChange={handleAdmissionTypeChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select admission type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {admissionTypes.map(({ id, name }) => (
+                        <SelectItem key={id} value={id}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField label="Batch" required>
+                  <Select 
+                    value={formData.batch.toString()}
+                    onValueChange={(value) => updateField('batch', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select batch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {batches.map(({ id, name }) => (
+                        <SelectItem key={id} value={id}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+
+                <FormField label="Course" required>
+                  <Select 
+                    value={formData.courseId}
+                    onValueChange={(value) => updateField('courseId', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue>{formData.courseId || "Select course"}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {courses.map(course => (
+                        <SelectItem key={course.id} value={course.id}>{course.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                
+              </div>
+            </section>
+
+            {/* Last Passed Exam Details if TOC is selected */}
+            {showLastPassedExamForm && (
+              <section className='bg-blue-100 p-4 rounded-md'>
+                <h3 className="text-lg font-semibold mb-4">Last Passed Exam Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  <FormField label="Subject Type" required>
+                    <Select 
+                      value={newSubject.subjectType.toString()}
+                      onValueChange={(value) => setNewSubject((prev: LastPassedExam) => ({ ...prev, subjectType: value as SubjectType }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select subject type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(SubjectType).map(([key, value]) => (
+                          <SelectItem key={value} value={value}>{key.replace(/_/g, ' ')}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+
+                  
+                  <FormField label="Subject" required>
+                    <Select
+                      value={newSubject.subject}
+                      onValueChange={(value) => setNewSubject((prev: LastPassedExam) => ({ ...prev, subject: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select subject" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map((subject) => (
+                          <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+                  <FormField label="Practical Marks" required>
+                    <Input
+                      type="number"
+                      value={newSubject.practicalMarks || ''} // Ensure the input is empty if practicalMarks is 0
+                      onChange={(e) => setNewSubject((prev: LastPassedExam) => ({ ...prev, practicalMarks: e.target.value ? Number(e.target.value) : 0 }))}
+                      placeholder="Enter practical marks"
+                      className="border-gray-800" // Change border color for this field
+                    />
+                  </FormField>
+                  <FormField label="Assignment Marks" required>
+                    <Input
+                      type="number"
+                      value={newSubject.assignmentMarks || ''} // Ensure the input is empty if assignmentMarks is 0
+                      onChange={(e) => setNewSubject((prev: LastPassedExam) => ({ ...prev, assignmentMarks: e.target.value ? Number(e.target.value) : 0 }))}
+                      placeholder="Enter assignment marks"
+                      className="border-gray-800" // Change border color for this field
+                    />
+                  </FormField>
+                  <FormField label="Theory Marks" required>
+                    <Input
+                      type="number"
+                      value={newSubject.theoryMarks || ''} // Ensure the input is empty if theoryMarks is 0
+                      onChange={(e) => setNewSubject((prev: LastPassedExam) => ({ ...prev, theoryMarks: e.target.value ? Number(e.target.value) : 0 }))}
+                      placeholder="Enter theory marks"
+                      className="border-gray-800" // Change border color for this field
+                    />
+                  </FormField>
+                  <FormField label="Obtained Marks" required>
+                    <Input
+                      type="number"
+                      value={newSubject.obtainedMarks || ''} // Ensure the input is empty if obtainedMarks is 0
+                      onChange={(e) => setNewSubject((prev: LastPassedExam) => ({ ...prev, obtainedMarks: e.target.value ? Number(e.target.value) : 0 }))}
+                      placeholder="Enter obtained marks"
+                      className="border-gray-800" // Change border color for this field
+                    />
+                  </FormField>
+                  <FormField label="Maximum Marks" required>
+                    <Input
+                      type="number"
+                      value={newSubject.maximumMarks || ''} // Ensure the input is empty if maximumMarks is 0
+                      onChange={(e) => setNewSubject((prev: LastPassedExam) => ({ ...prev, maximumMarks: e.target.value ? Number(e.target.value) : 0 }))}
+                      placeholder="Enter maximum marks"
+                      className="border-gray-800" // Change border color for this field
+                    />
+                  </FormField>
+                </div>
+                <Button onClick={handleAddLastPassedExam} className="mt-4">Add Subject Details</Button>
+                {lastPassedExams.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="font-semibold">Added Subjects:</h4>
+                    <table className="min-w-full border-collapse border border-gray-800">
+                      <thead>
+                        <tr>
+                          <th className="border border-gray-800 p-2">Subject</th>
+                          <th className="border border-gray-800 p-2">Type</th>
+                          <th className="border border-gray-800 p-2">Practical Marks</th>
+                          <th className="border border-gray-800 p-2">Assignment Marks</th>
+                          <th className="border border-gray-800 p-2">Theory Marks</th>
+                          <th className="border border-gray-800 p-2">Obtained Marks</th>
+                          <th className="border border-gray-800 p-2">Maximum Marks</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {lastPassedExams.map((exam, index) => (
+                          <tr key={index} className="border border-gray-800">
+                            <td className="border border-gray-800 p-2 text-center">{exam.subject}</td>
+                            <td className="border border-gray-800 p-2 text-center">{exam.subjectType}</td>
+                            <td className="border border-gray-800 p-2 text-center">{exam.practicalMarks}</td>
+                            <td className="border border-gray-800 p-2 text-center">{exam.assignmentMarks}</td>
+                            <td className="border border-gray-800 p-2 text-center">{exam.theoryMarks}</td>
+                            <td className="border border-gray-800 p-2 text-center">{exam.obtainedMarks}</td>
+                            <td className="border border-gray-800 p-2 text-center">{exam.maximumMarks}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Address Details */}
+            <section>
+              <h3 className="text-lg font-semibold mb-4">Address Details</h3>
+              
+              {/* Permanent Address */}
+              <div className="space-y-4 mb-4">
+                <h4 className="font-medium">Permanent Address</h4>
+                <FormField label="Address" required>
+                  <Input
+                    value={formData.permanentAddress.address}
+                    onChange={(e) => updateAddress('permanentAddress', 'address', e.target.value)}
+                    placeholder="Enter address"
+                  />
+                </FormField>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField label="City" required>
+                    <Input
+                      value={formData.permanentAddress.city}
+                      onChange={(e) => updateAddress('permanentAddress', 'city', e.target.value)}
+                      placeholder="Enter city"
+                    />
+                  </FormField>
+                  <FormField label="District" required>
+                    <Input
+                      value={formData.permanentAddress.district}
+                      onChange={(e) => updateAddress('permanentAddress', 'district', e.target.value)}
+                      placeholder="Enter district"
+                    />
+                  </FormField>
+                  <FormField label="State" required>
+                    <Select 
+                      value={formData.permanentAddress.state.toString()}
+                      onValueChange={(value) => updateAddress('permanentAddress', 'state', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {states.map(({ id, name }) => (
+                          <SelectItem key={id} value={id}>{name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+                  <FormField label="Pincode" required>
+                    <Input
+                      value={formData.permanentAddress.pincode}
+                      onChange={(e) => updateAddress('permanentAddress', 'pincode', e.target.value)}
+                      placeholder="Enter pincode"
+                    />
+                  </FormField>
+                </div>
+              </div>
+
+              {/* Same Address Checkbox */}
+              <div className="flex items-center space-x-2 mb-4">
+                <Checkbox
+                  id="sameAddress"
+                  checked={sameAddress}
+                  onCheckedChange={handleSameAddressCheckbox}
+                />
+                <label 
+                  htmlFor="sameAddress" 
+                  className="text-sm font-medium leading-none"
+                >
+                  Correspondence Address Same as Permanent Address
+                </label>
+              </div>
+
+              {/* Correspondence Address */}
+              {!sameAddress && (
+                <div className="space-y-4">
+                  <h4 className="font-medium">Correspondence Address</h4>
+                  <FormField label="Address" required>
+                    <Input
+                      value={formData.correspondenceAddress.address}
+                      onChange={(e) => updateAddress('correspondenceAddress', 'address', e.target.value)}
+                      placeholder="Enter address"
+                    />
+                  </FormField>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField label="City" required>
+                      <Input
+                        value={formData.correspondenceAddress.city}
+                        onChange={(e) => updateAddress('correspondenceAddress', 'city', e.target.value)}
+                        placeholder="Enter city"
+                      />
+                    </FormField>
+                    <FormField label="District" required>
+                      <Input
+                        value={formData.correspondenceAddress.district}
+                        onChange={(e) => updateAddress('correspondenceAddress', 'district', e.target.value)}
+                        placeholder="Enter district"
+                      />
+                    </FormField>
+                    <FormField label="State" required>
+                      <Select 
+                        value={formData.correspondenceAddress.state.toString()}
+                        onValueChange={(value) => updateAddress('correspondenceAddress', 'state', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select state" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {states.map(({ id, name }) => (
+                            <SelectItem key={id} value={id}>{name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormField>
+                    <FormField label="Pincode" required>
+                      <Input
+                        value={formData.correspondenceAddress.pincode}
+                        onChange={(e) => updateAddress('correspondenceAddress', 'pincode', e.target.value)}
+                        placeholder="Enter pincode"
+                      />
+                    </FormField>
+                  </div>
+                </div>
+              )}
+            </section>
+
+          </form>
         </div>
-        
       </CardContent>
     </Card>
   );

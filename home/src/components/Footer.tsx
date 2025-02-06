@@ -34,7 +34,7 @@ const Footer = () => {
                 <div className="flex flex-col md:flex-row w-full relative z-10">
                     {/* First Div - 30% */}
                     <div className="w-full md:w-[40vw] flex items-center justify-center">
-                        <h1 className="text-4xl font-serif font-bold text-center">Welcome to Our Institution</h1>
+                        <h1 className="text-4xl font-serif font-bold text-center">Welcome to SBCODL</h1>
                     </div>
                     {/* Second Div - 70% */}
                     <div className="w-full md:w-[60.3vw] flex flex-col justify-center items-center ">
@@ -56,21 +56,21 @@ const Footer = () => {
                 <div className="flex md:flex-row flex-col font-serif relative bg-background z-10 px-24 py-6 gap-[7vw]">
                     <div className='w-[25vw]'>
                         <div className="flex items-center space-x-3">
-                            <h2 className="text-2xl font-bold text-foreground">Solanki Brother Boards</h2>
+                            <h2 className="text-md font-bold text-foreground">SOLANKI BROTHERS COUNCIL FOR OPEN AND DISTANCE LEARNING</h2>
                         </div>
 
                         {/* Contact and Links */}
                         <div className="text-muted-foreground mt-4">
-                            <p>Email: contact@solankiboard.com</p>
-                            <p>Phone: +91 9876543210</p>
+                            <p>Email: info@sbiea.co.in</p>
+                            <p>Phone: +91 9997874343</p>
                             <div className="space-x-4">
                                 <a href="/child-policy" className="hover:text-foreground">Child Policy</a>
                                 <a href="/cookie-policy" className="hover:text-foreground">Cookie Policy</a>
                                 <a href="/privacy-policy" className="hover:text-foreground">Privacy Policy</a>
                                 <a href="/saferrecruitment-policy" className="hover:text-foreground">Safer Recruitment Policy</a>
-                                <a href="/safeguarding-policy" className="hover:text-foreground">Sage Guarding Policy</a>
+                                <a href="/safeguarding-policy" className="hover:text-foreground">Safe-Guarding Policy</a>
                             </div>
-                            <p className="text-sm">©2025 Solanki Brother Boards. All rights reserved.</p>
+                            <p className="text-sm">©2022 SOLANKI BROTHERS COUNCIL FOR OPEN AND DISTANCE LEARNING(SBCODL). All rights reserved.</p>
                         </div>
                     </div>
 
@@ -78,7 +78,9 @@ const Footer = () => {
                     <div className="space-y-8 flex flex-col w-[65vw] justify-center">
                         {/* Paragraph */}
                         <div className="text-muted-foreground">
-                            <p>Solanki brother board is a non-profit and non-denominational, co-educational, American international day and boarding IB World School in the heart of Rome. Click on the cards below to find out more about our values, teaching & learning and boarding at St. Stephen's.</p>
+                            <p>Solanki Brothers Council for Open and Distance Learning (SBCODL)
+
+SBCODL is India's first non-profit, non-denominational, co-educational boarding council, dedicated to fostering holistic learning and development. Nestled in the heart of India, we provide a unique blend of traditional values and innovative teaching methodologies to shape confident, creative, and independent thinkers.</p>
                         </div>
                         {/* Social Media Links */}
                         <div className="flex justify-end md:justify-start space-x-6">

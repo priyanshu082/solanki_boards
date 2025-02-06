@@ -13,6 +13,7 @@ import CookiePolicy from "./pages/policyPages/CookiePolicy";
 import PrivacyPolicy from "./pages/policyPages/PrivacyPolicy";
 import SafeguardingPolicy from "./pages/policyPages/SafeGuardingPolicy";
 import SaferRecruitmentPolicy from "./pages/policyPages/SaferRecruitmentPolicy";
+import AdmissionPolicy from "./pages/policyPages/AdmissionPage";
 
 
 interface LayoutProps {
@@ -53,6 +54,14 @@ function App() {
             element={
               <Layout>
                 <ChildPolicy />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admission"
+            element={
+              <Layout>
+                <AdmissionPolicy />
               </Layout>
             }
           />

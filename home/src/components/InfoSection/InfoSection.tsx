@@ -1,32 +1,84 @@
-import ImageCardInfoSection from './ImageCardInfoSection'
+// import ImageCardInfoSection from './ImageCardInfoSection'
+// import img1 from "../../assets/images/img1.jpeg"
+// import img2 from "../../assets/images/img2.jpeg"
+// import img3 from "../../assets/images/img3.jpeg"
+import { Link } from 'react-router-dom';
 
 const InfoSection = () => {
   return (
-    <div className='flex flex-col w-[90vw] items-center justify-center gap-[15vw] md:gap-[3vw] py-[5vw]'>
-        <div className='text-5xl text-center px-[5vw] font-bold text-primary font-serif'>
-        The Unique and Life-Changing Experience of Currey Ingram Academy
+    <div className="flex flex-col w-full items-center justify-center gap-12 py-16 border-t">
+      <div className='flex flex-col items-center max-w-4xl text-center px-4'>
+        <h1 className="text-4xl font-bold text-primary font-serif mb-4">
+          Admission Options at SBCODL
+        </h1>
+        <p className='text-lg text-primary font-medium mb-8'>
+          Hassle-free, seamless and secure admission procedures at SBCODL. Candidates need to fill the registration form to take direct online admission on website.
+        </p>
+
+        {/* Admission Blocks */}
+        <div className="grid md:grid-cols-2 gap-8 w-full mb-12">
+          {/* Block 1 */}
+          <div className=' border-2 p-2 rounded-md h-fit'>
+          <div className="border-2 border-primary rounded-lg p-4 bg-white">
+            <h2 className="text-2xl font-bold text-primary mb-4">Block 1</h2>
+            <ul className="space-y-2 text-gray-700">
+              <li>• Registration: 1st March to 31st August</li>
+              <li>• Examination: April-May</li>
+              <li>• For next year admission</li>
+            </ul>
+          </div>
+            </div>
+         
+
+          {/* Block 2 */}
+          <div className=' border-2 p-2 rounded-md h-fit'>
+          <div className="border-2 border-primary rounded-lg p-4 bg-white">
+            <h2 className="text-2xl font-bold text-primary mb-4">Block 2</h2>
+            <ul className="space-y-2 text-gray-700">
+              <li>• Registration:1st September to 28/29th February</li>
+              <li>• Examination: October-November</li>
+              <li>• Same year admission</li>
+            </ul>
+          </div>
+          </div>
+        
         </div>
 
-        <div className='flex flex-row items-center justify-center md:gap-[2vw]'>
-            
-        <ImageCardInfoSection item={{
-          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          title: 'School Management System',
-        }}/>
-        <div className='mt-[5vw]'>
-        <ImageCardInfoSection item={{
-          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          title: 'School Management System',
-        }}/>
+        <div className="flex flex-col items-center gap-4 mb-8 px-4">
+          <p className="text-gray-700 text-center">
+            For admission in Primary Programmes,Middle Programmes,Upper Programmes, Diploma and Certificate Courses, candidates are required to submit scanned copies
+            of original documents listed while registering for admission. To see the list of documents click below.
+          </p>
+          <Link to="/admission">
+          
+          <button className="px-6 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors">
+            Read More
+          </button>
+          </Link>
         </div>
+      </div>
+
+      {/* <div className="flex flex-col md:flex-row items-center justify-center gap-8 px-4">
+        <ImageCardInfoSection item={{
+          image: img1,
+          title: "Programs Offered",
+          description: "Secondary (Class X), Senior Secondary (Class XII), Diploma & PG Diploma, and Certificate Education Programs"
+        }}/>
         
         <ImageCardInfoSection item={{
-          image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          title: 'School Management System',
+          image: img2,
+          title: "Required Documents",
+          description: "Valid ID (Aadhaar/Passport/PAN), Proof of Date of Birth, Proof of Residence, Educational Certificates"
         }}/>
-        </div>
+        
+        <ImageCardInfoSection item={{
+          image: img3,
+          title: "How to Apply",
+          description: "Apply through SBCODL Admission Centres or register online at www.sbiea.co.in"
+        }}/>
+      </div> */}
     </div>
-  )
-}
+  );
+};
 
-export default InfoSection
+export default InfoSection;

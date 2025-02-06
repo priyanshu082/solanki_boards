@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import img from "../assets/images/img3.jpeg"
 import ContentComponent from '../components/ContentComponent';
+import { ArrowRight } from 'lucide-react';
 
 interface DropdownItem {
   title: string;
@@ -35,18 +35,17 @@ const WhySBCODL: React.FC = () => {
       {/* Top Section */}
       <div className="flex flex-col lg:flex-row">
         {/* heading */}
-        <div className="p-4 lg:p-12 w-full lg:w-[45vw] text-xl lg:text-3xl font-serif text-blue-800 font-light leading-8 lg:leading-[4vw]">
+        <div className="p-4 lg:p-12 w-full lg:w-[45vw] text-2xl lg:text-4xl font-serif text-blue-800 font-light leading-8 lg:leading-[4vw]">
           ABOUT THE <br/>
-          Solanki brother solanki brother soalnki brother
+          SBCODL
         </div>
         
         {/* content of top */}
-        <div className="p-4 lg:p-12 w-full leading-10 text-xl">
-          The International Baccalaureate (IB) is a global leader in international education—
-          developing inquiring, knowledgeable, confident, and caring young people. Our programmes 
-          empower school-aged students to take ownership in their own learning and help them 
-          develop future-ready skills to make a difference and thrive in a world that changes fast.
+        <div className="p-4 lg:p-12 w-full leading-8 text-xl">
+        The Solanki Brothers Council for Open and Distance Learning (SBCODL) is a recognized global leader in international education, committed to nurturing inquiring, knowledgeable, confident, and compassionate young individuals. Our programs empower students to take ownership of their learning journey and develop future-ready skills to thrive in a rapidly evolving world.
         </div>
+
+       
       </div>
 
       {/* Lower Section */}
@@ -55,19 +54,27 @@ const WhySBCODL: React.FC = () => {
         <div className="w-full lg:w-[50vw] p-4 lg:p-12">
           {/* Lower Section Heading */}
           <h2 className="text-xl lg:text-2xl font-serif text-blue-950 font-semibold mb-4 lg:mb-4">
-          Delivering a powerful continuum of student-centric learning for students aged 3-19 years.
+          Delivering Excellence in Student-Centric Learning
           </h2>
 
           {/* Lower Section Content */}
-          <p className="mb-4 lg:mb-8 text-sm lg:text-base text-gray-700">
-            Our commitment to educational excellence spans decades, with a proven track record
-            of nurturing students who go on to achieve remarkable success in their chosen fields.
-            We believe in a holistic approach to education that combines academic rigor with
-            personal development.
+          <p className="mb-4 lg:mb-8 text-lg text-gray-700">
+          
+          SBCODL offers a seamless continuum of innovative, student-focused educational programs for learners aged 3 to 19. These programs are thoughtfully designed to foster well-rounded individuals who approach today’s challenges with optimism, adaptability, and an open mind.
           </p>
 
+          <div className=" flex flex-col gap-2">
+                        <div className="flex text-sm text-blue-500 cursor-pointer flex-row justify-between hover:scale-[101%] transition-all duration-500 ease-in-out">
+                            <div>
+                            Discover the Benefits of Offering SBCODL Programs at Your School/Institution
+                            </div>
+                            <ArrowRight />
+                        </div>
+                        <div className="border border-blue-500" />
+                    </div>
+
           {/* Dropdowns */}
-          <div className="space-y-3 lg:space-y-4">
+          {/* <div className="space-y-3 lg:space-y-4">
             {dropdowns.map((dropdown: DropdownItem, index: number) => (
               <div key={index} className="border border-gray-800 rounded-lg">
                 <button
@@ -89,12 +96,12 @@ const WhySBCODL: React.FC = () => {
                 )}
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Right Image Section */}
         <div className="w-full lg:w-[50vw] p-4 lg:p-12 mt-4 lg:mt-0 rounded-4xl">
-          <div className="h-[50vh] lg:h-full w-full bg-gray-200 rounded-lg overflow-hidden">
+          <div className="h-[50vh] lg:h-[20vw] w-full bg-gray-200 rounded-lg overflow-hidden">
             <img
               src={img}
               alt="Educational Environment"
@@ -104,7 +111,7 @@ const WhySBCODL: React.FC = () => {
         </div>
       </div>
 
-<div className='bg-white w-full '>
+<div className='bg-white w-full mt-32'>
 <ContentComponent/>
 <ContentComponent/>
 <ContentComponent/>
