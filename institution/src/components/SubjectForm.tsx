@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 const SubjectForm = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [formData, setFormData] = useRecoilState(admissionFormState);
+  //@ts-ignore
   const [subjectsList, setSubjectsList] = useRecoilState(subjectsAtom);
 
   // Dummy subjects data with IDs

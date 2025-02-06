@@ -117,6 +117,8 @@ const RegisterStudentForm: React.FC = () => {
     name: key.replace(/_/g, ' ')
   }));
 
+  //@ts-ignore
+
   const countries = Object.entries(Country).map(([key, value]) => ({
     id: value.toString(),
     name: key
