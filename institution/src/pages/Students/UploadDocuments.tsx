@@ -15,20 +15,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import axios from 'axios';
+import { ExaminationType } from '@/store/atoms/formDataAtoms'; // Importing ExaminationType
 
 interface StudentDetails {
-  photo: string;
   name: string;
-  applicationNumber: string;
   fatherName: string;
-  currentYear: string;
+  motherName: string;
   course: string;
-  code: string;
-  school: string;
+  instituteId: string;
   qualifications: Array<{
-    type: string;
+    type: ExaminationType; // Updated to use ExaminationType
     yearOfPassing?: string;
-    document?: File;
   }>;
 }
 
@@ -41,10 +39,23 @@ const UploadDocuments = () => {
   const handleSearch = async () => {
     setIsLoading(true);
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch(`/api/students/search?type=${searchType}&query=${searchQuery}`);
-      const data = await response.json();
-      setStudentData(data);
+      // Using dummy data for now
+      const dummyData: StudentDetails = {
+        name: "John Doe",
+        fatherName: "Richard Doe",
+        motherName: "Jane Doe",
+        course: "Computer Science",
+        instituteId: "INST12345",
+        qualifications: [
+          { type: ExaminationType.X, yearOfPassing: "2020" }, // Updated to use ExaminationType
+          { type: ExaminationType.XII, yearOfPassing: "2024" } // Updated to use ExaminationType
+        ]
+      };
+      // Simulating an API call with axios
+      const response = await axios.get(`/api/students/search?type=${searchType}&query=${searchQuery}`);
+      // Uncomment the line below to use actual data from the response
+      // setStudentData(response.data);
+      setStudentData(dummyData); // Use dummy data for now
     } catch (error) {
       console.error('Error fetching student data:', error);
     } finally {
@@ -52,20 +63,17 @@ const UploadDocuments = () => {
     }
   };
 
-  const handleDocumentUpload = async (qualificationType: string, file: File) => {
+  const handleDocumentUpload = async (qualificationType: ExaminationType, file: File) => { // Updated to use ExaminationType
     const formData = new FormData();
     formData.append('document', file);
     formData.append('qualificationType', qualificationType);
-    formData.append('studentId', studentData?.applicationNumber || '');
+    formData.append('studentId', studentData?.name || '');
 
     try {
       // Replace with your actual upload endpoint
-      const response = await fetch('/api/documents/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await axios.post('/api/documents/upload', formData);
       
-      if (response.ok) {
+      if (response.status === 200) {
         // Update UI to show success
         console.log('Document uploaded successfully');
       }
@@ -124,42 +132,25 @@ const UploadDocuments = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex justify-center md:justify-start">
-                <img 
-                  src={studentData.photo || "/api/placeholder/150/150"} 
-                  alt="Student" 
-                  className="w-32 h-32 rounded-full object-cover"
-                />
+              <div>
+                <p className="font-semibold">Name:</p>
+                <p>{studentData.name}</p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="font-semibold">Name:</p>
-                  <p>{studentData.name}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Application Number:</p>
-                  <p>{studentData.applicationNumber}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Father's Name:</p>
-                  <p>{studentData.fatherName}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Current Year:</p>
-                  <p>{studentData.currentYear}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Course:</p>
-                  <p>{studentData.course}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Code:</p>
-                  <p>{studentData.code}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">School:</p>
-                  <p>{studentData.school}</p>
-                </div>
+              <div>
+                <p className="font-semibold">Father's Name:</p>
+                <p>{studentData.fatherName}</p>
+              </div>
+              <div>
+                <p className="font-semibold">Mother's Name:</p>
+                <p>{studentData.motherName}</p>
+              </div>
+              <div>
+                <p className="font-semibold">Course:</p>
+                <p>{studentData.course}</p>
+              </div>
+              <div>
+                <p className="font-semibold">Institute ID:</p>
+                <p>{studentData.instituteId}</p>
               </div>
             </div>
           </CardContent>
@@ -189,15 +180,10 @@ const UploadDocuments = () => {
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          handleDocumentUpload(qual.type, file);
+                          handleDocumentUpload(qual.type, file); // Updated to use ExaminationType
                         }
                       }}
                     />
-                  </div>
-                  <div>
-                    {qual.document && (
-                      <p className="text-sm text-green-600">Document uploaded</p>
-                    )}
                   </div>
                 </div>
               ))}

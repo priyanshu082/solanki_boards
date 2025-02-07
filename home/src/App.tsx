@@ -14,6 +14,7 @@ import PrivacyPolicy from "./pages/policyPages/PrivacyPolicy";
 import SafeguardingPolicy from "./pages/policyPages/SafeGuardingPolicy";
 import SaferRecruitmentPolicy from "./pages/policyPages/SaferRecruitmentPolicy";
 import AdmissionPolicy from "./pages/policyPages/AdmissionPage";
+import InstituteRegistrationForm from "./pages/InstituteForm";
 
 
 interface LayoutProps {
@@ -78,6 +79,14 @@ function App() {
             element={
               <Layout>
                 <PrivacyPolicy />
+              </Layout>
+            }
+          />
+          <Route
+            path="/institute-registration"
+            element={
+              <Layout>
+                <InstituteRegistrationForm />
               </Layout>
             }
           />

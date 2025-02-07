@@ -17,11 +17,15 @@ interface Student {
   applicationNumber: string;
   name: string;
   fatherName: string;
-  course: string;
+  admissionType: string; // Added admissionType to Student interface
+  batch: string; // Added batch to Student interface
+  course: string; // Added course to Student interface
+  status: string; // Added status to Student interface
+  documentsUploaded: string; // Added documentsUploaded to Student interface
 }
 
 const ShowStudents = () => {
-  const [batches, setBatches] = useState([]);
+  const [batches, setBatches] = useState<any[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [filters, setFilters] = useState({
     admissionType: '',
@@ -55,6 +59,12 @@ const ShowStudents = () => {
       setStudents(data);
     } catch (error) {
       console.error('Error searching students:', error);
+      // Using dummy data if API fails
+      const dummyData: Student[] = [
+        { id: 1, applicationNumber: "APP123", name: "John Doe", fatherName: "Richard Doe", admissionType: "TOC", batch: "Batch 1", course: "Senior", status: "Registered", documentsUploaded: "Yes" },
+        { id: 2, applicationNumber: "APP124", name: "Jane Smith", fatherName: "Michael Smith", admissionType: "PART", batch: "Batch 2", course: "Senior Secondary", status: "Pending", documentsUploaded: "No" },
+      ];
+      setStudents(dummyData);
     }
   };
 
@@ -87,7 +97,7 @@ const ShowStudents = () => {
                   <SelectValue placeholder="Batch" />
                 </SelectTrigger>
                 <SelectContent>
-                  {batches.map((batch) => (
+                  {batches.map((batch: any) => (
                     <SelectItem key={batch.id} value={batch.id}>{batch.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -156,7 +166,11 @@ const ShowStudents = () => {
                   <TableHead>Application No.</TableHead>
                   <TableHead>Student Name</TableHead>
                   <TableHead>Father Name</TableHead>
-                  <TableHead>Course</TableHead>
+                  <TableHead>Admission Type</TableHead> {/* Added Admission Type column */}
+                  <TableHead>Batch</TableHead> {/* Added Batch column */}
+                  <TableHead>Course</TableHead> {/* Added Course column */}
+                  <TableHead>Status</TableHead> {/* Added Status column */}
+                  <TableHead>Documents Uploaded</TableHead> {/* Added Documents Uploaded column */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -166,7 +180,11 @@ const ShowStudents = () => {
                     <TableCell>{student.applicationNumber}</TableCell>
                     <TableCell>{student.name}</TableCell>
                     <TableCell>{student.fatherName}</TableCell>
-                    <TableCell>{student.course}</TableCell>
+                    <TableCell>{student.admissionType}</TableCell> {/* Display Admission Type */}
+                    <TableCell>{student.batch}</TableCell> {/* Display Batch */}
+                    <TableCell>{student.course}</TableCell> {/* Display Course */}
+                    <TableCell>{student.status}</TableCell> {/* Display Status */}
+                    <TableCell>{student.documentsUploaded}</TableCell> {/* Display Documents Uploaded */}
                   </TableRow>
                 ))}
               </TableBody>

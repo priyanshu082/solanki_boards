@@ -52,6 +52,8 @@ const Sidebar = () => {
       icon: <Settings className="h-5 w-5" />,
       items: [
         { name: "Profile", path: "profile" },
+        { name: "Accredited Certificate", path: "accredited-certificate" },
+        { name: "Sanctioned Letter", path: "sanctioned-letter" },
       ]
     }
   ];
