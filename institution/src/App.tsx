@@ -7,6 +7,8 @@ import ShowStudents from './pages/Students/ShowStudents'
 import Profile from './pages/Profile'
 import FeePayment from './pages/Students/FeePayment'
 import { Auth } from './pages/Login'
+import Certificate from './pages/Certificate'
+import Letter from './pages/Letter'
 // import Layout from './components/Sidebar'
 // import { Signin } from './pages/Signin'
 // import { Home } from './pages/Home'
@@ -38,6 +40,8 @@ function App() {
           <Route path="show-students" element={<ShowStudents />} />
           <Route path="profile" element={<Profile />} />
           <Route path="fee-payment" element={<FeePayment />} />
+          <Route path="accredited-certificate" element={<Certificate />} />
+          <Route path="sanctioned-letter" element={<Letter />} />
         </Route>
         <Route path="/login" element={<Auth/>}/>
       </Routes>
