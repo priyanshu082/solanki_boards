@@ -43,7 +43,7 @@ const Sidebar = () => {
         { name: "Register Student", path: "/register-student" },
         { name: "Upload Document", path: "/upload-document" },
         { name: "Show Students", path: "/show-students" },
-        { name: "Fee Payment", path: "/fee-payment" },
+        { name: "Fee Payment", path: "/pay" },
       ]
     },
     {

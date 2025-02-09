@@ -17,9 +17,9 @@ const LetterOverlay = () => {
     
     const currentDate = new Date().toLocaleDateString('en-GB', {
         day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-    });
+        month: '2-digit',
+        year: '2-digit'
+    }).replace(/\//g, '/');
 
     useEffect(() => {
         const img = new Image();

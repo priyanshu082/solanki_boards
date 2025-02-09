@@ -23,7 +23,7 @@ const Certificate = () => {
             setCertificateData({
                 name: "Virendra Singh",
                 course: "Secondary School Examination",
-                date: "2023-10-01"
+                date: "01 Feb 2025"
             });
         };
 
@@ -77,10 +77,10 @@ const Certificate = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+        <div className="flex flex-col-reverse items-center justify-center min-h-screen bg-gray-100 p-4">
             <div
                 id="certificate"
-                className="relative w-[210mm] h-[150mm] rounded-lg shadow-lg overflow-hidden"
+                className="relative w-[290mm] h-[200mm] rounded-lg shadow-lg overflow-hidden"
                 style={{
                     backgroundImage: `url(${certificate})`,
                     backgroundSize: 'cover',
@@ -89,24 +89,24 @@ const Certificate = () => {
                 }}
             >
                 {/* Certificate ID - Adjusted position */}
-                <p className="absolute top-[25px] right-[95px] text-xl font-semibold text-black">
+                <p className="absolute top-[32px] right-[163px] text-xl font-semibold text-black">
                     45342
                 </p>
 
                 {/* Student Name - Improved positioning */}
-                <div className="absolute top-[190px] left-0 right-0 text-center">
-                    <h2 className="text-5xl font-dancing-script tracking-wider inline-block">
+                <div className="absolute top-[260px] left-0 right-[70px] text-center">
+                    <h2 className="text-6xl font-dancing-script tracking-wider inline-block">
                         {certificateData.name}
                     </h2>
                 </div>
 
                 {/* Date Information - Fixed alignment */}
-                <div className="absolute bottom-[133px] w-full px-[25%]">
+                <div className="absolute bottom-[169px] w-full px-[27%]">
                     <div className="flex justify-between">
-                        <h3 className="text-xl font-semibold text-black">
+                        <h3 className="text-2xl font-semibold text-black">
                             {certificateData.date}
                         </h3>
-                        <p className="text-xl font-semibold text-black">
+                        <p className="text-2xl font-semibold text-black">
                             {certificateData.date}
                         </p>
                     </div>
@@ -115,7 +115,7 @@ const Certificate = () => {
 
             <button
                 onClick={() => handleDownloadImage('certificate', `${certificateData.name}_certificate`)}
-                className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors"
+                className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors"
             >
                 Download Certificate
             </button>
