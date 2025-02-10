@@ -249,9 +249,9 @@ export function Navbar() {
           </NavigationMenuItem>
 
           <NavigationMenuItem>
-            <Link to="/boarding">
+            <Link to="/faculty">
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Boarding
+                Faculty
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>

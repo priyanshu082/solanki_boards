@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ImageCard from './ImageCard'
 import { Button } from '../ui/button'
 import { Link } from 'react-router-dom'
