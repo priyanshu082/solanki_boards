@@ -23,8 +23,8 @@ const InfoSection = () => {
             <h2 className="text-2xl font-bold text-primary mb-4">Block 1</h2>
             <ul className="space-y-2 text-gray-700">
               <li>• Registration: 1st March to 31st August</li>
-              <li>• Examination: April-May</li>
-              <li>• For next year admission</li>
+              <li>• Examination: May-June</li>
+              {/* <li>• For next year admission</li> */}
             </ul>
           </div>
             </div>
@@ -36,8 +36,8 @@ const InfoSection = () => {
             <h2 className="text-2xl font-bold text-primary mb-4">Block 2</h2>
             <ul className="space-y-2 text-gray-700">
               <li>• Registration:1st September to 28/29th February</li>
-              <li>• Examination: October-November</li>
-              <li>• Same year admission</li>
+              <li>• Examination: November-December</li>
+              {/* <li>• Same year admission</li> */}
             </ul>
           </div>
           </div>
@@ -46,7 +46,7 @@ const InfoSection = () => {
 
         <div className="flex flex-col items-center gap-4 mb-8 px-4">
           <p className="text-gray-700 text-center">
-            For admission in Primary Programmes,Middle Programmes,Upper Programmes, Diploma and Certificate Courses, candidates are required to submit scanned copies
+            For admission in Middle Programmes,Upper Programmes, Diploma,Undergraduate ,Postgraduate and Certificate Courses, candidates are required to submit scanned copies
             of original documents listed while registering for admission. To see the list of documents click below.
           </p>
           <Link to="/admission">
@@ -58,25 +58,7 @@ const InfoSection = () => {
         </div>
       </div>
 
-      {/* <div className="flex flex-col md:flex-row items-center justify-center gap-8 px-4">
-        <ImageCardInfoSection item={{
-          image: img1,
-          title: "Programs Offered",
-          description: "Secondary (Class X), Senior Secondary (Class XII), Diploma & PG Diploma, and Certificate Education Programs"
-        }}/>
-        
-        <ImageCardInfoSection item={{
-          image: img2,
-          title: "Required Documents",
-          description: "Valid ID (Aadhaar/Passport/PAN), Proof of Date of Birth, Proof of Residence, Educational Certificates"
-        }}/>
-        
-        <ImageCardInfoSection item={{
-          image: img3,
-          title: "How to Apply",
-          description: "Apply through SBCODL Admission Centres or register online at www.sbiea.co.in"
-        }}/>
-      </div> */}
+     
     </div>
   );
 };

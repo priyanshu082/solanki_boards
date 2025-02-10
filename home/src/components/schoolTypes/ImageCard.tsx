@@ -30,12 +30,12 @@ const ImageCard = ({ item }: ImageCardProps) => {
       <motion.div
         className="absolute bottom-0 left-0 w-full h-full flex items-center justify-center bg-background/30"
         animate={{
-          backgroundColor: isHovered ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0.3)',
+          backgroundColor: isHovered ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0.6)',
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         <motion.p
-          className="text-white text-lg font-light flex flex-col items-center justify-center font-mono"
+          className="text-white text-lg font-bold flex flex-col items-center justify-center font-mono"
           animate={{ opacity: isHovered ? 0 : 1 }}
           transition={{ duration: 0.5, ease: 'easeInOut' }}
         >

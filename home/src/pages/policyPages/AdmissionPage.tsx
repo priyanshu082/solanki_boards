@@ -114,6 +114,8 @@ const AdmissionPolicy = () => {
                                             <ul className="list-disc pl-4">
                                                 <li>Class VIII Certificate OR Self Certificate of language proficiency</li>
                                                 <li>Secondary Certificate (for Senior Secondary admission)</li>
+                                                <li>Senior Secondary Certificate (for Undergraduate admission)</li>
+                                                <li>Graduation Certificate (for Postgraduate admission)</li>
                                             </ul>
                                         </TableCell>
                                     </TableRow>

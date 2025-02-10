@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
               alt="Logo" 
               className="h-8 object-contain"
             />
-            <span className="font-semibold text-xl text-gray-800">SBCODL BOARDS </span>
+            <span className="font-semibold text-xl text-gray-800">SBCODL INSTITUTION'S </span>
           </Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
