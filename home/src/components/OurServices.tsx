@@ -1,4 +1,4 @@
-import { Card, CardContent, CardTitle } from "@repo/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Globe, Target, Handshake, Lightbulb, Rocket, School } from "lucide-react";
 
 const ServicesSection = () => {

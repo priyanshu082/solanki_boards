@@ -1,34 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import img from "../assets/images/img3.jpeg"
 import ContentComponent from '../components/ContentComponent';
 import { ArrowRight } from 'lucide-react';
 
-interface DropdownItem {
-  title: string;
-  content: string;
-}
+// interface DropdownItem {
+//   title: string;
+//   content: string;
+// }
 
-const dropdowns: DropdownItem[] = [
-  {
-    title: "Our Mission",
-    content: "To provide world-class education that empowers students to become global citizens and lifelong learners."
-  },
-  {
-    title: "Our Vision",
-    content: "To be the leading educational institution that nurtures innovative thinkers and compassionate leaders."
-  },
-  {
-    title: "Our Values",
-    content: "Excellence, Innovation, Integrity, Collaboration, and Global Mindedness guide everything we do."
-  }
-];
+// const dropdowns: DropdownItem[] = [
+//   {
+//     title: "Our Mission",
+//     content: "To provide world-class education that empowers students to become global citizens and lifelong learners."
+//   },
+//   {
+//     title: "Our Vision",
+//     content: "To be the leading educational institution that nurtures innovative thinkers and compassionate leaders."
+//   },
+//   {
+//     title: "Our Values",
+//     content: "Excellence, Innovation, Integrity, Collaboration, and Global Mindedness guide everything we do."
+//   }
+// ];
 
 const WhySBCODL: React.FC = () => {
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  // const [openDropdown, setOpenDropdown] = useState<number | null>(null);
 
-  const toggleDropdown = (index: number): void => {
-    setOpenDropdown(openDropdown === index ? null : index);
-  };
+  // const toggleDropdown = (index: number): void => {
+  //   setOpenDropdown(openDropdown === index ? null : index);
+  // };
 
   return (
     <div className="flex flex-col bg-white text-gray-800 px-4 lg:px-8 mx-auto w-full">
