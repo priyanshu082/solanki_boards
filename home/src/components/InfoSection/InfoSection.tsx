@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const InfoSection = () => {
   return (
-    <div className="flex flex-col w-full items-center justify-center gap-12 py-16 border-t">
+    <div className="flex flex-col w-full items-center justify-center gap-12 py-16 border-y">
       <div className='flex flex-col items-center max-w-4xl text-center px-4'>
         <h1 className="text-4xl font-bold text-primary font-serif mb-4">
           Admission Options at SBCODL
