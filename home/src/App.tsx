@@ -106,14 +106,14 @@ function App() {
               </Layout>
             }
           />
-          <Route
+          {/* <Route
             path="/why-sbcodl"
             element={
               <Layout>
                 <WhySBCODL />
               </Layout>
             }
-          />
+          /> */}
           <Route
             path="/chairman"
             element={
