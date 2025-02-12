@@ -38,12 +38,12 @@ const aboutDropdownItems = [
   },
   {
     title: "COE's Message",
-    href: "/about/vision",
+    href: "/coe",
     description: "Discover our goals and what drives us forward.",
   },
   {
     title: "Mission & Vission",
-    href: "/about/leadership",
+    href: "/mission-vision",
     description: "Meet our experienced leadership team.",
   },
 ]

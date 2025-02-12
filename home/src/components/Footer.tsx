@@ -75,11 +75,11 @@ const Footer = () => {
                     </div>
 
                     {/* Right Section */}
-                    <div className="space-y-8 flex flex-col w-[65vw] justify-center">
+                    <div className="space-y-8 flex flex-col w-[55vw] justify-center">
                         {/* Paragraph */}
                         <div className="text-muted-foreground">
-                            <p>Solanki Brothers Council for Open and Distance Learning (SBCODL)
-SBCODL is India's first non-profit, non-denominational, co-educational boarding council, dedicated to fostering holistic learning and development. Nestled in the heart of India, we provide a unique blend of traditional values and innovative teaching methodologies to shape confident, creative, and independent thinkers.</p>
+                            <p>Solanki Brothers Council for Open and Distance Learning (SBCODL),
+                            is India’s first non-profit, non-denominational, co-educational council dedicated to fostering holistic learning and development. Nestled in the heart of India, SBCODL offers a unique blend of traditional values and modern, innovative teaching methodologies to nurture confident, creative, and independent thinkers prepared for a dynamic world.</p>
                         </div>
                         {/* Social Media Links */}
                         <div className="flex justify-end md:justify-start space-x-6">

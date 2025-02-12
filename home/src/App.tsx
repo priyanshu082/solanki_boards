@@ -16,7 +16,8 @@ import SaferRecruitmentPolicy from "./pages/policyPages/SaferRecruitmentPolicy";
 import AdmissionPolicy from "./pages/policyPages/AdmissionPage";
 import InstituteRegistrationForm from "./pages/InstituteForm";
 import BoardProfile from "./components/BoardProfile";
-
+import COE from "./pages/COE";
+import MissionVision from "./pages/MissionVission";
 interface LayoutProps {
   children: ReactNode;
 }
@@ -130,7 +131,24 @@ function App() {
               </Layout>
             }
           />
+          <Route
+            path="/coe"
+            element={
+              <Layout>
+                <COE />
+              </Layout>
+            }
+          />
+          <Route
+            path="/mission-vision"
+            element={
+              <Layout>
+                <MissionVision />
+              </Layout>
+            }
+          />
         </Routes>
+        
       </BrowserRouter>
     </ThemeProvider>
   );

@@ -3,7 +3,7 @@ const ChairmanMessage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <header className="bg-blue-900 text-white py-8 px-4 text-center">
+      <header className="bg-primary text-white py-8 px-4 text-center">
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">Chairman's Message</h1>
       </header>
 
