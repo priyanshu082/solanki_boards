@@ -1,15 +1,15 @@
 import { Facebook, Instagram, Twitter, Linkedin, Youtube } from 'lucide-react';
 import backgroundImage from "../assets/images/footer_bg.jpg";
-import institute1 from "../assets/images/patner_logo_1.jpeg"
-import institute2 from "../assets/images/patner_logo_2.jpeg"
-import institute3 from "../assets/images/patner_logo_3.jpeg"
-import institute4 from "../assets/images/patner_logo_4.png"
-import institute5 from "../assets/images/patner_logo_5.jpeg"
-import institute6 from "../assets/images/patner_logo_6.jpeg"
-import institute7 from "../assets/images/patner_logo_7.jpeg"
-import institute8 from "../assets/images/patner_logo_8.png"
-import institute9 from "../assets/images/patner_logo_9.png"
-import institute10 from "../assets/images/patner_logo_10.png"
+import institute1 from "../assets/images/patners/patner_logo_1.jpeg"
+import institute2 from "../assets/images/patners/patner_logo_2.jpeg"
+import institute3 from "../assets/images/patners/patner_logo_3.jpeg"
+import institute4 from "../assets/images/patners/patner_logo_4.png"
+import institute5 from "../assets/images/patners/patner_logo_5.jpeg"
+import institute6 from "../assets/images/patners/patner_logo_6.jpeg"
+import institute7 from "../assets/images/patners/patner_logo_7.jpeg"
+import institute8 from "../assets/images/patners/patner_logo_8.png"
+import institute9 from "../assets/images/patners/patner_logo_9.png"
+import institute10 from "../assets/images/patners/patner_logo_10.png"
 
 const Footer = () => {
     const institutes = [
@@ -79,7 +79,6 @@ const Footer = () => {
                         {/* Paragraph */}
                         <div className="text-muted-foreground">
                             <p>Solanki Brothers Council for Open and Distance Learning (SBCODL)
-
 SBCODL is India's first non-profit, non-denominational, co-educational boarding council, dedicated to fostering holistic learning and development. Nestled in the heart of India, we provide a unique blend of traditional values and innovative teaching methodologies to shape confident, creative, and independent thinkers.</p>
                         </div>
                         {/* Social Media Links */}
