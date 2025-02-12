@@ -15,7 +15,7 @@ import SafeguardingPolicy from "./pages/policyPages/SafeGuardingPolicy";
 import SaferRecruitmentPolicy from "./pages/policyPages/SaferRecruitmentPolicy";
 import AdmissionPolicy from "./pages/policyPages/AdmissionPage";
 import InstituteRegistrationForm from "./pages/InstituteForm";
-
+import BoardProfile from "./components/BoardProfile";
 
 interface LayoutProps {
   children: ReactNode;
@@ -115,10 +115,18 @@ function App() {
             }
           />
           <Route
-            path="/chairman"
+            path="/chairman-message"
             element={
               <Layout>
                 <ChairmanMessage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/board-profile"
+            element={
+              <Layout>
+                <BoardProfile />
               </Layout>
             }
           />

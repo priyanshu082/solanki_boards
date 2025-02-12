@@ -77,7 +77,7 @@ const SchoolSection = () => {
                     )}
                 </div>
                 <div className='flex flex-col gap-2 mt-5'>
-                    <Link to="/chairman">
+                    <Link to="/chairman-message">
                         <Button variant='outline' className='text-white px-5 py-5 text-lg w-fit'>
                             Chairman Message
                         </Button>

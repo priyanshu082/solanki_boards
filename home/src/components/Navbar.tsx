@@ -27,13 +27,13 @@ import { cn } from "../lib/utils"
 
 const aboutDropdownItems = [
   {
-    title: "Board Profile",
-    href: "/about/infrastructure",
+    title: "Profile",
+    href: "/board-profile",
     description: "Explore our world-class facilities.",
   },
   {
     title: "Chairman Message",
-    href: "/about/history",
+    href: "/chairman-message",
     description: "Learn about our institution's rich history and heritage.",
   },
   {
