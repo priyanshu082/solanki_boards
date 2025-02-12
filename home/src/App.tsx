@@ -7,7 +7,7 @@ import Footer from "./components/Footer";
 import { Navbar } from "./components/Navbar";
 import { ReactNode } from 'react';
 import ChildPolicy from "./pages/policyPages/ChildPolicy";
-// import WhySBCODL from "./pages/WhySBCODL";
+import WhySBCODL from "./pages/WhySBCODL";
 import ChairmanMessage from "./pages/ChairmanMessage";
 import CookiePolicy from "./pages/policyPages/CookiePolicy";
 import PrivacyPolicy from "./pages/policyPages/PrivacyPolicy";
@@ -106,14 +106,14 @@ function App() {
               </Layout>
             }
           />
-          {/* <Route
+          <Route
             path="/why-sbcodl"
             element={
               <Layout>
                 <WhySBCODL />
               </Layout>
             }
-          /> */}
+          />
           <Route
             path="/chairman"
             element={
