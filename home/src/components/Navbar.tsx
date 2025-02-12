@@ -78,33 +78,33 @@ const recognitionDropdownItems = [
 
 const programDropdownItems = [
   {
-    title: "Primary Years Programme",
-    href: "/programs/engineering",
-    description: "Various engineering disciplines and courses.",
-  },
-  {
     title: "Middle Years Programme",
-    href: "/programs/management",
+    href: "/programs/middle-years",
     description: "Business and management programs.",
   },
   {
     title: "Upper Years Programme",
-    href: "/programs/science",
+    href: "/programs/upper-years",
     description: "Pure and applied science courses.",
   },
   {
     title: "Diploma Programme",
-    href: "/programs/arts",
+    href: "/programs/diploma",
     description: "Liberal arts and humanities.",
   },
   {
-    title: "PG Programme",
-    href: "/programs/medicine",
+    title: "UG Programme",
+    href: "/programs/ug",
     description: "Medical and healthcare programs.",
   },
   {
-    title: "Certificate Programme",
-    href: "/programs/law",
+    title: "PG Programme",
+    href: "/programs/pg",
+    description: "Medical and healthcare programs.",
+  },
+  {
+    title: "Research Programme",
+    href: "/programs/certificate",
     description: "Legal studies and courses.",
   }
 ]
@@ -144,6 +144,7 @@ const admissionItems = [
     description: "Step-by-step guide to admission.",
   },
 ]
+
 const councilItems = [
   {
     title: "Governing Body",

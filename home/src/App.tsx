@@ -23,6 +23,13 @@ import ExcecutiveCommittee from "./pages/council/ExcecutiveCommittee";
 import PowersOfSBCODL from "./pages/council/PowerOfSBCODL";
 import ByeLawsRules from "./pages/council/ByeLawsRules";
 import Prospectus from "./pages/council/Prospectus";
+import MiddleYears from "./pages/programmes/MiddleYears";
+import Diploma from "./pages/programmes/Diploma";
+import UpperYears from "./pages/programmes/UpperYears";
+import UG from "./pages/programmes/UG";
+import Research from "./pages/programmes/Research";
+import PG from "./pages/programmes/PG";
+
 
 interface LayoutProps {
   children: ReactNode;
@@ -67,6 +74,12 @@ function App() {
           <Route path="/powers-of-sbcodl" element={<Layout><PowersOfSBCODL /></Layout>} /> 
           <Route path="/bye-laws-rules" element={<Layout><ByeLawsRules /></Layout>} /> 
           <Route path="/prospectus" element={<Layout><Prospectus /></Layout>} /> 
+          <Route path="/programs/middle-years" element={<Layout><MiddleYears /></Layout>} /> 
+          <Route path="/programs/upper-years" element={<Layout><UpperYears /></Layout>} /> 
+          <Route path="/programs/diploma" element={<Layout><Diploma /></Layout>} /> 
+          <Route path="/programs/ug" element={<Layout><UG /></Layout>} /> 
+          <Route path="/programs/pg" element={<Layout><PG /></Layout>} /> 
+          <Route path="/programs/certificate" element={<Layout><Research /></Layout>} /> 
         </Routes>
         
       </BrowserRouter>
