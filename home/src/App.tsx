@@ -19,6 +19,11 @@ import BoardProfile from "./pages/about/BoardProfile";
 import COE from "./pages/about/COE";
 import MissionVision from "./pages/about/MissionVission";
 import GoverningBody from "./pages/council/GoverningBody";
+import ExcecutiveCommittee from "./pages/council/ExcecutiveCommittee";
+import PowersOfSBCODL from "./pages/council/PowerOfSBCODL";
+import ByeLawsRules from "./pages/council/ByeLawsRules";
+import Prospectus from "./pages/council/Prospectus";
+
 interface LayoutProps {
   children: ReactNode;
 }
@@ -58,6 +63,10 @@ function App() {
           <Route path="/coe" element={<Layout><COE /></Layout>} />
           <Route path="/mission-vision" element={<Layout><MissionVision /></Layout>} /> 
           <Route path="/governing-body" element={<Layout><GoverningBody /></Layout>} /> 
+          <Route path="/executive-committee" element={<Layout><ExcecutiveCommittee /></Layout>} /> 
+          <Route path="/powers-of-sbcodl" element={<Layout><PowersOfSBCODL /></Layout>} /> 
+          <Route path="/bye-laws-rules" element={<Layout><ByeLawsRules /></Layout>} /> 
+          <Route path="/prospectus" element={<Layout><Prospectus /></Layout>} /> 
         </Routes>
         
       </BrowserRouter>

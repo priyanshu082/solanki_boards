@@ -152,22 +152,22 @@ const councilItems = [
   },
   {
     title: "Executive Committee",
-    href: "/admission/requirements",
+    href: "/executive-committee",
     description: "Eligibility and documentation requirements.",
   },
   {
     title: "Powers of SBCODL",
-    href: "/admission/requirements",
+    href: "/powers-of-sbcodl",
     description: "Eligibility and documentation requirements.",
   },
   {
     title: "Bye-Laws & Rules",
-    href: "/admission/requirements",
+    href: "/bye-laws-rules",
     description: "Eligibility and documentation requirements.",
   },
   {
     title: "Prospectus",
-    href: "/admission/requirements",
+    href: "/prospectus",
     description: "Eligibility and documentation requirements.",
   },
 ]
