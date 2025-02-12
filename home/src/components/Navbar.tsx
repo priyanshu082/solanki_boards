@@ -344,7 +344,7 @@ export function Navbar() {
           </NavigationMenuItem>
 
           <NavigationMenuItem>
-            <Link to="/contact">
+            <Link to="/contact-us">
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 Contact Us
               </NavigationMenuLink>

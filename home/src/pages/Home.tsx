@@ -2,7 +2,7 @@ import IntroVideo from '../components/IntroVideo'
 import NumberSection from '../components/NumberSection'
 import SchoolSection from '../components/schoolTypes/SchoolSection'
 import InfoSection from '../components/InfoSection/InfoSection'
-import ContactSection from './ContactSection'
+import ContactSection from '../components/ContactSection'
 
 const Home = () => {
   return (
