@@ -47,6 +47,34 @@ const aboutDropdownItems = [
     description: "Meet our experienced leadership team.",
   },
 ]
+ 
+const recognitionDropdownItems = [
+  {
+    title: "Membership/ Accreditation",
+    href: "/membership-accreditation",
+    description: "Explore our memberships and accreditations that enhance our credibility.",
+  },
+  {
+    title: "Recognitions",
+    href: "/recognitions",
+    description: "Learn about the recognitions we have received for our excellence.",
+  },
+  {
+    title: "Constitutional Reliability",
+    href: "/constitutional-reliability",
+    description: "Understand our commitment to constitutional reliability in education.",
+  },
+  {
+    title: "Autonomous Institution",
+    href: "/autonomous-institution",
+    description: "Discover our status as an autonomous institution and what it means for our students.",
+  },
+  {
+    title: "ISO Certification",
+    href: "/iso-certification",
+    description: "Find out about our ISO certification and its significance.",
+  },
+]
 
 const programDropdownItems = [
   {
@@ -119,7 +147,7 @@ const admissionItems = [
 const councilItems = [
   {
     title: "Governing Body",
-    href: "/admission/process",
+    href: "/governing-body",
     description: "Step-by-step guide to admission.",
   },
   {
@@ -190,6 +218,7 @@ export function Navbar() {
         <NavigationMenu className="container mx-auto hidden lg:block">
      
           <NavigationMenuList>
+
             <NavigationMenuItem>
               <Link to="/">
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -213,7 +242,6 @@ export function Navbar() {
             </NavigationMenuItem>
 
             
-  
             <NavigationMenuItem>
             <NavigationMenuTrigger>Council</NavigationMenuTrigger>
             <NavigationMenuContent className="">
@@ -231,7 +259,24 @@ export function Navbar() {
             </NavigationMenuContent>
           </NavigationMenuItem>
 
-            <NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Recognition</NavigationMenuTrigger>
+            <NavigationMenuContent className="">
+              <ul className="grid w-[400px] md:w-[200px] md:grid-cols-1 ">
+                {recognitionDropdownItems.map((item) => (
+                  <ListItem
+                    key={item.title}
+                    title={item.title}
+                    href={item.href}
+                    >
+                    {item.description}
+                  </ListItem>
+                ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
             <NavigationMenuTrigger>Programmes</NavigationMenuTrigger>
             <NavigationMenuContent className="">
               <ul className="grid w-[400px] md:w-[200px] md:grid-cols-1 ">
@@ -291,16 +336,6 @@ export function Navbar() {
             </NavigationMenuContent>
           </NavigationMenuItem>
 
-        
-
-          {/* <NavigationMenuItem>
-            <Link to="/port-activity">
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Sports Activity
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem> */}
-
           <NavigationMenuItem>
             <Link to="/contact">
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -310,6 +345,7 @@ export function Navbar() {
           </NavigationMenuItem>
 
           </NavigationMenuList>
+
         </NavigationMenu>
   
         {/* Mobile Navigation */}

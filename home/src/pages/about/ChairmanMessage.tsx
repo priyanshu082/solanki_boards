@@ -1,4 +1,5 @@
-import chairman from "../assets/images/chairman2.jpeg"
+import chairman from "../../assets/images/chairman2.jpeg"
+
 const ChairmanMessage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
