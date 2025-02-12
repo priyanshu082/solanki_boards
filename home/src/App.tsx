@@ -29,7 +29,7 @@ import UpperYears from "./pages/programmes/UpperYears";
 import UG from "./pages/programmes/UG";
 import Research from "./pages/programmes/Research";
 import PG from "./pages/programmes/PG";
-
+import Certificate from "./pages/programmes/Certificate";
 
 interface LayoutProps {
   children: ReactNode;
@@ -79,7 +79,8 @@ function App() {
           <Route path="/programs/diploma" element={<Layout><Diploma /></Layout>} /> 
           <Route path="/programs/ug" element={<Layout><UG /></Layout>} /> 
           <Route path="/programs/pg" element={<Layout><PG /></Layout>} /> 
-          <Route path="/programs/certificate" element={<Layout><Research /></Layout>} /> 
+          <Route path="/programs/certificate" element={<Layout><Certificate /></Layout>} /> 
+          <Route path="/programs/research" element={<Layout><Research /></Layout>} /> 
         </Routes>
         
       </BrowserRouter>

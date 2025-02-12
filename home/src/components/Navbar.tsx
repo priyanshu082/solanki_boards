@@ -88,6 +88,11 @@ const programDropdownItems = [
     description: "Pure and applied science courses.",
   },
   {
+    title: "Certificate Programme",
+    href: "/programs/certificate",
+    description: "Legal studies and courses.",
+  },
+  {
     title: "Diploma Programme",
     href: "/programs/diploma",
     description: "Liberal arts and humanities.",
@@ -104,9 +109,10 @@ const programDropdownItems = [
   },
   {
     title: "Research Programme",
-    href: "/programs/certificate",
+    href: "/programs/research",
     description: "Legal studies and courses.",
-  }
+  },
+
 ]
 
 const accreditedInstitutes = [

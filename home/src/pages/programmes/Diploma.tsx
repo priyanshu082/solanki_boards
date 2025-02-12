@@ -96,21 +96,28 @@ const Diploma = () => {
 
   return (
     <div className="min-h-screen bg-primary p-4 md:p-8 lg:p-12">
-      <Card className=" mx-auto bg-white">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Badge variant="secondary" className="text-lg px-4 py-1">
-              SBCODL
-            </Badge>
+      <Card className="mx-auto bg-white">
+
+        <CardHeader className="text-center flex flex-row  justify-between px-[10vw]">
+
+        
+            <div className='flex justify-center flex-col text-center'>
+              <CardTitle className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary">
+              Diploma Courses
+            </CardTitle>
+
+            <CardDescription className="text-lg mt-4 max-w-3xl mx-auto text-primary">
+              The Solanki Brothers Council for Open and Distance Learning offers a diverse 
+              range of diploma programs catering to various fields, ensuring quality education 
+              and skill development for students.
+            </CardDescription>
+            </div>
+
+          <div className="flex justify-end ">
+            <button className="mt-6 h-fit  text-white text-xl py-2 px-6 rounded bg-primary">
+              Registration
+            </button>
           </div>
-          <CardTitle className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary">
-            Diploma Courses
-          </CardTitle>
-          <CardDescription className="text-lg mt-4 max-w-3xl mx-auto text-primary">
-            The Solanki Brothers Council for Open and Distance Learning offers a diverse 
-            range of diploma programs catering to various fields, ensuring quality education 
-            and skill development for students.
-          </CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -181,6 +188,11 @@ const Diploma = () => {
           )}
         </CardContent>
       </Card>
+    <div className="text-center py-4">
+      <p className="text-sm text-gray-200">
+        For more details on admission procedures, course modules, and fee structures, please visit <a href="http://www.sbiea.co.in" className="text-blue-500 underline">www.sbiea.co.in</a> or contact the SBCODL administration.
+      </p>
+    </div>
     </div>
   );
 };

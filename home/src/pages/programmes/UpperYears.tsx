@@ -35,11 +35,11 @@ const UpperYears = ({
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-12">
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-4">
-            <TabsTrigger value="overview">Program Overview</TabsTrigger>
-            <TabsTrigger value="curriculum">Core Curriculum</TabsTrigger>
-            <TabsTrigger value="electives">Electives</TabsTrigger>
-            <TabsTrigger value="assessment">Assessment</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-4 bg-gray-400">
+            <TabsTrigger value="overview" className="text-white">Program Overview</TabsTrigger>
+            <TabsTrigger value="curriculum" className="text-white">Core Curriculum</TabsTrigger>
+            <TabsTrigger value="electives" className="text-white">Electives</TabsTrigger>
+            <TabsTrigger value="assessment" className="text-white">Assessment</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-8">
