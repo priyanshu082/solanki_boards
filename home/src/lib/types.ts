@@ -1,4 +1,5 @@
 export interface UGCourse {
+    image: string;
     id: string;
     name: string;
     institution: string;
@@ -29,6 +30,7 @@ export interface UGCourse {
 }
 
 export interface PGCourse {
+   
     id: string;
     programInfo: {
         name: string;

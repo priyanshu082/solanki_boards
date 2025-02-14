@@ -1,12 +1,13 @@
 
-// import bca from '../assets/bca.png';
-// import bba from '../assets/bba.png';
-// import bcom from '../assets/bcom.png';
-// import bam from '../assets/bam.png';
-// import bscit from '../assets/bscit.png';
+import bca from '../assets/images/ugCourses/bca.jpeg';
+import bba from '../assets/images/ugCourses/bba.jpeg';
+import bcom from '../assets/images/ugCourses/bcom.jpeg';
+import bam from '../assets/images/ugCourses/bam.jpeg';
+import bscit from '../assets/images/ugCourses/bscit.jpeg';
   
    export const UGprograms= [
       {
+        "image": bca,
         "id": "UG-BCA",
             "name": "BCA (Bachelor of Computer Applications)",
             "institution": "Solanki Brothers Council for Open and Distance Learning (SBCODL)",
@@ -150,6 +151,7 @@
             "disclaimer": "SBCODL does not guarantee government jobs or automatic admission into other institutions. This course is designed for knowledge enhancement and career progression in the IT field. Students are advised to verify all details before enrollment. If any false promises are made by third parties regarding job placements, we request students to report such activities directly to SBCODL at our official contact details."
       },
       {
+        "image": bba,
         "id": "UG-BBA",
         "name": "BBA (Bachelor of Business Administration)",
         "institution": "Solanki Brothers Council for Open and Distance Learning (SBCODL)",
@@ -277,6 +279,7 @@
         "disclaimer": "SBCODL does not guarantee government jobs or automatic admission into other institutions. This course is designed for knowledge enhancement and career progression in the business and management field. Students should verify all details before enrollment. If any false promises are made by third parties regarding job placements, we request students to report such activities directly to SBCODL at our official contact details."
       },
       {
+        "image": bcom,
         "id": "UG-BCOM",
         "name": "B.Com (Bachelor of Commerce)",
         "institution": "Solanki Brothers Council for Open and Distance Learning (SBCODL)",
@@ -403,6 +406,7 @@
         "disclaimer": "SBCODL does not guarantee government jobs or automatic admission into other institutions. This course is designed for knowledge enhancement and career progression in the business and finance field. Students should verify all details before enrollment. If any false promises are made by third parties regarding job placements, we request students to report such activities directly to SBCODL at our official contact details."
       },
       {
+        "image": bam,
         "id": "UG-BAM",
         "name": "Bachelor of Arts (B.A.) in Ministry",
         "institution": "Solanki Brothers Council for Open and Distance Learning (SBCODL)",
@@ -587,13 +591,14 @@
         },
         "disclaimer": "SBCODL does not guarantee government jobs or automatic admission into other institutions. This course is designed for knowledge enhancement and career progression in the ministry field. Students should verify all details before enrollment. If any false promises are made by third parties regarding job placements, we request students to report such activities directly to SBCODL at our official contact details."
       },
-              {
-                "id": "UG-BSCIT",
-                "name": "B.Sc. in Information Technology",
-                "institution": "Solanki Brothers Council for Open and Distance Learning (SBCODL)",
-                "duration": "3 Years",
-                "mode": "Distance Learning",
-                "totalSemesters": 6,
+      {
+        "image": bscit,
+        "id": "UG-BSCIT",
+        "name": "B.Sc. in Information Technology",
+        "institution": "Solanki Brothers Council for Open and Distance Learning (SBCODL)",
+        "duration": "3 Years",
+        "mode": "Distance Learning",
+        "totalSemesters": 6,
                 "annualFee": 5500,
                 "eligibility": "Higher Secondary Certificate (10+2) with Mathematics from a recognized board. Minimum 45% aggregate marks.",
                 "overview": "The B.Sc. IT program at SBCODL is designed to provide a solid foundation in computer science, software development, and IT infrastructure, preparing students for careers in the dynamic technology industry.",

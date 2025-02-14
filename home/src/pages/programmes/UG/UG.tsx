@@ -17,6 +17,11 @@ const UG = () => {
           {(UGprograms as unknown as UGCourse[]).map((course) => (
             <Link to={`/ugcourse/${course.id}`} key={course.id}>
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer h-full">
+                <img 
+                  src={course.image} 
+                  alt={course.name}
+                  className="w-full h-48 object-cover rounded-t-lg"
+                />
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-xl font-bold text-blue-400">
