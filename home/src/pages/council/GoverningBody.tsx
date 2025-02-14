@@ -8,8 +8,10 @@ import {
 } from "../../components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Separator } from "../../components/ui/separator"
+import { governingBodyMembers } from "../../data/governingBody"
 
 const GoverningBody = () => {
+  
   return (
     <div className="min-h-screen bg-white p-4 md:p-8 lg:p-12">
       <div className="max-w-7xl mx-auto">
@@ -27,6 +29,8 @@ const GoverningBody = () => {
 
         <Separator className="my-2" />
 
+        
+
         <Table className="text-primary">
           <TableHeader>
             <TableRow>
@@ -36,46 +40,19 @@ const GoverningBody = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">Chairman</TableCell>
-              <TableCell>Dr. Arvind Singh</TableCell>
-              <TableCell>
-                <ul className="list-disc pl-4">
-                  <li>Strategic vision and leadership for SBCODL's growth</li>
-                  <li>Global partnerships and innovation in education</li>
-                </ul>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">Vice-Chairman</TableCell>
-              <TableCell>Smt Sarla Devi</TableCell>
-              <TableCell>
-                <ul className="list-disc pl-4">
-                  <li>Assists in policy-making and operational initiatives</li>
-                  <li>Supports strategic implementation</li>
-                </ul>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">Secretary</TableCell>
-              <TableCell>Prof Kanika Singh</TableCell>
-              <TableCell>
-                <ul className="list-disc pl-4">
-                  <li>Oversees administrative compliance and effective governance</li>
-                  <li>Facilitates communication among stakeholders</li>
-                </ul>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">Student Representative</TableCell>
-              <TableCell>Mr Shubham Chauhan</TableCell>
-              <TableCell>
-                <ul className="list-disc pl-4">
-                  <li>Represents student interests and voices in governance</li>
-                  <li>Participates in discussions impacting student welfare</li>
-                </ul>
-              </TableCell>
-            </TableRow>
+            {governingBodyMembers.map((member, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">{member.position}</TableCell>
+                <TableCell>{member.name}</TableCell>
+                <TableCell>
+                  <ul className="list-disc pl-4">
+                    {member.responsibilities.map((responsibility, idx) => (
+                      <li key={idx}>{responsibility}</li>
+                    ))}
+                  </ul>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
 
