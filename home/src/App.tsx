@@ -28,11 +28,15 @@ import Diploma from "./pages/programmes/Diploma";
 import UpperYears from "./pages/programmes/UpperYears";
 import UG from "./pages/programmes/UG/UG";
 import Research from "./pages/programmes/Research";
-import PG from "./pages/programmes/PG";
+import PG from "./pages/programmes/PG/PG";
 import Certificate from "./pages/programmes/Certificate";
 import Faculty from "./pages/Faculty";
 import ContactUs from "./pages/ContactUs";
-import CourseDetail from "./pages/programmes/UG/CourseDetail";
+
+import CourseDetailPG from "./pages/programmes/PG/CourseDetailPG";
+import CourseDetailUG from "./pages/programmes/UG/CourseDetailUG";
+
+
 interface LayoutProps {
   children: ReactNode;
 }
@@ -85,7 +89,8 @@ function App() {
           <Route path="/programs/research" element={<Layout><Research /></Layout>} /> 
           <Route path="/faculty" element={<Layout><Faculty /></Layout>} /> 
           <Route path="/contact-us" element={<Layout><ContactUs /></Layout>} /> 
-          <Route path="/course/:id" element={<Layout><CourseDetail /></Layout>} />
+          <Route path="/ugcourse/:id" element={<Layout><CourseDetailUG /></Layout>} />
+          <Route path="/pgcourse/:id" element={<Layout><CourseDetailPG /></Layout>} />
         </Routes>
         
       </BrowserRouter>

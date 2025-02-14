@@ -13,8 +13,8 @@ import {
   Code,
   Network
 } from 'lucide-react';
-import { Course } from '../../../lib/types';
-import { programs } from '../../../data/course';
+import { UGCourse } from '../../../lib/types';
+import { UGprograms } from '../../../data/course';
 
 interface SubjectData {
   code: string;
@@ -29,16 +29,16 @@ const CourseDetails = () => {
   const [activeYear, setActiveYear] = useState(1);
   
   // Get course data from JSON based on name
-  const program = programs.find(course => course.id === id || '') as unknown as Course;  
+  const program = UGprograms.find(course => course.id === id || '') as unknown as UGCourse;   
 
   if (!program) {
     return <div>Course not found</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 text-primary">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+      <div className="bg-gradient-to-r bg-primary text-white py-16">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">{program.name}</h1>
           <p className="text-xl opacity-90">{program.institution}</p>
@@ -48,7 +48,7 @@ const CourseDetails = () => {
               <Clock className="w-6 h-6" />
               <div>
                 <p className="text-sm opacity-75">Duration</p>
-                <p className="font-semibold">{program.duration}</p>
+                <p className="font-semibold">{typeof program.duration === 'string' ? program.duration : `${program.duration.minimum} to ${program.duration.maximum}`}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
@@ -79,7 +79,7 @@ const CourseDetails = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 lg:max-w-[600px]">
+          <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 lg:max-w-[600px] bg-gray-400 text-primary font-bold">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
             <TabsTrigger value="careers">Careers</TabsTrigger>
@@ -103,7 +103,7 @@ const CourseDetails = () => {
                     onClick={() => setActiveYear(year)}
                     className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                       activeYear === year 
-                        ? 'bg-blue-600 text-white' 
+                        ? 'bg-primary text-white' 
                         : 'bg-white text-gray-600 hover:bg-gray-50'
                     }`}
                   >
@@ -116,7 +116,7 @@ const CourseDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {program.curriculum[`${['first', 'second', 'third'][activeYear-1]}Year` as YearKey].subjects.map((subject: SubjectData) => (
                   <div key={subject.code} className="bg-white p-6 rounded-lg shadow-sm">
-                    <Badge variant="outline" className="mb-3">{subject.code}</Badge>
+                    <Badge variant="outline" className="mb-3 text-primary">{subject.code}</Badge>
                     <h3 className="font-medium text-lg mb-2">{subject.name}</h3>
                     <div className="flex items-center text-sm text-gray-600">
                       <Progress value={100} className="h-2 w-16 mr-2" />

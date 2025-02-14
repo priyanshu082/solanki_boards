@@ -1,8 +1,8 @@
-export interface Course {
+export interface UGCourse {
     id: string;
     name: string;
     institution: string;
-    duration: string;
+    duration: string | { minimum: string; maximum: string };
     mode: string;
     totalSemesters: number;
     annualFee: number;
@@ -26,4 +26,68 @@ export interface Course {
       };
     };
     disclaimer: string;
+}
+
+export interface PGCourse {
+    id: string;
+    programInfo: {
+        name: string;
+        institution: string;
+        duration: string | { minimum: string; maximum: string };
+        mode: string;
+        annualFee: number;
+        eligibility: string;
+    };
+    programObjectives: string[];
+    curriculum: {
+        firstYear: {
+            courseCode: string;
+            subjectName: string;
+            credits: number;
+        }[];
+        secondYear: {
+            courseCode: string;
+            subjectName: string;
+            credits: number;
+        }[];
+        thirdYear: {
+            courseCode: string;
+            subjectName: string;
+            credits: number;
+        }[];
+        fourthYear: {
+            courseCode: string;
+            subjectName: string;
+            credits: number;
+        }[];
+    };
+    electiveSubjects: {
+        [key: string]: {
+            subjectName: string;
+            subjectCode: string;
+        }[];
+    };
+    learningMethodology: string[];
+    assessmentAndEvaluation: {
+        assignments: string;
+        midSemesterExams: string;
+        endSemesterExams: string;
+        projectWork: string;
+    };
+    keyFeatures: string[];
+    feeStructure: {
+        semester: {
+            semester: string;
+            tuitionFee: number;
+            examinationFee: number;
+            totalFee: number;
+        }[];
+    };
+    accreditationAndRecognition: string;
+    careerOpportunities: string[];
+    contactInformation: {
+        website: string;
+        email: string;
+        phone: string;
+    };
 }
