@@ -1057,9 +1057,9 @@
         programInfo: {
           name: "Master of Divinity (M.Div.)",
           institution: "Solanki Brothers Council for Open and Distance Learning (SBCODL)",
-          duration: { minimum: "3 Years", maximum: "6 Years" },
+          duration: { minimum: "2 Years", maximum: "4 Years" },
           mode: "Distance Learning",
-          annualFee: 55000,
+          annualFee: 5500,
           eligibility: "Bachelor's degree in Theology or any discipline with minimum 50% marks"
         },
         programObjectives: [
