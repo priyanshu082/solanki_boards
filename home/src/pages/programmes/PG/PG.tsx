@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../..
 import { Badge } from "../../../components/ui/badge";
 import { GraduationCap, Clock, IndianRupee } from 'lucide-react';
 import { PGprograms } from '../../../data/course';
-import { PGCourse } from '../../../lib/types';    
+import { PGCourse } from '../../../lib/Types/Courses';    
 
 const PG = () => {
   return (

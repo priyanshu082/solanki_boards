@@ -35,7 +35,7 @@ import ContactUs from "./pages/ContactUs";
 
 import CourseDetailPG from "./pages/programmes/PG/CourseDetailPG";
 import CourseDetailUG from "./pages/programmes/UG/CourseDetailUG";
-
+import Membership from "./pages/Recognition/Membership";
 
 interface LayoutProps {
   children: ReactNode;
@@ -91,6 +91,7 @@ function App() {
           <Route path="/contact-us" element={<Layout><ContactUs /></Layout>} /> 
           <Route path="/ugcourse/:id" element={<Layout><CourseDetailUG /></Layout>} />
           <Route path="/pgcourse/:id" element={<Layout><CourseDetailPG /></Layout>} />
+          <Route path="/membership-accreditation" element={<Layout><Membership /></Layout>} />
         </Routes>
         
       </BrowserRouter>

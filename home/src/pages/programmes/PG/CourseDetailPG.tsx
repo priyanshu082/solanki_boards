@@ -13,7 +13,7 @@ import {
   Code,
   Network
 } from 'lucide-react';
-import { PGCourse } from '../../../lib/types';
+import { PGCourse } from '../../../lib/Types/Courses';
 import { PGprograms } from '../../../data/course';
 
 type YearKey = 'firstYear' | 'secondYear';

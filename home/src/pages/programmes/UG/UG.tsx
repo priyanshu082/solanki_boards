@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../..
 import { Badge } from "../../../components/ui/badge";
 import { GraduationCap, Clock, IndianRupee } from 'lucide-react';
 import { UGprograms } from '../../../data/course';
-import { UGCourse } from '../../../lib/types';
+import { UGCourse } from '../../../lib/Types/Courses';
 
 // Define the types for the course data
 

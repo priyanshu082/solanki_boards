@@ -50,7 +50,7 @@ const aboutDropdownItems = [
  
 const recognitionDropdownItems = [
   {
-    title: "Membership/ Accreditation",
+    title: "Membership / Accreditation",
     href: "/membership-accreditation",
     description: "Explore our memberships and accreditations that enhance our credibility.",
   },

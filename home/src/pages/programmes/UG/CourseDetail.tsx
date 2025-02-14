@@ -29,7 +29,7 @@ const CourseDetails = () => {
   const [activeYear, setActiveYear] = useState(1);
   
   // Get course data from JSON based on name
-  const program = UGprograms.find(course => course.id === id || '') as unknown as UGCourse;   
+  const program = UGprograms.find(course => course.id === id || '') as unknown as UGCourse;  
 
   if (!program) {
     return <div>Course not found</div>;
@@ -48,7 +48,7 @@ const CourseDetails = () => {
               <Clock className="w-6 h-6" />
               <div>
                 <p className="text-sm opacity-75">Duration</p>
-                <p className="font-semibold">{typeof program.duration === 'string' ? program.duration : `${program.duration.minimum} to ${program.duration.maximum}`}</p>
+                <p className="font-semibold">{typeof program.duration === 'string' ? program.duration : program.duration.minimum}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
