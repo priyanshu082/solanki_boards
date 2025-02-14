@@ -10,7 +10,7 @@ import institute7 from "../assets/images/patners/patner_logo_7.jpeg"
 import institute8 from "../assets/images/patners/patner_logo_8.png"
 import institute9 from "../assets/images/patners/patner_logo_9.png"
 import institute10 from "../assets/images/patners/patner_logo_10.png"
-
+import institute11 from "../assets/images/patners/patner_logo_11.jpg"
 const Footer = () => {
     const institutes = [
         { src: institute4, alt: "Institute 4" },
@@ -23,6 +23,7 @@ const Footer = () => {
         { src: institute5, alt: "Institute 5" },
         { src: institute6, alt: "Institute 6" },
         { src: institute7, alt: "Institute 7" },
+        { src: institute11, alt: "Institute 11" },
       ];
     return (
         <footer className="border-t">
@@ -88,7 +89,7 @@ const Footer = () => {
           key={index}
           src={institute.src}
           alt={institute.alt}
-          className="w-10 h-10 md:w-10 md:h-10 hover:scale-105 transition-transform rounded-md"
+          className="w-10 h-10 md:w-10 md:h-10 hover:scale-105 transition-transform rounded-md object-contain"
         />
       ))}
     </div>

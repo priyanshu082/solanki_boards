@@ -1,5 +1,5 @@
 import partner1 from '../assets/images/patners/patner_logo_8.png';
-import partner2 from '../assets/images/patners/patner_logo_4.png';
+import partner2 from '../assets/images/patners/patner_logo_11.jpg';
 import partner3 from '../assets/images/patners/patner_logo_4.png';
 import partner4 from '../assets/images/patners/patner_logo_9.png';
 import partner5 from '../assets/images/patners/patner_logo_5.jpeg';
@@ -9,14 +9,14 @@ import partner6 from '../assets/images/patners/patner_logo_3.jpeg';
 export const memberships = [
     {
       id: 1,
-      title: "Global Education Accrediting Commission (GEAC) Approved Institutional Membership/Accreditation",
+      title: "Global Education Accrediting Commission (GEAC)",
       description: "The Global Education Accrediting Commission (GEAC) is an honorable organization that evaluates and accredits educational institutions for the delivery of education at standards of rigorous quality. Such accreditation from GEAC means that an institution has gone through a thorough review process and conforms to the prescribed educational standards. SBCODL has now earned institutional membership and accreditation from GEAC. Their K-12 and higher education programs have been vouched for quality by GEAC to SBCODL, thus proving the glory of such programs via open and distance education. The quality-and consistency-in-educating institutions at primary, secondary admission and tertiary levels become one true by this accreditation under SBCODL. Visit www.sbiea.co.in for more information about the institutional membership and accreditation of SBCODL, or you can solely get in touch with SBCODL through its communication lines. Such accreditation from GEAC not only boosts the credibility of SBCODL but also assures the students and stakeholders of being committed to and passionate about educational excellence. https://www.globaleducationaccreditingcommission.org/account/my-account.",
       website: "www.globaleducationaccreditingcommission.org",
       image: partner1
     },
     {
       id: 2,
-      title: "International Association for Biblical Education (IABE) Approved Institutional Membership/Accreditation",
+      title: "International Association for Biblical Education (IABE)",
       description: "The Solanki Brothers Council for Open and Distance Learning (SBCODL) becomes privileged to have its institutional membership with the International Association for Biblical Education (IABE) to show its commitment to providing quality education based on biblical values and universal academic standards. With this mark of honor, we reflect our commitment to the pursuit of excellence in open and distance learning, giving our students a balanced education in terms of faith and academic excellence. The SBCODL offers a wide spectrum of accreditations including undergraduate (UG) and postgraduate (PG) degrees as well as a Ph.D. degree in all spheres of discipline. The programs shall be centered to develop the intellectual capacity, critical thinking, and ethical leadership so that a student may succeed in academic as well as professional frontiers. Our entire ethos at SBCODL focuses on innovation to develop the whole person creatively and spiritually; hence modernization will be married with ancient biblical wisdom in our teaching. The accredited programs offer qualifications recognized worldwide, improving students' career opportunities and academic prospects. With its membership with IABE, SBCODL reiterates its unflinching commitment to giving students premium education and spiritual upliftment. https://iabeinternational.org/",
       website: "iabeinternational.org",
       image: partner2
