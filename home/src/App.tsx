@@ -26,12 +26,13 @@ import Prospectus from "./pages/council/Prospectus";
 import MiddleYears from "./pages/programmes/MiddleYears";
 import Diploma from "./pages/programmes/Diploma";
 import UpperYears from "./pages/programmes/UpperYears";
-import UG from "./pages/programmes/UG";
+import UG from "./pages/programmes/UG/UG";
 import Research from "./pages/programmes/Research";
 import PG from "./pages/programmes/PG";
 import Certificate from "./pages/programmes/Certificate";
 import Faculty from "./pages/Faculty";
 import ContactUs from "./pages/ContactUs";
+import CourseDetail from "./pages/programmes/UG/CourseDetail";
 interface LayoutProps {
   children: ReactNode;
 }
@@ -84,6 +85,7 @@ function App() {
           <Route path="/programs/research" element={<Layout><Research /></Layout>} /> 
           <Route path="/faculty" element={<Layout><Faculty /></Layout>} /> 
           <Route path="/contact-us" element={<Layout><ContactUs /></Layout>} /> 
+          <Route path="/course/:id" element={<Layout><CourseDetail /></Layout>} />
         </Routes>
         
       </BrowserRouter>
