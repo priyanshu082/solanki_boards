@@ -134,7 +134,8 @@ const RegisterPage = () => {
       const submissionData = {
         ...formData,
         lastPassedExam: formData.lastPassedExam.length > 0 ? formData.lastPassedExam[0] : null,
-        dob: formData.dob.split('T')[0]
+        dob: formData.dob.split('T')[0],
+        instituteId: localStorage.getItem('id') || '' // Added instituteId from localStorage
       };
 
       // Add all form fields directly

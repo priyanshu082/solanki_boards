@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -11,153 +11,208 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AdmissionType, BatchType, PaymentStatus } from '@/store/atoms/formDataAtoms';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { studentSearchUrl } from '@/Config';
 
 interface Student {
-  id: number;
+  id: string;
   applicationNumber: string;
   name: string;
   fatherName: string;
-  admissionType: string; // Added admissionType to Student interface
-  batch: string; // Added batch to Student interface
-  course: string; // Added course to Student interface
-  status: string; // Added status to Student interface
-  documentsUploaded: string; // Added documentsUploaded to Student interface
+  admissionType: AdmissionType;
+  batch: string;
+  courseId: string;
+  paymentStatus: string;
+  documents: string[];
 }
 
 const ShowStudents = () => {
-  const [batches, setBatches] = useState<any[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [filters, setFilters] = useState({
-    admissionType: '',
-    batch: '',
-    course: '',
-    status: '',
-    documentsUploaded: ''
-  });
+  const [allStudents, setAllStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  useEffect(() => {
-    const fetchBatches = async () => {
-      try {
-        const response = await fetch('/api/batches');
-        const data = await response.json();
-        setBatches(data);
-      } catch (error) {
-        console.error('Error fetching batches:', error);
-      }
-    };
-    fetchBatches();
-  }, []);
+  // Filter states
+  const [selectedAdmissionType, setSelectedAdmissionType] = useState('all');
+  const [selectedBatch, setSelectedBatch] = useState('all');
 
-  const handleSearch = async () => {
+  const [selectedCourse, setSelectedCourse] = useState('all');
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('any');
+  const [selectedDocumentStatus, setSelectedDocumentStatus] = useState('');
+
+  const admissionTypes = Object.entries(AdmissionType).map(([key, value]) => ({
+    id: value.toString(),
+    name: key.replace(/_/g, ' ')
+  }));
+
+  const batches = Object.entries(BatchType).map(([key, value]) => ({
+    id: value.toString(),
+    name: key.replace(/_/g, ' ')
+  }));
+
+  const paymentStatuses = Object.entries(PaymentStatus).map(([key, value]) => ({
+    id: value.toString(),
+    name: key.replace(/_/g, ' ')
+  }));
+
+  const fetchStudents = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/students/filter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filters)
+      const token = localStorage.getItem('token');
+      console.log(token);
+      if (!token) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Authentication Error',
+          text: 'Please login again to continue',
+          confirmButtonColor: '#3085d6'
+        });
+        return;
+      }
+
+      const response = await axios.post(studentSearchUrl,{}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
-      const data = await response.json();
-      setStudents(data);
-    } catch (error) {
-      console.error('Error searching students:', error);
-      // Using dummy data if API fails
-      const dummyData: Student[] = [
-        { id: 1, applicationNumber: "APP123", name: "John Doe", fatherName: "Richard Doe", admissionType: "TOC", batch: "Batch 1", course: "Senior", status: "Registered", documentsUploaded: "Yes" },
-        { id: 2, applicationNumber: "APP124", name: "Jane Smith", fatherName: "Michael Smith", admissionType: "PART", batch: "Batch 2", course: "Senior Secondary", status: "Pending", documentsUploaded: "No" },
-      ];
-      setStudents(dummyData);
+
+      setAllStudents(response.data);
+
+    } catch (error: any) {
+      console.error('Error fetching students:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.response?.data?.message || 'Failed to fetch students',
+        confirmButtonColor: '#3085d6'
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  // Filter students whenever filter criteria changes
+  useEffect(() => {
+    let result = [...allStudents];
+
+    if (selectedAdmissionType !== 'all') {
+      result = result.filter(student => student.admissionType === selectedAdmissionType);
+    }
+
+    if (selectedBatch !== 'all') {
+      result = result.filter(student => student.batch === selectedBatch);
+    }
+
+    if (selectedCourse !== 'all') {
+      result = result.filter(student => student.courseId === selectedCourse);
+    }
+
+    if (selectedPaymentStatus !== 'any') {
+      result = result.filter(student => student.paymentStatus === selectedPaymentStatus);
+    }
+
+    if (selectedDocumentStatus !== '') {
+      result = result.filter(student => 
+        selectedDocumentStatus === 'YES' ? student.documents.length > 0 : student.documents.length === 0
+      );
+    }
+
+    setFilteredStudents(result);
+    setCurrentPage(1);
+  }, [selectedAdmissionType, selectedBatch, selectedCourse, selectedPaymentStatus, selectedDocumentStatus, allStudents]);
+
+  // Get current page students
+  const paginatedStudents = filteredStudents.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Student Filters</CardTitle>
+          <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div>
-              <Select onValueChange={(value) => setFilters({...filters, admissionType: value})}>
+              <label className="block text-sm font-medium text-gray-700">Admission Type</label>
+              <Select onValueChange={setSelectedAdmissionType} value={selectedAdmissionType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Admission Type" />
+                  <SelectValue placeholder="Select Admission Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="TOC">TOC</SelectItem>
-                  <SelectItem value="PART">Part Admission</SelectItem>
-                  <SelectItem value="BOSSE">BOSSE</SelectItem>
-                  <SelectItem value="REPEAT">Repeat</SelectItem>
-                  <SelectItem value="VOCATIONAL">Vocational</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  {admissionTypes.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-
             <div>
-              <Select onValueChange={(value) => setFilters({...filters, batch: value})}>
+              <label className="block text-sm font-medium text-gray-700">Batch</label>
+              <Select onValueChange={setSelectedBatch} value={selectedBatch}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Batch" />
+                  <SelectValue placeholder="Select Batch" />
                 </SelectTrigger>
                 <SelectContent>
-                  {batches.map((batch: any) => (
+                  <SelectItem value="all">All</SelectItem>
+                  {batches.map((batch) => (
                     <SelectItem key={batch.id} value={batch.id}>{batch.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-
             <div>
-              <Select onValueChange={(value) => setFilters({...filters, course: value})}>
+              <label className="block text-sm font-medium text-gray-700">Payment Status</label>
+              <Select onValueChange={setSelectedPaymentStatus} value={selectedPaymentStatus}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Course" />
+                  <SelectValue placeholder="Select Payment Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="SENIOR">Senior</SelectItem>
-                  <SelectItem value="SENIOR_SECONDARY">Senior Secondary</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  {paymentStatuses.map((status) => (
+                    <SelectItem key={status.id} value={status.id}>{status.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-
             <div>
-              <Select onValueChange={(value) => setFilters({...filters, status: value})}>
+              <label className="block text-sm font-medium text-gray-700">Documents Uploaded</label>
+              <Select onValueChange={setSelectedDocumentStatus} value={selectedDocumentStatus}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder="Select Document Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="REGISTERED">Registered</SelectItem>
-                  <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="ELIGIBLE">Eligible</SelectItem>
-                  <SelectItem value="NON_ELIGIBLE">Non Eligible</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Select onValueChange={(value) => setFilters({...filters, documentsUploaded: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Documents Uploaded" />
-                </SelectTrigger>
-                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value="YES">Yes</SelectItem>
                   <SelectItem value="NO">No</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-
-          <Button 
-            onClick={handleSearch} 
-            className="w-full md:w-auto"
-          >
-            <Search className="mr-2 h-4 w-4" />
-            Search
-          </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Student List</CardTitle>
+          <CardTitle>
+            Student List {loading && <Loader2 className="inline ml-2 animate-spin" />}
+          </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="flex justify-between mb-4">
+            <Button onClick={fetchStudents} disabled={loading}>
+              Refresh
+            </Button>
+          </div>
           <div className="rounded-md border">
             <Table>
               <TableHeader>
@@ -166,29 +221,45 @@ const ShowStudents = () => {
                   <TableHead>Application No.</TableHead>
                   <TableHead>Student Name</TableHead>
                   <TableHead>Father Name</TableHead>
-                  <TableHead>Admission Type</TableHead> {/* Added Admission Type column */}
-                  <TableHead>Batch</TableHead> {/* Added Batch column */}
-                  <TableHead>Course</TableHead> {/* Added Course column */}
-                  <TableHead>Status</TableHead> {/* Added Status column */}
-                  <TableHead>Documents Uploaded</TableHead> {/* Added Documents Uploaded column */}
+                  <TableHead>Admission Type</TableHead>
+                  <TableHead>Batch</TableHead>
+                  <TableHead>Course</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Documents Uploaded</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {students.map((student, index) => (
+                {paginatedStudents.map((student, index) => (
                   <TableRow key={student.id}>
-                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                     <TableCell>{student.applicationNumber}</TableCell>
                     <TableCell>{student.name}</TableCell>
                     <TableCell>{student.fatherName}</TableCell>
-                    <TableCell>{student.admissionType}</TableCell> {/* Display Admission Type */}
-                    <TableCell>{student.batch}</TableCell> {/* Display Batch */}
-                    <TableCell>{student.course}</TableCell> {/* Display Course */}
-                    <TableCell>{student.status}</TableCell> {/* Display Status */}
-                    <TableCell>{student.documentsUploaded}</TableCell> {/* Display Documents Uploaded */}
+                    <TableCell>{student.admissionType}</TableCell>
+                    <TableCell>{student.batch}</TableCell>
+                    <TableCell>{student.courseId}</TableCell>
+                    <TableCell>{student.paymentStatus}</TableCell>
+                    <TableCell>{student.documents.length > 0 ? "Yes" : "No"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+          </div>
+
+          <div className="flex justify-between items-center mt-4">
+            <Button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1 || loading}
+            >
+              Previous
+            </Button>
+            <span>Page {currentPage} of {Math.ceil(filteredStudents.length / itemsPerPage)}</span>
+            <Button
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              disabled={currentPage >= Math.ceil(filteredStudents.length / itemsPerPage) || loading}
+            >
+              Next
+            </Button>
           </div>
         </CardContent>
       </Card>

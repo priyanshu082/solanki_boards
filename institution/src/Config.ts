@@ -8,8 +8,8 @@ export const STUDENT_BASE_URL = BASE_URL + '/student';
 
 // Admin Routes
 export const instituteLoginUrl = INSTITUTE_BASE_URL + '/auth/login';
-
 export const instituteRegisterUrl = INSTITUTE_BASE_URL + '/register';
+export const studentSearchUrl = INSTITUTE_BASE_URL + '/student/list';
 export const instituteLogoutUrl = INSTITUTE_BASE_URL + '/logout';
 export const instituteProfileUrl = INSTITUTE_BASE_URL + '/profile';
 export const instituteDashboardUrl = INSTITUTE_BASE_URL + '/dashboard';
@@ -25,13 +25,6 @@ export enum alertTypeEnum{
     warning="warning"
 }
 
-export const paymentStatusEnum = {
-    PASS: "PASS",
-    FAIL: "FAIL",
-    PENDING: "PENDING",
-    INCOMPLETE: "INCOMPLETE",
-    WITHHELD: "WITHHELD",
-    CANCELLED: "CANCELLED"
-}
+
 
 export const InstituteAmount = 10000;

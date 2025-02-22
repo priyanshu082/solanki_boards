@@ -89,6 +89,15 @@ export interface Address {
   pincode: string;
 }
 
+export enum PaymentStatus {
+  PASS = "PASS",
+  FAIL = "FAIL",
+  PENDING = "PENDING",
+  INCOMPLETE = "INCOMPLETE",
+  WITHHELD = "WITHHELD",
+  CANCELLED = "CANCELLED"
+}
+
 export interface EducationalQualification {
   examination: ExaminationType;
   subjects: string;
@@ -118,7 +127,7 @@ export interface AdmissionFormData {
   gender: Gender;
   fatherName: string;
   motherName: string;
-  instituteId?: string;
+  instituteId: string;
   nationality: string;
   email: string;
   phoneNumber: string;
@@ -141,6 +150,7 @@ const initialFormState: AdmissionFormData = {
   dob: '',
   fatherName: '',
   motherName: '',
+  instituteId: '',
   category: StudentCategory.GENERAL,
   gender: Gender.MALE,
   nationality: '',
