@@ -14,7 +14,7 @@ import PrivacyPolicy from "./pages/policyPages/PrivacyPolicy";
 import SafeguardingPolicy from "./pages/policyPages/SafeGuardingPolicy";
 import SaferRecruitmentPolicy from "./pages/policyPages/SaferRecruitmentPolicy";
 import AdmissionPolicy from "./pages/policyPages/AdmissionPage";
-import InstituteRegistrationForm from "./pages/InstituteForm";
+import InstituteRegistrationForm from "./pages/accredited/InstituteForm";
 import BoardProfile from "./pages/about/BoardProfile";
 import COE from "./pages/about/COE";
 import MissionVision from "./pages/about/MissionVission";
@@ -92,6 +92,7 @@ function App() {
           <Route path="/ugcourse/:id" element={<Layout><CourseDetailUG /></Layout>} />
           <Route path="/pgcourse/:id" element={<Layout><CourseDetailPG /></Layout>} />
           <Route path="/membership-accreditation" element={<Layout><Membership /></Layout>} />
+          <Route path="/accredited-institute-registration" element={<Layout><InstituteRegistrationForm /></Layout>} />  
         </Routes>
         
       </BrowserRouter>

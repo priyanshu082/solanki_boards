@@ -133,7 +133,7 @@ const accreditedInstitutes = [
   },
   {
     title: "Online Accreditation Form",
-    href: "/institutes/research",
+    href: "/accredited-institute-registration",
     description: "Specialized research institutions.",
   },
   {
