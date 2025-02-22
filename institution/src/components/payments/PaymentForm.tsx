@@ -71,7 +71,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">
-              {paymentType === 'INSTITUTE' ? 'Registration Number' : 'Student ID'}
+              {paymentType === 'INSTITUTE' ? 'Application Number' : 'Student ID'}
             </label>
             <Input
               type="text"
@@ -79,7 +79,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               onChange={(e) => setRegistrationNumber(e.target.value)}
               required
               className="w-full"
-              placeholder={paymentType === 'INSTITUTE' ? 'Enter registration number' : 'Enter student ID'}
+              placeholder={paymentType === 'INSTITUTE' ? 'Enter application number' : 'Enter student ID'}
             />
             {paymentType === 'STUDENT' && (
               <Button 

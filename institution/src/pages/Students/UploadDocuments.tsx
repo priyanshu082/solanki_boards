@@ -5,80 +5,212 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Loader2, X, RotateCcw } from "lucide-react";
 import axios from 'axios';
-import { ExaminationType } from '@/store/atoms/formDataAtoms'; // Importing ExaminationType
+import { DocumentType } from '@/store/atoms/formDataAtoms';
+import { addmisionPutUrl, studentSearchUrl } from '@/Config';
+import Swal from 'sweetalert2';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface Document {
+  id: string;
+  documentType: keyof typeof DocumentType;
+  fileName: string;
+  fileUrl: string;
+}
 
 interface StudentDetails {
+  id: string;
   name: string;
   fatherName: string;
   motherName: string;
   course: string;
   instituteId: string;
-  qualifications: Array<{
-    type: ExaminationType; // Updated to use ExaminationType
-    yearOfPassing?: string;
-  }>;
+  documents: Document[];
+}
+
+interface DocumentUploadParams {
+  file: File;
+  documentType: keyof typeof DocumentType;
+  studentId: string;
 }
 
 const UploadDocuments = () => {
-  const [searchType, setSearchType] = useState<'name' | 'application'>('name');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [studentData, setStudentData] = useState<StudentDetails | null>(null);
+  const [uploadError, setUploadError] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedDocType, setSelectedDocType] = useState<keyof typeof DocumentType>('PROFILE_PHOTO');
 
   const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Input',
+        text: 'Please enter an application number',
+        confirmButtonColor: '#3085d6'
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Using dummy data for now
-      const dummyData: StudentDetails = {
-        name: "John Doe",
-        fatherName: "Richard Doe",
-        motherName: "Jane Doe",
-        course: "Computer Science",
-        instituteId: "INST12345",
-        qualifications: [
-          { type: ExaminationType.X, yearOfPassing: "2020" }, // Updated to use ExaminationType
-          { type: ExaminationType.XII, yearOfPassing: "2024" } // Updated to use ExaminationType
-        ]
-      };
-      // Simulating an API call with axios
-      const response = await axios.get(`/api/students/search?type=${searchType}&query=${searchQuery}`);
-      // Uncomment the line below to use actual data from the response
-      // setStudentData(response.data);
-      setStudentData(dummyData); // Use dummy data for now
-    } catch (error) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Authentication Error',
+          text: 'Please login again to continue',
+          confirmButtonColor: '#3085d6'
+        });
+        return;
+      }
+
+      const response = await axios.get(`${studentSearchUrl}/${searchQuery}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data) {
+        console.log(response.data);
+        setStudentData(response.data);
+        setUploadError('');
+        setSelectedFile(null);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'No Results',
+          text: 'No student found with this application number',
+          confirmButtonColor: '#3085d6'
+        });
+      }
+    } catch (error: any) {
       console.error('Error fetching student data:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.response?.data?.message || 'Failed to fetch student details',
+        confirmButtonColor: '#3085d6'
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDocumentUpload = async (qualificationType: ExaminationType, file: File) => { // Updated to use ExaminationType
-    const formData = new FormData();
-    formData.append('document', file);
-    formData.append('qualificationType', qualificationType);
-    formData.append('studentId', studentData?.name || '');
-
+  const handleDocumentUpload = async () => {
     try {
-      // Replace with your actual upload endpoint
-      const response = await axios.post('/api/documents/upload', formData);
-      
-      if (response.status === 200) {
-        // Update UI to show success
-        console.log('Document uploaded successfully');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Authentication Error',
+          text: 'Please login again to continue',
+          confirmButtonColor: '#3085d6'
+        });
+        return;
       }
-    } catch (error) {
+
+      if (!selectedFile || !studentData) {
+        Swal.fire({
+          icon: 'error',
+          title: 'File Required',
+          text: 'Please select a file to upload',
+          confirmButtonColor: '#3085d6'
+        });
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', selectedFile);
+      formData.append('id', studentData.id);
+      formData.append('documentType', selectedDocType);
+
+      const response = await axios.put(`${addmisionPutUrl}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      if (response.data) {
+        setUploadError('');
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Document uploaded successfully',
+          confirmButtonColor: '#3085d6'
+        });
+        handleSearch();
+      }
+    } catch (error: any) {
       console.error('Error uploading document:', error);
+      setUploadError(error.response?.data?.message || 'Failed to upload document');
+      Swal.fire({
+        icon: 'error',
+        title: 'Upload Failed',
+        text: error.response?.data?.message || 'Failed to upload document',
+        confirmButtonColor: '#3085d6'
+      });
+    }
+  };
+
+  const handleFileRemove = () => {
+    setSelectedFile(null);
+    setUploadError('');
+  };
+
+  const handleDocumentUpdate = async (documentId: string, documentType: keyof typeof DocumentType, file: File) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Authentication Error',
+          text: 'Please login again to continue',
+          confirmButtonColor: '#3085d6'
+        });
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('id', studentData!.id);
+      formData.append('documentType', documentType);
+      formData.append('documentId', documentId);
+
+      const response = await axios.put(`${addmisionPutUrl}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      if (response.data) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Document updated successfully',
+          confirmButtonColor: '#3085d6'
+        });
+        handleSearch(); // Refresh data
+      }
+    } catch (error: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: error.response?.data?.message || 'Failed to update document',
+        confirmButtonColor: '#3085d6'
+      });
     }
   };
 
@@ -91,22 +223,9 @@ const UploadDocuments = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
-            <Select
-              value={searchType}
-              onValueChange={(value: 'name' | 'application') => setSearchType(value)}
-            >
-              <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Search by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name">Name</SelectItem>
-                <SelectItem value="application">Application Number</SelectItem>
-              </SelectContent>
-            </Select>
-            
             <div className="flex-1">
               <Input
-                placeholder={`Enter student ${searchType}`}
+                placeholder="Enter Application Number"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -117,8 +236,12 @@ const UploadDocuments = () => {
               disabled={isLoading}
               className="w-full md:w-auto"
             >
-              <Search className="mr-2 h-4 w-4" />
-              Search
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="mr-2 h-4 w-4" />
+              )}
+              {isLoading ? 'Searching...' : 'Search'}
             </Button>
           </div>
         </CardContent>
@@ -158,32 +281,137 @@ const UploadDocuments = () => {
       )}
 
       {/* Document Upload Section */}
-      {studentData?.qualifications && (
+      {studentData && (
         <Card>
           <CardHeader>
             <CardTitle>Document Upload</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {studentData.qualifications.map((qual, index) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg">
-                  <div>
-                    <p className="font-semibold">{qual.type}</p>
-                    {qual.yearOfPassing && (
-                      <p className="text-sm text-gray-600">Year: {qual.yearOfPassing}</p>
-                    )}
-                  </div>
-                  <div className="flex items-center">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg">
+                <div>
+                  <Select 
+                    value={selectedDocType}
+                    onValueChange={(value: keyof typeof DocumentType) => setSelectedDocType(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select document type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(DocumentType).map(([key, value]) => (
+                        <SelectItem key={key} value={value}>
+                          {key.replace(/_/g, ' ')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
                     <Input
                       type="file"
-                      accept=".pdf"
+                      accept=".jpeg,.jpg,.png"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          handleDocumentUpload(qual.type, file); // Updated to use ExaminationType
+                          setSelectedFile(file);
                         }
                       }}
                     />
+                    {selectedFile && (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={handleFileRemove}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  {uploadError && (
+                    <p className="text-sm text-red-500">{uploadError}</p>
+                  )}
+                </div>
+                <div className="flex items-center">
+                  <Button
+                    onClick={handleDocumentUpload}
+                    disabled={!selectedFile}
+                    className="w-full"
+                  >
+                    {uploadError ? (
+                      <>
+                        <RotateCcw className="mr-2 h-4 w-4" />
+                        Retry Upload
+                      </>
+                    ) : (
+                      'Upload'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Uploaded Documents Section */}
+      {studentData?.documents && studentData.documents.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Uploaded Documents</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {studentData.documents.map((doc) => (
+                <div key={doc.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg items-center">
+                  <div>
+                    <p className="font-semibold">{doc.documentType.replace(/_/g, ' ')}</p>
+                    <p className="text-sm text-gray-600">{doc.fileName}</p>
+                  </div>
+                  
+                  <div>
+                    <a 
+                      href={doc.fileUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Document
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept=".jpeg,.jpg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleDocumentUpdate(doc.id, doc.documentType, file);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = '.jpeg,.jpg,.png';
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) {
+                            handleDocumentUpdate(doc.id, doc.documentType, file);
+                          }
+                        };
+                        input.click();
+                      }}
+                    >
+                      Update Document
+                    </Button>
                   </div>
                 </div>
               ))}

@@ -14,7 +14,7 @@ import {
 import { AdmissionType, BatchType, PaymentStatus } from '@/store/atoms/formDataAtoms';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { studentSearchUrl } from '@/Config';
+import {  allStudentsSearchUrl } from '@/Config';
 
 interface Student {
   id: string;
@@ -39,6 +39,7 @@ const ShowStudents = () => {
   const [selectedAdmissionType, setSelectedAdmissionType] = useState('all');
   const [selectedBatch, setSelectedBatch] = useState('all');
 
+  //@ts-ignore
   const [selectedCourse, setSelectedCourse] = useState('all');
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('any');
   const [selectedDocumentStatus, setSelectedDocumentStatus] = useState('');
@@ -73,7 +74,7 @@ const ShowStudents = () => {
         return;
       }
 
-      const response = await axios.post(studentSearchUrl,{}, {
+      const response = await axios.post(allStudentsSearchUrl,{}, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
