@@ -3,9 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PaymentForm } from '../../components/payments';
 import { ArrowLeft, CreditCard, Building } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
+import { useEffect } from 'react';
+import { InstituteAmount } from '@/Config'; 
 
 const PaymentPage = () => {
   const [paymentType, setPaymentType] = useState<'STUDENT' | 'INSTITUTE' | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<string | null>("");
+
+  useEffect(() => {
+    const status = localStorage.getItem("paymentStatus");
+    setPaymentStatus(status);
+  }, []);
 
   const handlePaymentTypeSelect = (type: 'STUDENT' | 'INSTITUTE') => {
     setPaymentType(type);
@@ -93,6 +101,7 @@ const PaymentPage = () => {
                 <PaymentForm
                   paymentType={paymentType}
                   userId="123"
+                  amount={paymentType === 'INSTITUTE' ? InstituteAmount : InstituteAmount} // Set fixed amount for institute payment
                   onSuccess={(data) => {
                     console.log('Success', data);
                     toast.success('Payment successful!', {

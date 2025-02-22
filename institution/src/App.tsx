@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
 import Layout from './Layout'
 import RegisterStudent from './pages/Students/RegisterStudent'
@@ -12,26 +12,16 @@ import { PaymentCallback } from './components/payments/PaymentCallback'
 import { PaymentStatus } from './components/payments/PaymentStatus'
 import PaymentPage from './pages/Payments/PaymentPage'
 
-// import Layout from './components/Sidebar'
-// import { Signin } from './pages/Signin'
-// import { Home } from './pages/Home'
-// import { RoomDetails } from './pages/Room'
-// import CreateRoom from './pages/CreateRoom'
-// import BookingPage from './pages/BookingPage'
-// import Bookings from './pages/Bookings'
-// import Footer from './components/Footer'
-
-
 // Protected Route wrapper component
-// const ProtectedRoute = ({ children }:any) => {
-//   const id = localStorage.getItem('id')
+const ProtectedRoute = ({ children }: any) => {
+  const id = localStorage.getItem('id')
   
-//   if (!id) {
-//     return <Navigate to="/signin" replace />
-//   }
+  if (!id) {
+    return <Navigate to="/login" replace />
+  }
   
-//   return children
-// }
+  return children
+}
 
 function App() {
   return (
@@ -40,27 +30,29 @@ function App() {
         {/* Wrap pages with the Layout */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="register-student" element={<RegisterStudent />} />
-          <Route path="upload-document" element={<UploadDocuments />} />
-          <Route path="show-students" element={<ShowStudents />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="accredited-certificate" element={<Certificate />} />
-          <Route path="sanctioned-letter" element={<Letter />} />
+          <Route path="register-student" element={<ProtectedRoute><RegisterStudent /></ProtectedRoute>} />
+          <Route path="upload-document" element={<ProtectedRoute><UploadDocuments /></ProtectedRoute>} />
+          <Route path="show-students" element={<ProtectedRoute><ShowStudents /></ProtectedRoute>} />
+          <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="accredited-certificate" element={<ProtectedRoute><Certificate /></ProtectedRoute>} />
+          <Route path="sanctioned-letter" element={<ProtectedRoute><Letter /></ProtectedRoute>} />
 
-
-
-        <Route path="/pay" element={<PaymentPage />} />
-        
-        {/* PhonePe callback handler */}
-        <Route path="/payment/callback" element={<PaymentCallback />} />
-        
-        {/* Success/Error pages */}
-        <Route path="/payment/success" element={
-          <PaymentStatus status="success" />
-        } />
-        <Route path="/payment/error" element={
-          <PaymentStatus status="error" />
-        } />
+          <Route path="/pay" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
+          
+          {/* PhonePe callback handler */}
+          <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
+          
+          {/* Success/Error pages */}
+          <Route path="/payment/success" element={
+            <ProtectedRoute>
+              <PaymentStatus status="success" />
+            </ProtectedRoute>
+          } />
+          <Route path="/payment/error" element={
+            <ProtectedRoute>
+              <PaymentStatus status="error" />
+            </ProtectedRoute>
+          } />
         </Route>
         <Route path="/login" element={<Auth />} />
         

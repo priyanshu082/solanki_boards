@@ -10,30 +10,35 @@ interface PaymentFormProps {
   userId: string;
   onSuccess?: (data: any) => void;
   onError?: (error: any) => void;
+  amount: number; // Ensure amount is passed as a prop
 }
 
 export const PaymentForm: React.FC<PaymentFormProps> = ({
   paymentType,
   userId,
   onSuccess,
-  onError
+  onError,
+  amount
 }) => {
-  const [amount, setAmount] = useState('');
+  const [amountStudent, setAmountStudent] = useState('');
+  const [amountInstitute] = useState(amount); // Fixed amount for institute
   const [registrationNumber, setRegistrationNumber] = useState('');
   const { payment, initiatePayment } = usePayment();
 
   const handleFetchAmount = async () => {
-    // Simulate fetching amount based on registration number
-    try {
-      const response = await fetch(`/api/getAmount?registrationNumber=${registrationNumber}`);
-      const data = await response.json();
-      if (data.amount) {
-        setAmount(data.amount.toString());
-      } else {
-        throw new Error('Amount not found');
+    // Fetch amount only for students
+    if (paymentType === 'STUDENT') {
+      try {
+        const response = await fetch(`/api/getAmount?registrationNumber=${registrationNumber}`);
+        const data = await response.json();
+        if (data.amount) {
+          setAmountStudent(data.amount.toString()); // Set amount for student
+        } else {
+          throw new Error('Amount not found');
+        }
+      } catch (error) {
+        onError?.(error);
       }
-    } catch (error) {
-      onError?.(error);
     }
   };
 
@@ -42,7 +47,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
 
     try {
       const response = await initiatePayment({
-        amount: parseFloat(amount),
+        amount: paymentType === 'STUDENT' ? parseFloat(amountStudent) : amountInstitute, // Use student amount or fixed institute amount
         paymentType,
         userId
       });
@@ -76,20 +81,22 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               className="w-full"
               placeholder={paymentType === 'INSTITUTE' ? 'Enter registration number' : 'Enter student ID'}
             />
-            <Button 
-              type="button" 
-              onClick={handleFetchAmount} 
-              className="mt-2 w-full"
-            >
-              Fetch Amount
-            </Button>
+            {paymentType === 'STUDENT' && (
+              <Button 
+                type="button" 
+                onClick={handleFetchAmount} 
+                className="mt-2 w-full"
+              >
+                Fetch Amount
+              </Button>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Amount (₹)</label>
             <Input
               type="number"
-              value={amount}
+              value={paymentType === 'STUDENT' ? amountStudent : amountInstitute} // Show appropriate amount
               readOnly
               className="w-full"
               placeholder="Amount will be fetched automatically"
@@ -105,7 +112,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
           <Button 
             type="submit" 
             className="w-full"
-            disabled={payment.status === 'loading' || !amount}
+            disabled={payment.status === 'loading' || (paymentType === 'STUDENT' && !amountStudent)}
           >
             {payment.status === 'loading' ? 'Processing...' : 'Pay Now'}
           </Button>

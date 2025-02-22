@@ -5,6 +5,7 @@ import background from "../assets/bg.jpg";
 import axios from "axios";
 import { BACKEND_URL } from "@/Config";
 import { User, KeyRound, Shield, Eye, EyeOff } from "lucide-react";
+
 export enum alertTypeEnum {
     success = "success",
     error = "error",
@@ -13,33 +14,35 @@ export enum alertTypeEnum {
 }
 
 interface LoginInput {
-    enrollmentNumber: string;
-    dateOfBirth: string;
+    applicationNumber: string;
+    headAadharNumber: string;
 }
 
 export const Auth = () => {
     const navigate = useNavigate();
     const [loginInputs, setLoginInputs] = useState<LoginInput>({
-        enrollmentNumber: "",
-        dateOfBirth: "",
+        applicationNumber: "",
+        headAadharNumber: "",
     });
 
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertType, setAlertType] = useState<alertTypeEnum>();
-    const [showPassword, setShowPassword] = useState(false);
+    const [showAadhar, setShowAadhar] = useState(false);
 
     async function sendRequest() {
         try {
             const response = await axios.post(
-                `${BACKEND_URL}/api/v1/student/login`,
+                `${BACKEND_URL}/api/v1/institute/login`,
                 loginInputs
             );
 
-            const student = response.data.student;
+            const institute = response.data.institute;
 
-            localStorage.setItem("id", student.id);
-            localStorage.setItem("name", student.name);
-            localStorage.setItem("role", "student");
+            localStorage.setItem("id", institute.id);
+            localStorage.setItem("name", institute.headName);
+            localStorage.setItem("role", "institute");
+            localStorage.setItem("accessToken", response.data.accessToken);
+            localStorage.setItem("refreshToken", response.data.refreshToken);
 
             setAlertMessage("Login Successful");
             setAlertType(alertTypeEnum.success);
@@ -55,7 +58,7 @@ export const Auth = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-blue-950 relative  rounded-md">
+        <div className="min-h-screen flex items-center justify-center bg-blue-950 relative rounded-md">
             {/* Background Image */}
             <img
                 src={background}
@@ -75,12 +78,11 @@ export const Auth = () => {
                     />
                     <Shield className="h-16 w-16 text-yellow-400 mb-6" />
                     <h1 className="text-3xl font-bold text-yellow-400 mb-4">
-                        Welcome to Student Portal
+                        Welcome to Institute Portal
                     </h1>
                     <p className="text-gray-100 text-lg text-center">
-                        Secure access to your personalized dashboard.
-                        Enter your Enrollment Number and Date of Birth to
-                        continue.
+                        Secure access to your institute dashboard.
+                        Enter your Application Number and Aadhar Number to continue.
                     </p>
                 </div>
 
@@ -89,7 +91,7 @@ export const Auth = () => {
                     <div className="max-w-md mx-auto">
                         <div className="text-center mb-8">
                             <h2 className="text-2xl font-bold text-yellow-200">
-                                Student Login
+                                Institute Login
                             </h2>
                             <p className="text-gray-400 mt-2 text-sm">
                                 Enter your credentials to continue.
@@ -97,53 +99,51 @@ export const Auth = () => {
                         </div>
 
                         <div className="space-y-4">
-                            {/* Enrollment Number Input */}
+                            {/* Application Number Input */}
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <User className="h-5 w-5 text-yellow-200" />
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Enrollment Number"
+                                    placeholder="Application Number"
                                     className="w-full pl-10 pr-3 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                                    value={loginInputs.enrollmentNumber}
+                                    value={loginInputs.applicationNumber}
                                     onChange={(e) =>
                                         setLoginInputs({
                                             ...loginInputs,
-                                            enrollmentNumber: e.target.value,
+                                            applicationNumber: e.target.value,
                                         })
                                     }
                                 />
                             </div>
 
-                            {/* Date of Birth Input */}
-                            <div className="space-y-4">
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <User className="h-5 w-5 text-yellow-200" />
-                                    </div>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="Date of Birth"
-                                        className="w-full pl-10 pr-10 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                                        value={loginInputs.dateOfBirth}
-                                        onChange={(e) =>
-                                            setLoginInputs({
-                                                ...loginInputs,
-                                                dateOfBirth: e.target.value,
-                                            })
-                                        }
-                                    />
-                                    <div
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                                        onClick={() => setShowPassword((prev) => !prev)}
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="h-5 w-5 text-yellow-200" />
-                                        ) : (
-                                            <Eye className="h-5 w-5 text-yellow-200" />
-                                        )}
-                                    </div>
+                            {/* Aadhar Number Input */}
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <KeyRound className="h-5 w-5 text-yellow-200" />
+                                </div>
+                                <input
+                                    type={showAadhar ? "text" : "password"}
+                                    placeholder="Aadhar Number"
+                                    className="w-full pl-10 pr-10 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                                    value={loginInputs.headAadharNumber}
+                                    onChange={(e) =>
+                                        setLoginInputs({
+                                            ...loginInputs,
+                                            headAadharNumber: e.target.value,
+                                        })
+                                    }
+                                />
+                                <div
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                    onClick={() => setShowAadhar((prev) => !prev)}
+                                >
+                                    {showAadhar ? (
+                                        <EyeOff className="h-5 w-5 text-yellow-200" />
+                                    ) : (
+                                        <Eye className="h-5 w-5 text-yellow-200" />
+                                    )}
                                 </div>
                             </div>
 

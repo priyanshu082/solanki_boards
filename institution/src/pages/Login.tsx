@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import background from "../assets/bg.jpg";
 import axios from "axios";
-import { BACKEND_URL } from "@/Config";
+import { instituteLoginUrl } from "@/Config";
 import { User, KeyRound, Shield, Eye,EyeOff } from "lucide-react";
 
 export enum alertTypeEnum {
@@ -14,37 +14,46 @@ export enum alertTypeEnum {
 }
 
 interface LoginInput {
-    registrationNumber: string;
-    dateOfBirth: string;
+    applicationNumber: string;
+    dob: string;
 }
 
 export const Auth = () => {
     const navigate = useNavigate();
     const [loginInputs, setLoginInputs] = useState<LoginInput>({
-        registrationNumber: "",
-        dateOfBirth: "",
+        applicationNumber: "",
+        dob: "",
     });
 
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertType, setAlertType] = useState<alertTypeEnum>();
-    const [showPassword, setShowPassword] = useState(false); 
+    const [showDob, setShowDob] = useState(false);
 
     async function sendRequest() {
         try {
             const response = await axios.post(
-                `${BACKEND_URL}/api/v1/user/login`,
+                `${instituteLoginUrl}`,
                 loginInputs
             );
 
-            const user = response.data.user;
+            const institute = response.data.institute;
 
-            localStorage.setItem("id", user.id);
-            localStorage.setItem("name", user.name);
-            localStorage.setItem("role", user.role);
+            localStorage.setItem("id", institute.id);
+            localStorage.setItem("paymentStatus", institute.paymentStatus);
+            localStorage.setItem("role", "institute");
+            localStorage.setItem("accessToken", response.data.accessToken);
+            localStorage.setItem("refreshToken", response.data.refreshToken);
 
             setAlertMessage("Login Successful");
             setAlertType(alertTypeEnum.success);
 
+            // setTimeout(() => {
+            //     if(institute.paymentStatus !== paymentStatusEnum.PASS){
+            //         navigate("/pay");
+            //     }else{
+            //         navigate("/");
+            //     }
+            // }, 1000);
             setTimeout(() => {
                 navigate("/");
             }, 1000);
@@ -79,9 +88,8 @@ export const Auth = () => {
                         Welcome to Institution Portal
                     </h1>
                     <p className="text-gray-100 text-lg text-center">
-                        Secure access to your personalized dashboard.
-                        Enter your LoginID number and Password to
-                        continue.
+                        Secure access to your institute dashboard.
+                        Enter your Application Number and Date of Birth to continue.
                     </p>
                 </div>
 
@@ -98,56 +106,53 @@ export const Auth = () => {
                         </div>
 
                         <div className="space-y-4">
-                            {/* Registration Number Input */}
+                            {/* Application Number Input */}
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <User className="h-5 w-5 text-yellow-200" />
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Login ID"
+                                    placeholder="Application Number"
                                     className="w-full pl-10 pr-3 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                                    value={loginInputs.registrationNumber}
+                                    value={loginInputs.applicationNumber}
                                     onChange={(e) =>
                                         setLoginInputs({
                                             ...loginInputs,
-                                            registrationNumber: e.target.value,
+                                            applicationNumber: e.target.value,
                                         })
                                     }
                                 />
                             </div>
 
                             {/* Date of Birth Input */}
-                            <div className="space-y-4">
-  
-    <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <User className="h-5 w-5 text-yellow-200" />
-        </div>
-        <input
-            type={showPassword ? "text" : "password"} // Toggle between text and password
-            placeholder="Password"
-            className="w-full pl-10 pr-10 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
-            value={loginInputs.dateOfBirth} // Example field, replace with the correct password field
-            onChange={(e) =>
-                setLoginInputs({
-                    ...loginInputs,
-                    dateOfBirth: e.target.value, // Example, replace as necessary
-                })
-            }
-        />
-        <div
-            className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-            onClick={() => setShowPassword((prev) => !prev)} // Toggle visibility
-        >
-            {showPassword ? (
-                <EyeOff className="h-5 w-5 text-yellow-200" />
-            ) : (
-                <Eye className="h-5 w-5 text-yellow-200" />
-            )}
-        </div>
-    </div>
-</div>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <KeyRound className="h-5 w-5 text-yellow-200" />
+                                </div>
+                                <input
+                                    type={showDob ? "text" : "password"}
+                                    placeholder="Date of Birth (YYYY-MM-DD)"
+                                    className="w-full pl-10 pr-10 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                                    value={loginInputs.dob}
+                                    onChange={(e) =>
+                                        setLoginInputs({
+                                            ...loginInputs,
+                                            dob: e.target.value,
+                                        })
+                                    }
+                                />
+                                <div
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                    onClick={() => setShowDob((prev) => !prev)}
+                                >
+                                    {showDob ? (
+                                        <EyeOff className="h-5 w-5 text-yellow-200" />
+                                    ) : (
+                                        <Eye className="h-5 w-5 text-yellow-200" />
+                                    )}
+                                </div>
+                            </div>
 
                             {/* Login Button */}
                             <button
@@ -163,11 +168,9 @@ export const Auth = () => {
                                 <div
                                     className={`
                                         p-4 rounded-lg text-center text-sm
-                                        ${
-                                            alertType ===
-                                            alertTypeEnum.success
-                                                ? "bg-green-500 text-white"
-                                                : "bg-red-500 text-white"
+                                        ${alertType === alertTypeEnum.success
+                                            ? "bg-green-500 text-white"
+                                            : "bg-red-500 text-white"
                                         }
                                     `}
                                 >
