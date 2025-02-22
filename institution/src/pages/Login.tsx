@@ -41,19 +41,12 @@ export const Auth = () => {
             localStorage.setItem("id", institute.id);
             localStorage.setItem("paymentStatus", institute.paymentStatus);
             localStorage.setItem("role", "institute");
-            localStorage.setItem("accessToken", response.data.accessToken);
+            localStorage.setItem("token", response.data.accessToken);
             localStorage.setItem("refreshToken", response.data.refreshToken);
 
             setAlertMessage("Login Successful");
             setAlertType(alertTypeEnum.success);
 
-            // setTimeout(() => {
-            //     if(institute.paymentStatus !== paymentStatusEnum.PASS){
-            //         navigate("/pay");
-            //     }else{
-            //         navigate("/");
-            //     }
-            // }, 1000);
             setTimeout(() => {
                 navigate("/");
             }, 1000);

@@ -8,6 +8,7 @@ import { InstituteAmount } from '@/Config';
 
 const PaymentPage = () => {
   const [paymentType, setPaymentType] = useState<'STUDENT' | 'INSTITUTE' | null>(null);
+  //@ts-ignore
   const [paymentStatus, setPaymentStatus] = useState<string | null>("");
 
   useEffect(() => {

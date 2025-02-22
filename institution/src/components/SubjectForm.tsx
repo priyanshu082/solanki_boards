@@ -5,7 +5,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useRecoilState } from 'recoil';
-import { admissionFormState, subjectsAtom } from '@/store/atoms/formDataAtoms';
+import { admissionFormState } from '@/store/atoms/formDataAtoms';
+import { staticDataAtoms } from '@/store/atoms/staticDataAtoms';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -13,7 +14,7 @@ const SubjectForm = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [formData, setFormData] = useRecoilState(admissionFormState);
   //@ts-ignore
-  const [subjectsList, setSubjectsList] = useRecoilState(subjectsAtom);
+  const [subjectsList, setSubjectsList] = useRecoilState(staticDataAtoms.subjectsAtom);
 
   // Dummy subjects data with IDs
   const subjects = [

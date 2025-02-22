@@ -6,17 +6,20 @@ import EducationQualificationForm from '@/components/EducationQualificationForm'
 import SubjectForm from '@/components/SubjectForm';
 import { Button } from "@/components/ui/button";
 import { toast } from '@/hooks/use-toast';
+import axios from 'axios';
+import { admissionRegistrationUrl } from '@/Config';
 
 type FormType = 'student' | 'EducationalQualification' | 'Subjects';
 
 const RegisterPage = () => {
   const [activeForm, setActiveForm] = useState<FormType>('student');
   const formData = useRecoilValue(admissionFormState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
 
-  // Log the state of Recoil
-  console.log('Recoil State:', formData);
+  // Validation functions remain the same...
 
+  console.log(formData);  
   const validateStudentForm = (): boolean => {
     const requiredFields = [
       'name',
@@ -39,7 +42,7 @@ const RegisterPage = () => {
     type AddressKey = typeof addressFields[number];
   
     const hasBasicFields = requiredFields.every(field => 
-      formData[field as keyof AdmissionFormData] && String(formData[field as keyof AdmissionFormData ]).trim() !== ''
+      formData[field as keyof AdmissionFormData] && String(formData[field as keyof AdmissionFormData]).trim() !== ''
     );
   
     const hasValidAddresses = addressFields.every((field: AddressKey) => 
@@ -53,19 +56,16 @@ const RegisterPage = () => {
   };
 
   const validateEducationalQualifications = (): boolean => {
-    // Check if there are any educational qualifications
     if (formData.educationalQualifications.length === 0) {
-      return false; // No qualifications present
+      return false;
     }
 
-    // Validate each qualification
     return formData.educationalQualifications.every(qual => {
       const hasExamination = Boolean(qual.examination);
       const hasSubjects = Boolean(qual.subjects);
       const hasYearOfPassing = Boolean(qual.yearOfPassing);
       const hasPercentage = typeof qual.percentage === 'number' && !isNaN(qual.percentage);
       
-
       return hasExamination && hasSubjects && hasYearOfPassing && hasPercentage;
     });
   };
@@ -74,9 +74,15 @@ const RegisterPage = () => {
     return formData.subjectIds.length > 0;
   };
 
+  const validateAllForms = (): boolean => {
+    return validateStudentForm() && 
+           validateEducationalQualifications() && 
+           validateSubjects();
+  };
+
   const handleNext = () => {
     if (activeForm === 'student' && validateStudentForm()) {
-      setActiveForm('EducationalQualification'); // Allow transition to Educational Qualification first
+      setActiveForm('EducationalQualification');
     } else if (activeForm === 'EducationalQualification' && validateEducationalQualifications()) {
       setActiveForm('Subjects');
     } else {
@@ -88,51 +94,100 @@ const RegisterPage = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!validateStudentForm() || !validateEducationalQualifications() || !validateSubjects()) {
+  const handleSubmit = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    
+    if (!validateAllForms()) {
       toast({
-        title: "Incomplete Application",
-        description: "Please ensure all sections are completed",
+        title: "Incomplete Form",
+        description: "Please fill all required fields before submitting",
         variant: "destructive",
       });
       return;
     }
 
-    const submissionData = {
-      ...formData,
-      studentPhoto: formData.studentPhoto,
-    };
+    setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/admission/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submissionData),
-      });
+      const data = new FormData();
 
-      if (!response.ok) {
-        throw new Error('Submission failed');
+      // Add the photo
+      if (formData.studentPhoto) {
+        data.append('image', formData.studentPhoto);
+      } else {
+        alert("Missing Photo");
+        setIsSubmitting(false);
+        return;
       }
 
-      toast({
-        title: "Success",
-        description: "Your application has been submitted successfully",
+      // Create submission data with proper lastPassedExam format
+      const submissionData = {
+        ...formData,
+        lastPassedExam: formData.lastPassedExam.length > 0 ? formData.lastPassedExam[0] : null,
+        dob: formData.dob.split('T')[0]
+      };
+
+      // Add all form fields directly
+      Object.entries(submissionData).forEach(([key, value]) => {
+        if (key === 'studentPhoto') return;
+
+        // Skip null values
+        if (value === null) return;
+
+        if (typeof value === 'object') {
+          data.append(key, JSON.stringify(value));
+        } else {
+          data.append(key, String(value));
+        }
       });
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("Authentication Error");
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('Submitting form data:', Object.fromEntries(data.entries()));
+
+      const response = await axios.post(admissionRegistrationUrl, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (response.data) {
+        toast({
+          title: "Success",
+          description: "Your application has been submitted successfully",
+        });
+      }
       
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to submit application. Please try again.",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      console.error('Submission error:', error);
+      if (error.response?.status === 401) {
+        toast({
+          title: "Authentication Error",
+          description: "Please login again to continue",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to submit application. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
     const isFormValid = validateStudentForm();
-    setCanProceed(isFormValid); // Allow proceeding regardless of active form
+    setCanProceed(isFormValid);
   }, [formData, activeForm]);
 
   const forms: Record<FormType, JSX.Element> = {
@@ -183,10 +238,10 @@ const RegisterPage = () => {
         ) : (
           <Button 
             onClick={handleSubmit}
-            disabled={!canProceed}
+            disabled={!validateAllForms() || isSubmitting}
             className="bg-green-600 hover:bg-green-700"
           >
-            Submit Application
+            {isSubmitting ? 'Submitting...' : 'Submit Application'}
           </Button>
         )}
       </div>

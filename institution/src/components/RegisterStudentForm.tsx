@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import { toast } from "@/hooks/use-toast";
 
 // Reusable Form Field Component
 const FormField: React.FC<{
@@ -158,16 +159,31 @@ const RegisterStudentForm: React.FC = () => {
     }
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatar(reader.result);
-        setImageFile(file);
-        updateField('studentPhoto', file); // Save the uploaded image in the form data
-      };
-      reader.readAsDataURL(file);
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid File",
+          description: "Please upload an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Validate file size (e.g., 5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File Too Large",
+          description: "Please upload an image smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      setFormData(prev => ({
+        ...prev,
+        studentPhoto: file
+      }));
     }
   };
 
@@ -187,11 +203,15 @@ const RegisterStudentForm: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center md:items-start gap-6">
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-[150px] h-[150px] border-2 border-gray-200 rounded-md overflow-hidden">
-                  <img
-                    src={avatar as string}
-                    alt="Student Photo"
-                    className="w-full h-full object-cover"
-                  />
+                  {formData.studentPhoto ? (
+                    <img
+                      src={URL.createObjectURL(formData.studentPhoto)}
+                      alt="Student Photo"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <p className="text-gray-500">No photo uploaded</p>
+                  )}
                 </div>
               </div>
 
@@ -203,13 +223,13 @@ const RegisterStudentForm: React.FC = () => {
                     className="bg-blue-500 text-white hover:bg-blue-600 w-fit"
                     onClick={() => document.getElementById('fileInput')?.click()} // Open file dialog on button click
                   >
-                    Change
+                    Upload Photo
                   </Button>
                   <Input 
                     id="fileInput" // Hidden file input
                     type="file" 
                     accept="image/*" 
-                    onChange={handleImageChange} 
+                    onChange={handleFileChange} 
                     className="hidden"
                   />
                 </div>
