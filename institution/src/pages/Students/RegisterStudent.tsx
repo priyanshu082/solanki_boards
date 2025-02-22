@@ -5,9 +5,10 @@ import RegisterStudentForm from '@/components/RegisterStudentForm';
 import EducationQualificationForm from '@/components/EducationQualificationForm';
 import SubjectForm from '@/components/SubjectForm';
 import { Button } from "@/components/ui/button";
-import { toast } from '@/hooks/use-toast';
+import Swal from 'sweetalert2';
 import axios from 'axios';
 import { admissionRegistrationUrl } from '@/Config';
+import { useNavigate } from 'react-router-dom';
 
 type FormType = 'student' | 'EducationalQualification' | 'Subjects';
 
@@ -16,6 +17,7 @@ const RegisterPage = () => {
   const formData = useRecoilValue(admissionFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
+  const navigate = useNavigate();
 
   // Validation functions remain the same...
 
@@ -86,10 +88,11 @@ const RegisterPage = () => {
     } else if (activeForm === 'EducationalQualification' && validateEducationalQualifications()) {
       setActiveForm('Subjects');
     } else {
-      toast({
-        title: "Incomplete Form",
-        description: "Please fill all required fields before proceeding",
-        variant: "destructive",
+      Swal.fire({
+        icon: 'error',
+        title: 'Incomplete Form',
+        text: 'Please fill all required fields before proceeding',
+        confirmButtonColor: '#3085d6'
       });
     }
   };
@@ -99,10 +102,11 @@ const RegisterPage = () => {
     if (isSubmitting) return;
     
     if (!validateAllForms()) {
-      toast({
-        title: "Incomplete Form",
-        description: "Please fill all required fields before submitting",
-        variant: "destructive",
+      Swal.fire({
+        icon: 'error',
+        title: 'Incomplete Form',
+        text: 'Please fill all required fields before submitting',
+        confirmButtonColor: '#3085d6'
       });
       return;
     }
@@ -116,7 +120,12 @@ const RegisterPage = () => {
       if (formData.studentPhoto) {
         data.append('image', formData.studentPhoto);
       } else {
-        alert("Missing Photo");
+        Swal.fire({
+          icon: 'error',
+          title: 'Missing Photo',
+          text: 'Please upload a student photo and try again',
+          confirmButtonColor: '#3085d6'
+        });
         setIsSubmitting(false);
         return;
       }
@@ -144,7 +153,12 @@ const RegisterPage = () => {
 
       const token = localStorage.getItem('token');
       if (!token) {
-        alert("Authentication Error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Authentication Error',
+          text: 'Please login again to continue',
+          confirmButtonColor: '#3085d6'
+        });
         setIsSubmitting(false);
         return;
       }
@@ -159,25 +173,41 @@ const RegisterPage = () => {
       });
 
       if (response.data) {
-        toast({
-          title: "Success",
-          description: "Your application has been submitted successfully",
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Your application has been submitted successfully',
+          confirmButtonColor: '#3085d6'
         });
+
+        // Navigate after a fixed delay of 3 seconds
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
       }
       
     } catch (error: any) {
       console.error('Submission error:', error);
       if (error.response?.status === 401) {
-        toast({
-          title: "Authentication Error",
-          description: "Please login again to continue",
-          variant: "destructive",
+        Swal.fire({
+          icon: 'error',
+          title: 'Authentication Error',
+          text: 'Please login again to continue',
+          confirmButtonColor: '#3085d6'
         });
       } else {
-        toast({
-          title: "Error",
-          description: "Failed to submit application. Please try again.",
-          variant: "destructive",
+        Swal.fire({
+          icon: 'error',
+          title: 'Error Creating Student Profile',
+          text: error.response?.data?.message || 'Failed to submit application. Please try again.',
+          confirmButtonColor: '#3085d6',
+          showCancelButton: true,
+          confirmButtonText: 'Try Again',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleSubmit(e);
+          }
         });
       }
     } finally {
