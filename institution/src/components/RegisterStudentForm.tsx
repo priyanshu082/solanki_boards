@@ -50,7 +50,9 @@ const FormField: React.FC<{
 const RegisterStudentForm: React.FC = () => {
   const [formData, setFormData] = useRecoilState(admissionFormState);
   const [sameAddress, setSameAddress] = useRecoilState(sameAsPermanentState);
+  //@ts-ignore
   const [avatar, setAvatar] = useState<string | ArrayBuffer | null>(null);
+  //@ts-ignore
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [lastPassedExams, setLastPassedExams] = useRecoilState(lastPassedExamState); // Use the atom for last passed exams
   const [showLastPassedExamForm, setShowLastPassedExamForm] = useState(false); // State to control visibility of last passed exam form
