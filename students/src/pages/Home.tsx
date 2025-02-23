@@ -1,188 +1,305 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import dummy from "../assets/dummy.jpeg"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
 
-// Define TypeScript interfaces for type safety
-interface PersonalDetails {
-  name: string;
-  profileImage: string;
-  email: string;
-  phone: string;
-  fatherName: string;
-  motherName: string;
-  dob: string;
-  gender: string;
-  nationality: string;
-  category: string;
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import dummy from "../assets/dummy.jpeg";
+import { studentDetailsUrl } from '../Config';
+import axios from 'axios';
+
+interface Address {
   address: string;
+  city: string;
+  district: string;
+  state: string;
+  country: string;
+  pincode: string;
 }
 
-interface Subject {
-  code: string;
-  name: string;
-  credits: number;
-}
-
-interface CourseDetails {
-  program: string;
-  session: string;
-  semester: string;
-  subjects: Subject[];
+interface EducationalQualification {
+  examination: string;
+  subjects: string;
+  board: string;
+  university: string | null;
+  yearOfPassing: string;
+  division: string | null;
+  grade: string;
+  percentage: number;
 }
 
 interface StudentData {
-  personalDetails: PersonalDetails;
-  courseDetails: CourseDetails;
+  id: string;
+  admissionType: string;
+  name: string;
+  dob: string;
+  fatherName: string;
+  motherName: string;
+  category: string;
+  gender: string;
+  nationality: string;
+  courseId: string;
+  batch: string;
+  studentPhoto: string;
+  subjectIds: string[];
+  applicationNumber: string;
+  enrollmentNumber: string | null;
+  phoneNumber: string;
+  email: string;
+  instituteId: string;
+  paymentStatus: string;
+  paymentAmount: number;
+  correspondenceAddress: Address[];
+  permanentAddress: Address[];
+  educationalQualifications: EducationalQualification[];
+  documents: any[];
+  lastPassedExam: any[];
 }
-
-const FAKE_STUDENT_DATA: StudentData = {
-  personalDetails: {
-    name: "John Doe",
-    profileImage: "/api/placeholder/200/200",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    fatherName: "Michael Doe",
-    motherName: "Sarah Doe",
-    dob: "2005-06-15",
-    gender: "Male",
-    nationality: "American",
-    category: "General",
-    address: "123 Learning Street, Education City, 54321"
-  },
-  courseDetails: {
-    program: "Bachelor of Computer Science",
-    session: "2023-2024",
-    semester: "3rd Semester",
-    subjects: [
-      { code: "CS101", name: "Programming Fundamentals", credits: 4 },
-      { code: "CS202", name: "Data Structures", credits: 4 },
-      { code: "MATH301", name: "Linear Algebra", credits: 3 }
-    ]
-  }
-};
 
 const StudentProfile: React.FC = () => {
   const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const studentId = localStorage.getItem('id');
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        // Replace with actual API call
-        const response = await fetch('/api/student-details');
-        const data: StudentData = await response.json();
-        setStudentData(data);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${studentDetailsUrl}/${studentId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setStudentData(response.data);
       } catch (error) {
         console.error("Failed to fetch student data", error);
-        setStudentData(FAKE_STUDENT_DATA);
+        setStudentData(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchStudentData();
-  }, []);
+  }, [studentId]);
 
   if (loading) {
-    return <div className="p-4 text-center text-blue-400">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (!studentData) {
-    return <div className="p-4 text-center text-blue-400">No student data available</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl text-red-500">
+        No student data available
+      </div>
+    );
   }
 
-  const { personalDetails, courseDetails } = studentData;
-
   return (
-    <div className="container mx-auto p-4">
-      <Card className="w-full shadow-2xl rounded-xl overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-400 to-indigo-900 text-white p-6">
-          <div className="grid md:grid-cols-[auto_1fr] items-center gap-6">
-            <img 
-              src={dummy} 
-              alt={personalDetails.name} 
-              className="w-56 h-56 mx-auto md:mx-0 rounded-full object-cover border-6 border-white shadow-lg"
-            />
-            <div className="text-center md:text-left space-y-3">
-              <CardTitle className="text-4xl font-extrabold drop-shadow-md">
-                {personalDetails.name}
-              </CardTitle>
-              <div className="space-x-2">
-                <Badge className="bg-white/20 text-white hover:bg-white/30">
-                  {courseDetails.program}
-                </Badge>
-                <Badge variant="outline" className="border-white/50 text-white hover:bg-white/10">
-                  {courseDetails.session}
-                </Badge>
+    <div className=" mx-auto px-12 space-y-8 ">
+      {/* Profile Header with gradient background */}
+      <Card className="w-full overflow-hidden border-none shadow-xl">
+        <CardHeader className="bg-gradient-to-br from-blue-800 to-indigo-900 p-8">
+          <div className="grid lg:grid-cols-[300px_1fr] gap-8 items-center">
+            <div className="relative mx-auto lg:mx-0">
+              <div className="w-64 h-64 rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl">
+                <img 
+                  src={studentData.studentPhoto || dummy} 
+                  alt={studentData.name} 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <p className="text-white/80 italic text-lg">
-                Exploring Knowledge, Shaping Future in {courseDetails.program}
-              </p>
+              <Badge className="absolute bottom-4 right-4 bg-emerald-500 text-white px-4 py-1 text-sm font-medium">
+                {studentData.batch}
+              </Badge>
             </div>
-          </div>
-        </CardHeader>
-        
-        <Separator />
-        
-        <CardContent className="p-6 bg-gray-50">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Personal Information */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-2xl font-bold text-blue-500 mb-5 border-b-4 border-blue-300 pb-2">
-                Personal Information
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { label: "Father's Name", value: personalDetails.fatherName },
-                  { label: "Mother's Name", value: personalDetails.motherName },
-                  { label: "Date of Birth", value: personalDetails.dob },
-                  { label: "Gender", value: personalDetails.gender },
-                  { label: "Nationality", value: personalDetails.nationality },
-                  { label: "Category", value: personalDetails.category }
-                ].map((detail, index) => (
-                  <div key={index} className="bg-blue-50 p-3 rounded-lg">
-                    <span className="block text-sm text-blue-600 font-semibold">{detail.label}</span>
-                    <p className="text-gray-700 font-medium">{detail.value}</p>
-                  </div>
-                ))}
+            
+            <div className="text-center lg:text-left space-y-6">
+              <div>
+                <h1 className="text-4xl font-bold text-white mb-2">
+                  {studentData.name}
+                </h1>
+                <p className="text-blue-100 text-lg">
+                  {studentData.enrollmentNumber || studentData.applicationNumber}
+                </p>
               </div>
-            </div>
 
-            {/* Academic Details */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-2xl font-bold text-blue-500 mb-5 border-b-4 border-blue-300 pb-2">
-                Academic Details
-              </h3>
-              <div className="space-y-4">
-                {[
-                  { label: "Program", value: courseDetails.program },
-                  { label: "Session", value: courseDetails.session },
-                  { label: "Semester", value: courseDetails.semester }
-                ].map((detail, index) => (
-                  <div key={index} className="bg-blue-50 p-3 rounded-lg">
-                    <span className="block text-sm text-blue-600 font-semibold">{detail.label}</span>
-                    <p className="text-gray-700 font-medium">{detail.value}</p>
-                  </div>
-                ))}
-                
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <span className="block text-sm text-blue-600 font-semibold mb-2">Subjects</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    {courseDetails.subjects.map(subject => (
-                      <div key={subject.code} className="flex justify-between items-center bg-white p-2 rounded">
-                        <span className="text-gray-700 text-sm">{subject.name}</span>
-                        <Badge variant="outline" className="text-blue-00">{subject.code}</Badge>
-                      </div>
-                    ))}
-                  </div>
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                <Badge className="bg-white/10 text-white border-none px-4 py-1.5">
+                  {studentData.admissionType}
+                </Badge>
+                <Badge className={`px-4 py-1.5 ${
+                  studentData.paymentStatus === 'PASS' 
+                    ? 'bg-emerald-500' 
+                    : studentData.paymentStatus === 'PENDING'
+                    ? 'bg-amber-500'
+                    : 'bg-red-500'
+                } text-white border-none`}>
+                  {studentData.paymentStatus}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-white/80">
+                <div>
+                  <p className="text-sm text-white/60">Email</p>
+                  <p>{studentData.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-white/60">Phone</p>
+                  <p>{studentData.phoneNumber}</p>
                 </div>
               </div>
             </div>
           </div>
-        </CardContent>
+        </CardHeader>
       </Card>
+
+      <Tabs defaultValue="personal" className="w-full">
+        <TabsList className="bg-white border rounded-lg p-0 space-x-2">
+          <TabsTrigger 
+            value="personal"
+            className="data-[state=active]:bg-blue-800 data-[state=active]:text-white rounded-md px-6 py-2 transition-all"
+          >
+            Personal
+          </TabsTrigger>
+          <TabsTrigger 
+            value="education"
+            className="data-[state=active]:bg-blue-800 data-[state=active]:text-white rounded-md px-6 py-2 transition-all"
+          >
+            Education
+          </TabsTrigger>
+          <TabsTrigger 
+            value="address"
+            className="data-[state=active]:bg-blue-800 data-[state=active]:text-white rounded-md px-6 py-2 transition-all"
+          >
+            Address
+          </TabsTrigger>
+          <TabsTrigger 
+            value="documents"
+            className="data-[state=active]:bg-blue-800 data-[state=active]:text-white rounded-md px-6 py-2 transition-all"
+          >
+            Documents
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="personal">
+          <Card className="border-none shadow-lg">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Personal Information</h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  { label: "Father's Name", value: studentData.fatherName },
+                  { label: "Mother's Name", value: studentData.motherName },
+                  { label: "Date of Birth", value: new Date(studentData.dob).toLocaleDateString() },
+                  { label: "Gender", value: studentData.gender },
+                  { label: "Nationality", value: studentData.nationality },
+                  { label: "Category", value: studentData.category }
+                ].map((detail, index) => (
+                  <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <p className="text-sm text-blue-800 font-medium mb-1">{detail.label}</p>
+                    <p className="text-gray-700">{detail.value}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="education">
+          <Card className="border-none shadow-lg">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Educational Qualifications</h3>
+              <div className="space-y-4">
+                {studentData.educationalQualifications.map((qual, index) => (
+                  <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-sm text-blue-800 font-medium mb-1">Examination</p>
+                        <p className="text-gray-700">{qual.examination}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-800 font-medium mb-1">Subjects</p>
+                        <p className="text-gray-700">{qual.subjects}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-800 font-medium mb-1">Board</p>
+                        <p className="text-gray-700">{qual.board}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-800 font-medium mb-1">Year of Passing</p>
+                        <p className="text-gray-700">{qual.yearOfPassing}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-800 font-medium mb-1">Grade</p>
+                        <p className="text-gray-700">{qual.grade}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-800 font-medium mb-1">Percentage</p>
+                        <p className="text-gray-700">{qual.percentage}%</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="address">
+          <Card className="border-none shadow-lg">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Address</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Correspondence Address</h4>
+                  {studentData.correspondenceAddress.map((addr, index) => (
+                    <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                      <p className="text-blue-800 font-medium mb-1">{addr.address}</p>
+                      <p className="text-gray-700">{addr.city}, {addr.district}</p>
+                      <p className="text-gray-700">{addr.state}, {addr.country}</p>
+                      <p className="text-gray-700">PIN: {addr.pincode}</p>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Permanent Address</h4>
+                  {studentData.permanentAddress.map((addr, index) => (
+                    <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                      <p className="text-blue-800 font-medium mb-1">{addr.address}</p>
+                      <p className="text-gray-700">{addr.city}, {addr.district}</p>
+                      <p className="text-gray-700">{addr.state}, {addr.country}</p>
+                      <p className="text-gray-700">PIN: {addr.pincode}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="documents">
+          <Card className="border-none shadow-lg">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Documents</h3>
+              {studentData.documents.length === 0 ? (
+                <div className="text-center text-gray-500 py-8">
+                  No documents uploaded yet
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {studentData.documents.map((doc, index) => (
+                    <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                      Document details here
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

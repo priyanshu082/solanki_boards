@@ -17,10 +17,23 @@ import {
   AccordionTrigger 
 } from "@/components/ui/accordion";
 import { Menu } from "lucide-react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear user data from local storage
+    localStorage.removeItem("id");
+    localStorage.removeItem("name");
+    localStorage.removeItem("role");
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+
+    // Redirect to login page or home page
+    navigate("/login");
+  };
 
   return (
     <nav className="relative flex items-center justify-between py-2 px-8 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-800 shadow-md z-50">
@@ -78,7 +91,7 @@ const Navbar = () => {
             </NavigationMenuItem>
             
             <NavigationMenuItem>
-              <Button variant="destructive" className="bg-red-500 hover:bg-red-600 text-white">Logout</Button>
+              <Button variant="destructive" className="bg-red-500 hover:bg-red-600 text-white" onClick={handleLogout}>Logout</Button>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
@@ -133,7 +146,7 @@ const Navbar = () => {
               </AccordionItem>
               
               <AccordionItem value="logout">
-                <Button variant="destructive" className="w-full bg-red-500 hover:bg-red-600 text-white">Logout</Button>
+                <Button variant="destructive" className="w-full bg-red-500 hover:bg-red-600 text-white" onClick={handleLogout}>Logout</Button>
               </AccordionItem>
             </Accordion>
           </SheetContent>

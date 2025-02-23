@@ -8,6 +8,7 @@ export const STUDENT_BASE_URL = BASE_URL + '/student';
 
 // Admin Routes
 export const studentLoginUrl = STUDENT_BASE_URL + '/login';
+export const studentDetailsUrl = STUDENT_BASE_URL + '/student';
 
 
 

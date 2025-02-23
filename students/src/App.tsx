@@ -1,9 +1,8 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
-
-import Navbar from './components/Navbar'
 import StudentIDCard from './pages/IDCard'
 import StudentLogin from './pages/Login'
+import Layout from './Layout'; // Import Layout component
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }: any) => {
@@ -21,10 +20,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<StudentLogin />} />
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/id-card" element={<ProtectedRoute><StudentIDCard /></ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route index element={<Home />} />
+          <Route path="/id-card" element={<StudentIDCard />} />
+        </Route>
       </Routes>
-      <Navbar />
     </BrowserRouter>
   )
 }

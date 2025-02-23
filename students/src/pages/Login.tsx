@@ -34,9 +34,7 @@ export const Auth = () => {
                 `${studentLoginUrl}`,
                 {
                     applicationNumber: loginInputs.applicationNumber,
-                    dateOfBirth: loginInputs.dateOfBirth.includes("T") 
-                        ? loginInputs.dateOfBirth.split("T")[0] 
-                        : loginInputs.dateOfBirth
+                    dob: new Date(loginInputs.dateOfBirth).toISOString()
                 }
             );
 
@@ -45,7 +43,7 @@ export const Auth = () => {
             localStorage.setItem("id", student.id);
             localStorage.setItem("name", student.name);
             localStorage.setItem("role", "student");
-            localStorage.setItem("accessToken", response.data.accessToken);
+            localStorage.setItem("token", response.data.accessToken);
             localStorage.setItem("refreshToken", response.data.refreshToken);
 
             setAlertMessage("Login Successful");
