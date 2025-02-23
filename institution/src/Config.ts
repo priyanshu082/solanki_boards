@@ -13,6 +13,8 @@ export const allStudentsSearchUrl = INSTITUTE_BASE_URL + '/student/list';
 export const studentSearchUrl = INSTITUTE_BASE_URL + '/student';
 export const admissionRegistrationUrl = INSTITUTE_BASE_URL + '/admission';
 export const addmisionPutUrl = INSTITUTE_BASE_URL + '/admission';
+export const instituteDetailsUrl = INSTITUTE_BASE_URL + '/institute'; //it will get param as instituteId
+export const instituteUpdateUrl = INSTITUTE_BASE_URL + '/institute'; //put request 
 
 
 

@@ -37,11 +37,7 @@ interface StudentDetails {
   documents: Document[];
 }
 
-interface DocumentUploadParams {
-  file: File;
-  documentType: keyof typeof DocumentType;
-  studentId: string;
-}
+
 
 const UploadDocuments = () => {
   const [searchQuery, setSearchQuery] = useState('');
