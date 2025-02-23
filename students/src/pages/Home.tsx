@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -98,7 +98,7 @@ const StudentProfile: React.FC = () => {
   }
 
   return (
-    <div className=" mx-auto px-12 space-y-8 ">
+    <div className=" mx-auto px-12 space-y-8  min-h-screen">
       {/* Profile Header with gradient background */}
       <Card className="w-full overflow-hidden border-none shadow-xl">
         <CardHeader className="bg-gradient-to-br from-blue-800 to-indigo-900 p-8">
@@ -291,7 +291,20 @@ const StudentProfile: React.FC = () => {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {studentData.documents.map((doc, index) => (
                     <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                      Document details here
+                      <div>
+                        <p className="font-semibold">{doc.documentType.replace(/_/g, ' ')}</p>
+                        <p className="text-sm text-gray-600">{doc.documentType.replace(/_/g, ' ')}</p>
+                      </div>
+                      <div className="mt-3">
+                        <a 
+                          href={doc.fileUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          View Document
+                        </a>
+                      </div>
                     </div>
                   ))}
                 </div>

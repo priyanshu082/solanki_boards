@@ -11,7 +11,7 @@ const Layout = () => {
 
         {/* Main Content Below Navbar */}
         <div className="mt-8 overflow-auto">
-          <main>
+          <main >
             <Outlet />
           </main>
         </div>
