@@ -42,6 +42,8 @@ interface StudentDetails {
 const UploadDocuments = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState<string>('');
   const [studentData, setStudentData] = useState<StudentDetails | null>(null);
   const [uploadError, setUploadError] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -105,6 +107,7 @@ const UploadDocuments = () => {
 
   const handleDocumentUpload = async () => {
     try {
+      setIsUploading(true);
       const token = localStorage.getItem('token');
       if (!token) {
         Swal.fire({
@@ -157,6 +160,8 @@ const UploadDocuments = () => {
         text: error.response?.data?.message || 'Failed to upload document',
         confirmButtonColor: '#3085d6'
       });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -167,6 +172,7 @@ const UploadDocuments = () => {
 
   const handleDocumentUpdate = async (documentId: string, documentType: keyof typeof DocumentType, file: File) => {
     try {
+      setIsUpdating(documentId);
       const token = localStorage.getItem('token');
       if (!token) {
         Swal.fire({
@@ -207,7 +213,17 @@ const UploadDocuments = () => {
         text: error.response?.data?.message || 'Failed to update document',
         confirmButtonColor: '#3085d6'
       });
+    } finally {
+      setIsUpdating('');
     }
+  };
+
+  // Get list of document types that haven't been uploaded yet
+  const getAvailableDocumentTypes = () => {
+    if (!studentData) return Object.entries(DocumentType);
+    
+    const uploadedTypes = new Set(studentData.documents.map(doc => doc.documentType as keyof typeof DocumentType));
+    return Object.entries(DocumentType).filter(([_, value]) => !uploadedTypes.has(value as keyof typeof DocumentType));
   };
 
   return (
@@ -294,7 +310,7 @@ const UploadDocuments = () => {
                       <SelectValue placeholder="Select document type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(DocumentType).map(([key, value]) => (
+                      {getAvailableDocumentTypes().map(([key, value]) => (
                         <SelectItem key={key} value={value}>
                           {key.replace(/_/g, ' ')}
                         </SelectItem>
@@ -331,10 +347,15 @@ const UploadDocuments = () => {
                 <div className="flex items-center">
                   <Button
                     onClick={handleDocumentUpload}
-                    disabled={!selectedFile}
+                    disabled={!selectedFile || isUploading}
                     className="w-full"
                   >
-                    {uploadError ? (
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : uploadError ? (
                       <>
                         <RotateCcw className="mr-2 h-4 w-4" />
                         Retry Upload
@@ -393,6 +414,7 @@ const UploadDocuments = () => {
                     <Button
                       variant="outline"
                       className="w-full"
+                      disabled={isUpdating === doc.id}
                       onClick={() => {
                         const input = document.createElement('input');
                         input.type = 'file';
@@ -406,7 +428,14 @@ const UploadDocuments = () => {
                         input.click();
                       }}
                     >
-                      Update Document
+                      {isUpdating === doc.id ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        'Update Document'
+                      )}
                     </Button>
                   </div>
                 </div>
