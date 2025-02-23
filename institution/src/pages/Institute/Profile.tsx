@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import profileimage from "../assets/dummy.jpeg"
+import profileimage from "../../assets/dummy.jpeg"
 import { 
   Card, 
   CardContent, 
@@ -20,7 +20,7 @@ import { useForm } from "react-hook-form";
 import { DocumentType } from '@/store/atoms/formDataAtoms';
 
 import { Upload } from 'lucide-react';
-import { instituteDetailsUrl, instituteUpdateUrl } from '../Config';
+import { instituteDetailsUrl, instituteUpdateUrl } from '../../Config';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 

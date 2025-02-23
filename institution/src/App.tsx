@@ -4,13 +4,14 @@ import Layout from './Layout'
 import RegisterStudent from './pages/Students/RegisterStudent'
 import UploadDocuments from './pages/Students/UploadDocuments'
 import ShowStudents from './pages/Students/ShowStudents'
-import Profile from './pages/Profile'
+import Profile from './pages/Institute/Profile'
 import { Auth } from './pages/Login'
-import Certificate from './pages/Certificate'
-import Letter from './pages/Letter'
+import Certificate from './pages/Institute/Certificate'
+import Letter from './pages/Institute/Letter'
 import { PaymentCallback } from './components/payments/PaymentCallback'
 import { PaymentStatus } from './components/payments/PaymentStatus'
 import PaymentPage from './pages/Payments/PaymentPage'
+import InstituteDocumentUpload from './pages/Institute/InstituteDocumentUpload'
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }: any) => {
@@ -36,6 +37,7 @@ function App() {
           <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="accredited-certificate" element={<ProtectedRoute><Certificate /></ProtectedRoute>} />
           <Route path="sanctioned-letter" element={<ProtectedRoute><Letter /></ProtectedRoute>} />
+          <Route path="/institute-document" element={<ProtectedRoute><InstituteDocumentUpload /></ProtectedRoute>} />
 
           <Route path="/pay" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
           
@@ -55,6 +57,7 @@ function App() {
           } />
         </Route>
         <Route path="/login" element={<Auth />} />
+       
         
         {/* Payment initiation page */}
         

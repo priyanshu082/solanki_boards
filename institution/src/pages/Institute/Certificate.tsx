@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
-import certificate from "../assets/certificate.png";
+import certificate from "../../assets/certificate.png";
 
 interface CertificateData {
     name: string;

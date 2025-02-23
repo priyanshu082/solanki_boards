@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
-import letterBackground from "../assets/letter.png"; // Your letter background image
+import letterBackground from "../../assets/letter.png"; // Your letter background image
 
 interface LetterData {
     name: string;
