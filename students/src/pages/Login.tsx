@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import background from "../assets/bg.jpg";
 import axios from "axios";
-import { BACKEND_URL } from "@/Config";
-import { User, KeyRound, Shield, Eye, EyeOff } from "lucide-react";
+import { studentLoginUrl } from "@/Config";
+import { User, KeyRound, Shield } from "lucide-react";
 
 export enum alertTypeEnum {
     success = "success",
@@ -15,32 +15,36 @@ export enum alertTypeEnum {
 
 interface LoginInput {
     applicationNumber: string;
-    headAadharNumber: string;
+    dateOfBirth: string; // Changed from headAadharNumber to dateOfBirth
 }
 
 export const Auth = () => {
     const navigate = useNavigate();
     const [loginInputs, setLoginInputs] = useState<LoginInput>({
         applicationNumber: "",
-        headAadharNumber: "",
+        dateOfBirth: "", // Changed from headAadharNumber to dateOfBirth
     });
 
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertType, setAlertType] = useState<alertTypeEnum>();
-    const [showAadhar, setShowAadhar] = useState(false);
 
     async function sendRequest() {
         try {
             const response = await axios.post(
-                `${BACKEND_URL}/api/v1/institute/login`,
-                loginInputs
+                `${studentLoginUrl}`,
+                {
+                    applicationNumber: loginInputs.applicationNumber,
+                    dateOfBirth: loginInputs.dateOfBirth.includes("T") 
+                        ? loginInputs.dateOfBirth.split("T")[0] 
+                        : loginInputs.dateOfBirth
+                }
             );
 
-            const institute = response.data.institute;
+            const student = response.data.student;
 
-            localStorage.setItem("id", institute.id);
-            localStorage.setItem("name", institute.headName);
-            localStorage.setItem("role", "institute");
+            localStorage.setItem("id", student.id);
+            localStorage.setItem("name", student.name);
+            localStorage.setItem("role", "student");
             localStorage.setItem("accessToken", response.data.accessToken);
             localStorage.setItem("refreshToken", response.data.refreshToken);
 
@@ -70,7 +74,7 @@ export const Auth = () => {
             {/* Main Content */}
             <div className="relative z-10 flex flex-col lg:flex-row w-full max-w-6xl mx-auto rounded-lg shadow-lg  ">
                 {/* Left Side */}
-                <div className="hidden lg:flex w-1/2 bg-blue-300 bg-opacity-50 p-8 flex-col rounded-l-lg justify-center items-center">
+                <div className="hidden lg:flex w-1/2 bg-blue-900 p-8 flex-col rounded-l-lg justify-center items-center">
                     <img
                         src={logo}
                         alt="School Logo"
@@ -78,11 +82,11 @@ export const Auth = () => {
                     />
                     <Shield className="h-16 w-16 text-yellow-400 mb-6" />
                     <h1 className="text-3xl font-bold text-yellow-400 mb-4">
-                        Welcome to Institute Portal
+                        Welcome to Student Portal
                     </h1>
                     <p className="text-gray-100 text-lg text-center">
-                        Secure access to your institute dashboard.
-                        Enter your Application Number and Aadhar Number to continue.
+                        Secure access to your student dashboard.
+                        Enter your Application Number and Date of Birth to continue. {/* Updated text */}
                     </p>
                 </div>
 
@@ -91,7 +95,7 @@ export const Auth = () => {
                     <div className="max-w-md mx-auto">
                         <div className="text-center mb-8">
                             <h2 className="text-2xl font-bold text-yellow-200">
-                                Institute Login
+                                Student Login
                             </h2>
                             <p className="text-gray-400 mt-2 text-sm">
                                 Enter your credentials to continue.
@@ -118,33 +122,23 @@ export const Auth = () => {
                                 />
                             </div>
 
-                            {/* Aadhar Number Input */}
+                            {/* Date of Birth Input */}
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <KeyRound className="h-5 w-5 text-yellow-200" />
                                 </div>
                                 <input
-                                    type={showAadhar ? "text" : "password"}
-                                    placeholder="Aadhar Number"
+                                    type="date" // Changed input type to date
+                                    placeholder="Date of Birth (YYYY-MM-DD)"
                                     className="w-full pl-10 pr-10 py-2 border border-blue-800 bg-blue-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                                    value={loginInputs.headAadharNumber}
+                                    value={loginInputs.dateOfBirth} // Changed from headAadharNumber to dateOfBirth
                                     onChange={(e) =>
                                         setLoginInputs({
                                             ...loginInputs,
-                                            headAadharNumber: e.target.value,
+                                            dateOfBirth: e.target.value, // Changed from headAadharNumber to dateOfBirth
                                         })
                                     }
                                 />
-                                <div
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                                    onClick={() => setShowAadhar((prev) => !prev)}
-                                >
-                                    {showAadhar ? (
-                                        <EyeOff className="h-5 w-5 text-yellow-200" />
-                                    ) : (
-                                        <Eye className="h-5 w-5 text-yellow-200" />
-                                    )}
-                                </div>
                             </div>
 
                             {/* Login Button */}

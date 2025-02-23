@@ -261,7 +261,7 @@ const RegisterStudentForm: React.FC = () => {
                   <Input
                     type="date"
                     value={formData.dob}
-                    onChange={(e) => updateField('dob', e.target.value)}
+                    onChange={(e) => updateField('dob', e.target.value.split('T')[0])} // Send only the date part (YYYY-MM-DD)
                   />
                 </FormField>
 
