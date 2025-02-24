@@ -3,7 +3,7 @@ export const BASE_URL = 'http://localhost:8080/api';
 export const ADMIN_BASE_URL = BASE_URL + '/admin';
 export const INSTITUTE_BASE_URL = BASE_URL + '/institute';
 export const STUDENT_BASE_URL = BASE_URL + '/student';
-
+export const PAYMENT_BASE_URL = BASE_URL + '/payment';
 // From this onwards, create particular routes of admin,instiute and student using their respective base url.
 
 // Admin Routes
@@ -15,6 +15,9 @@ export const admissionRegistrationUrl = INSTITUTE_BASE_URL + '/admission';
 export const addmisionPutUrl = INSTITUTE_BASE_URL + '/admission';
 export const instituteDetailsUrl = INSTITUTE_BASE_URL + '/institute'; //it will get param as instituteId
 export const instituteUpdateUrl = INSTITUTE_BASE_URL + '/institute'; //put request 
+export const paymentStatusUrl = PAYMENT_BASE_URL + '/check-payment-status';
+export const initiatePaymentUrl = PAYMENT_BASE_URL + '/initiate-payment';
+export const verifyPaymentUrl = PAYMENT_BASE_URL + '/verify-payment';
 
 
 
@@ -38,4 +41,4 @@ export enum alertTypeEnum{
 
 
 
-export const InstituteAmount = 10000;
+export const InstituteAmount = 1;

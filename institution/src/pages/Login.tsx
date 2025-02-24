@@ -43,12 +43,16 @@ export const Auth = () => {
             localStorage.setItem("role", "institute");
             localStorage.setItem("token", response.data.accessToken);
             localStorage.setItem("refreshToken", response.data.refreshToken);
-
+            console.log(response.data);
             setAlertMessage("Login Successful");
             setAlertType(alertTypeEnum.success);
 
             setTimeout(() => {
-                navigate("/");
+                if (response.data.paymentStatus === "PENDING") {
+                    navigate("/payment-institute");
+                } else {
+                    navigate("/");
+                }
             }, 1000);
         } catch (e: any) {
             setAlertMessage(e.response?.data?.message || "An error occurred");
