@@ -25,9 +25,15 @@ const Navbar: React.FC = () => {
 
   // Fetch user data from localStorage or use dummy data
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('avatarUrl');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(
+        {
+          name: 'John Doe',
+          email: 'john@example.com',
+          avatarUrl: storedUser,
+        }
+      );
     } else {
       // Dummy data if no user is found in localStorage
       setUser({
@@ -40,7 +46,14 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     // Clear user data from localStorage
-    localStorage.removeItem('user');
+    
+    localStorage.removeItem('id');
+    localStorage.removeItem('paymentStatus');
+    localStorage.removeItem('role');
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('avatarUrl');
+    localStorage.removeItem('merchantTransactionId');
     setUser(null);
     navigate('/login');
   };
@@ -72,12 +85,6 @@ const Navbar: React.FC = () => {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>
-            <div className="flex flex-col">
-              <span className="font-medium">{user.name}</span>
-              <span className="text-xs text-gray-500">{user.email}</span>
-            </div>
-          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={handleProfileClick}>
             Profile

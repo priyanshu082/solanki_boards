@@ -43,6 +43,7 @@ export const Auth = () => {
             localStorage.setItem("role", "institute");
             localStorage.setItem("token", response.data.accessToken);
             localStorage.setItem("refreshToken", response.data.refreshToken);
+            localStorage.setItem("avatarUrl", institute.headProfileImage);
             console.log(response.data);
             setAlertMessage("Login Successful");
             setAlertType(alertTypeEnum.success);
