@@ -67,7 +67,7 @@ const PaymentPageInstitute = () => {
 
       // Fetch institute details first
       const instituteData = await fetchInstituteDetails();
-      console.log(instituteData);
+    //   console.log(instituteData);
       if (!instituteData) return; // Exit if no data
 
       // Get latest payment details from institute data
