@@ -1,5 +1,5 @@
-import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
-import { paymentState, PaymentState } from '../store/atoms/paymentAtoms';
+import { useRecoilState  } from 'recoil';
+import { paymentState } from '../store/atoms/paymentAtoms';
 import axios from 'axios';
 
 export const usePayment = () => {
