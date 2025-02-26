@@ -14,7 +14,7 @@ const ImageCard = ({ item }: ImageCardProps) => {
 
   return (
     <motion.div
-      className="cursor-pointer w-[350px] h-[210px] overflow-hidden relative"
+      className="cursor-pointer w-full h-[310px] overflow-hidden relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

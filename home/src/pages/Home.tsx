@@ -6,7 +6,7 @@ import ContactSection from '../components/ContactSection'
 
 const Home = () => {
   return (
-    <div className='flex bg-white flex-col items-center justify-center md:mt-[65px] lg:mt-0 '>
+    <div className='flex bg-white flex-col items-center justify-center mt-[165px] lg:mt-[0px] '>
         <IntroVideo/>
         <SchoolSection/>
         <InfoSection/>

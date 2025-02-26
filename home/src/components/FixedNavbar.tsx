@@ -55,7 +55,7 @@ const FixedNavbar = () => {
 
   
   return (
-    <header className=" bg-white md:fixed md:top-0 md:left-0 md:right-0 z-50 ">
+    <header className=" bg-white fixed md:top-0 md:left-0 md:right-0 z-50 w-full">
    
 
       <div className="flex w-full py-2 flex-col lg:flex-row items-center justify-between gap-4">
@@ -67,14 +67,14 @@ const FixedNavbar = () => {
         </div>
         
         </Link>
-        <div className="text-2xl lg:text-xl xl:text-2xl font-bold text-secondary text-center">
+        <div className="text-xs lg:text-xl xl:text-2xl font-bold text-secondary text-center">
           SOLANKI BROTHERS COUNCIL FOR OPEN AND DISTANCE LEARNING
         </div>
         </div>
         
        
 
-       <div className=" gap-2 sm:gap-4 flex flex-row-reverse justify-between w-full lg:w-fit ">
+       <div className=" gap-2 sm:gap-4 px-4 flex flex-row-reverse justify-between w-full lg:w-fit ">
 
         <div className="flex justify-center gap-2 sm:gap-4 ">
      
@@ -93,7 +93,7 @@ const FixedNavbar = () => {
          
         </div>
 
-        <div className="lg:hidden flex justify-center items-center ml-[10px] ">
+        <div className="lg:hidden flex justify-center items-center  ">
           <Sheet>
             <SheetTrigger asChild>
                 <IoReorderThree className="text-primary h-[30px] w-[30px]" />

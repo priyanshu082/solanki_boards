@@ -33,7 +33,7 @@ const NumberSection: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col border-t-[1px] w-full text-primary py-6 border-b-[1px]">
+    <div className="flex flex-col border-t-[1px] w-full text-primary pt-6 border-b-[1px]">
  <div className="mb-4  text-center">
                 <div className="relative inline-block px-24 py-4 bg-gradient-to-r from-blue-950  to-blue-900 text-white rounded-lg shadow-lg">
                     <h1 className="text-2xl md:text-5xl font-extrabold mb-2">
