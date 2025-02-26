@@ -35,7 +35,7 @@ const ImageCard = ({ item }: ImageCardProps) => {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         <motion.p
-          className="text-white text-lg font-bold flex flex-col items-center justify-center font-mono"
+          className="text-white text-md font-bold flex flex-col items-center justify-center font-mono"
           animate={{ opacity: isHovered ? 0 : 1 }}
           transition={{ duration: 0.5, ease: 'easeInOut' }}
         >

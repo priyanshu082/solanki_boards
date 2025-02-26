@@ -50,7 +50,7 @@ const SchoolSection = () => {
                     </p>
                 </div>
                 
-                <div className='text-sm md:text-2xl font-light tracking-wider text-gray-700 mt-6 leading-relaxed'>
+                <div className='text-sm 2xl:text-xl font-light tracking-wider text-gray-700 mt-6 leading-relaxed'>
                     <p>
                         The Solanki Brothers Council for Open and Distance Learning (SBCODL) was established and incorporated by the Uttar Pradesh legislature and is accredited by the International Accreditation/ Membership. SBCODL embodies the futuristic vision of a young India, driven by emerging trends and skill development.
                     </p>

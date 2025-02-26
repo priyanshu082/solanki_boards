@@ -49,8 +49,9 @@ const Layout = ({ children }: LayoutProps) => {
     <FixedNavbar />
     <Navbar />
     </div>
-      
+      <div className="mt-[165px] lg:mt-[0px]">
       {children}
+      </div>
       <Footer />
     </>
   );
