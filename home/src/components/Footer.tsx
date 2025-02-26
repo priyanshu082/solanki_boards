@@ -26,7 +26,7 @@ const Footer = () => {
         { src: institute11, alt: "Institute 11" },
       ];
     return (
-        <footer className="border-t">
+        <footer className="border-t overflow-hidden">
             <div className="relative">
                 {/* Background Image */}
                 <div className="absolute inset-0 bg-fixed bg-cover bg-center object-cover opacity-70" style={{ backgroundImage: `url(${backgroundImage})` }}></div>

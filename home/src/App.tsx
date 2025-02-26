@@ -45,8 +45,11 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   return (
     <>
-      <FixedNavbar />
-      <Navbar />
+    <div className="flex flex-col z-[10]">
+    <FixedNavbar />
+    <Navbar />
+    </div>
+      
       {children}
       <Footer />
     </>
