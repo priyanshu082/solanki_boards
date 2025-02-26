@@ -47,7 +47,7 @@ const NumberSection: React.FC = () => {
             </div>
  <div 
       id="number-section"
-      className="bg-primary w-full text-blue-200 py-16 px-4 md:px-8 shadow-lg  my-2"
+      className="bg-primary w-full text-blue-200 py-16 px-4 md:px-8 shadow-lg  "
     >
      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

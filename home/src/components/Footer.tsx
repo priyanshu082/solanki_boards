@@ -20,12 +20,12 @@ const Footer = () => {
                     {/* Second Div */}
                     <div className="w-full md:w-[60%] flex flex-col justify-center items-center">
                         {/* Social Media Icons */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 w-full">
-                            {[Facebook, Instagram, Twitter, Linkedin, Youtube, Youtube].map((Icon, index) => (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 w-full">
+                            {[Facebook, Instagram, Twitter, Linkedin,].map((Icon, index) => (
                                 <div key={index} className="relative group aspect-square flex flex-col items-center justify-center border-[0.5px] border-white hover:bg-background/40 p-4">
-                                    <Icon size={32} className="text-white transition-opacity" />
+                                    <Icon size={28} className="text-white transition-opacity" />
                                     <div className="flex items-center justify-center">
-                                        <span className="text-white text-sm md:text-lg font-bold mt-2">SOCIAL {index + 1}</span>
+                                        <span className="text-white text-sm md:text-lg font-semibold mt-2">SOCIAL {index + 1}</span>
                                     </div>
                                 </div>
                             ))}
@@ -69,7 +69,7 @@ const Footer = () => {
                                     key={index}
                                     src={institute.src}
                                     alt={institute.alt}
-                                    className="w-8 h-8 md:w-16 md:h-16  hover:scale-105 transition-transform rounded-md object-contain"
+                                    className="w-8 h-8 bg-white md:w-12 md:h-12  hover:scale-105 transition-transform rounded-md object-contain"
                                 />
                             ))}
                         </div>
