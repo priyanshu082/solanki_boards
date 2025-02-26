@@ -1,4 +1,4 @@
-export const BASE_URL = process.env.BASEURL;
+export const BASE_URL = 'http://62.72.12.198/api/api';
 
 export const ADMIN_BASE_URL = BASE_URL + '/admin';
 export const INSTITUTE_BASE_URL = BASE_URL + '/institute';
