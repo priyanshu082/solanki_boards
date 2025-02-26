@@ -1,9 +1,5 @@
-// export const BASE_URL = 'http://62.72.12.198/api/api';
-
-
-// export const BASE_URL = 'http://localhost:8080/api';
-
-export const BASE_URL = import.meta.env.VITE_API_URL;
+// export const BASE_URL = import.meta.env.VITE_API_URL;
+export const BASE_URL = '/api';
 
 export const ADMIN_BASE_URL = BASE_URL + '/admin';
 export const INSTITUTE_BASE_URL = BASE_URL + '/institute';
