@@ -53,16 +53,8 @@ function App() {
           <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
           
           {/* Success/Error pages */}
-          <Route path="/payment/success" element={
-            <ProtectedRoute>
-              <PaymentStatus status="success" />
-            </ProtectedRoute>
-          } />
-          <Route path="/payment/error" element={
-            <ProtectedRoute>
-              <PaymentStatus status="error" />
-            </ProtectedRoute>
-          } />
+          <Route path="/payment/success" element={<ProtectedRoute> <PaymentStatus status="success" /></ProtectedRoute>} />
+          <Route path="/payment/error" element={ <ProtectedRoute> <PaymentStatus status="error" /></ProtectedRoute>} />
         </Route>
         <Route path="/login" element={<Auth />} />
        
