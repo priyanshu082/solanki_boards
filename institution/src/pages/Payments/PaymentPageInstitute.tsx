@@ -3,22 +3,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft, CreditCard, RefreshCw } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { initiatePaymentUrl, paymentStatusUrl, verifyPaymentUrl, instituteDetailsUrl, InstituteAmount } from '@/Config';
+import { initiatePaymentUrl, paymentStatusUrl, verifyPaymentUrl, InstituteAmount } from '@/Config';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { instituteState, instituteDetailsSelector, PaymentStatus } from '@/store/atoms/instituteAtoms';
 
 const PaymentPageInstitute = () => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
-  //@ts-ignore
-  const [paymentStatus, setPaymentStatus] = useState<string | null>("");
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [pollingCount, setPollingCount] = useState(0);
-  const maxPollingAttempts = 48; // Total polling attempts (matches backend intervals)
+  const maxPollingAttempts = 48;
+
+  const instituteDetails = useRecoilValue(instituteDetailsSelector);
+  const setInstituteDetails = useSetRecoilState(instituteState);
 
   useEffect(() => {
-    const status = localStorage.getItem("paymentStatus");
-    setPaymentStatus(status);
-
-    // Check if payment status is pending and show alert
-    if (status === "PENDING") {
+    if (instituteDetails?.paymentStatus === PaymentStatus.PENDING) {
       Swal.fire({
         icon: 'warning',
         title: 'Payment Pending',
@@ -26,54 +25,16 @@ const PaymentPageInstitute = () => {
         confirmButtonColor: '#EF4444'
       });
     }
-  }, []);
-
-  const fetchInstituteDetails = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Authentication Error',
-          text: 'Please login again to continue',
-          confirmButtonColor: '#3085d6'
-        });
-        return;
-      }
-
-      const instituteId = localStorage.getItem('id');
-      const response = await axios.get(`${instituteDetailsUrl}/${instituteId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      return response.data; // Return the institute data
-
-    } catch (error: any) {
-      console.error('Error fetching institute data:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.response?.data?.message || 'Failed to fetch institute details',
-        confirmButtonColor: '#3085d6'
-      });
-    }
-  };
+  }, [instituteDetails]);
 
   const checkPaymentStatus = async () => {
     try {
       setIsCheckingStatus(true);
 
-      // Fetch institute details first
-      const instituteData = await fetchInstituteDetails();
-    //   console.log(instituteData);
-      if (!instituteData) return; // Exit if no data
+      if (!instituteDetails) return;
 
-      // Get latest payment details from institute data
-      const lastPayment = instituteData.payments?.length - 1; // Assuming payments are sorted with latest first
-      const latestPayment = instituteData.payments?.[lastPayment]; // Assuming payments are sorted with latest first
-      const merchantTransactionId = latestPayment?.merchantTransactionId;
+      const lastPayment = instituteDetails.payments?.[instituteDetails.payments.length - 1];
+      const merchantTransactionId = lastPayment?.merchantTransactionId;
 
       if (!merchantTransactionId) {
         Swal.fire({
@@ -85,7 +46,6 @@ const PaymentPageInstitute = () => {
         return;
       }
 
-      // Start polling with increasing intervals
       const pollStatus = async () => {
         if (pollingCount >= maxPollingAttempts) {
           throw new Error('Payment status check timed out');
@@ -94,7 +54,7 @@ const PaymentPageInstitute = () => {
         const response = await axios.get(`${paymentStatusUrl}/${merchantTransactionId}`);
         
         if (response.data.status === "SUCCESS") {
-          localStorage.setItem("paymentStatus", "COMPLETED");
+          setInstituteDetails(prev => prev ? { ...prev, paymentStatus: PaymentStatus.SUCCESS } : null);
           Swal.fire({
             icon: 'success',
             title: 'Payment Successful!',
@@ -108,14 +68,13 @@ const PaymentPageInstitute = () => {
           throw new Error('Payment failed');
         }
 
-        // Continue polling if pending
         setPollingCount(prev => prev + 1);
-        const interval = pollingCount < 1 ? 20000 : // First 20 seconds
-                        pollingCount < 11 ? 3000 :  // Next 30 seconds
-                        pollingCount < 21 ? 6000 :  // Next 60 seconds
-                        pollingCount < 27 ? 10000 : // Next 60 seconds
-                        pollingCount < 29 ? 30000 : // Next 60 seconds
-                        60000;                      // Every minute until timeout
+        const interval = pollingCount < 1 ? 20000 : 
+                        pollingCount < 11 ? 3000 :
+                        pollingCount < 21 ? 6000 :
+                        pollingCount < 27 ? 10000 :
+                        pollingCount < 29 ? 30000 :
+                        60000;
         
         setTimeout(pollStatus, interval);
       };
