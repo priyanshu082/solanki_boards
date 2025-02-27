@@ -17,58 +17,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { DocumentType } from '@/store/atoms/formDataAtoms';
+
 
 import { Upload } from 'lucide-react';
 import { instituteDetailsUrl, instituteUpdateUrl } from '../../Config';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-
-interface Document {
-  id: string;
-  documentType: keyof typeof DocumentType;
-  fileName: string;
-  fileUrl: string;
-}
-
-interface InstituteDetails {
-  id: string;
-  applicationNumber: string;
-  registrationNumber: string;
-  headDob: string;
-  headName: string;
-  headFatherName: string;
-  headAadharNumber: string;
-  headPanCardNumber: string;
-  headMobileNumber: string;
-  headEmailId: string;
-  headProfileImage: string;
-  headGender: string;
-  headAddress: string;
-  headCity: string;
-  headState: string;
-  headUnionTerritory: string;
-  headCountry: string;
-  headPincode: string;
-  headBankName: string;
-  headAccountNumber: string;
-  headIfscCode: string;
-  centerCode: string;
-  centerName: string;
-  centerEmailId: string;
-  centerWebsiteUrl: string;
-  centerPhoneNumber: string;
-  centerAddress: string;
-  centerCity: string;
-  centerState: string;
-  centerUnionTerritory: string;
-  centerCountry: string;
-  centerPincode: string;
-  documents: Document[];
-}
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { instituteState, instituteDetailsSelector } from '@/store/atoms/instituteAtoms';
 
 const Profile = () => {
-    const [instituteData, setInstituteData] = useState<InstituteDetails | null>(null);
+    const instituteDetails = useRecoilValue(instituteDetailsSelector);
+    const setInstituteDetails = useSetRecoilState(instituteState);
     const [isLoading, setIsLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
@@ -95,7 +55,7 @@ const Profile = () => {
                     }
                 });
                 console.log(response.data);
-                setInstituteData(response.data);
+                setInstituteDetails(response.data);
                 
                 // Set form default values
                 form.reset({
@@ -157,7 +117,7 @@ const Profile = () => {
 
             const data = new FormData();
             data.append('image', file);
-            data.append('applicationNumber', instituteData?.applicationNumber || '');
+            data.append('applicationNumber', instituteDetails?.applicationNumber || '');
 
             const response = await axios.put(instituteUpdateUrl, data, {
                 headers: {
@@ -167,7 +127,7 @@ const Profile = () => {
             });
 
             if (response.data) {
-                setInstituteData(prev => prev ? {...prev, headProfileImage: response.data.headProfileImage} : null);
+                setInstituteDetails(prev => prev ? {...prev, headProfileImage: response.data.headProfileImage} : null);
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
@@ -217,7 +177,7 @@ const Profile = () => {
             }
 
             const formData = new FormData();
-            formData.append('applicationNumber', instituteData?.applicationNumber || '');
+            formData.append('applicationNumber', instituteDetails?.applicationNumber || '');
             Object.keys(data).forEach(key => {
                 formData.append(key, data[key]);
             });
@@ -230,7 +190,7 @@ const Profile = () => {
             });
 
             if (response.data) {
-                setInstituteData(response.data);
+                setInstituteDetails(response.data);
                 setIsEditing(false);
                 Swal.fire({
                     icon: 'success',
@@ -280,7 +240,7 @@ const Profile = () => {
                         {/* Profile Image Section */}
                         <div className="flex items-center space-x-4">
                             <img 
-                                src={instituteData?.headProfileImage || profileimage} 
+                                src={instituteDetails?.headProfileImage || profileimage} 
                                 alt="Profile" 
                                 className="w-24 h-24 rounded-full object-cover"
                             />
@@ -312,7 +272,7 @@ const Profile = () => {
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Head Name</label>
                                 <Input 
-                                    value={instituteData?.headName} 
+                                    value={instituteDetails?.headName} 
                                     readOnly 
                                     className="bg-gray-100 cursor-not-allowed" 
                                 />
@@ -320,7 +280,7 @@ const Profile = () => {
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Center Code</label>
                                 <Input 
-                                    value={instituteData?.centerCode} 
+                                    value={instituteDetails?.centerCode} 
                                     readOnly 
                                     className="bg-gray-100 cursor-not-allowed" 
                                 />
@@ -328,7 +288,7 @@ const Profile = () => {
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Head Mobile Number</label>
                                 <Input 
-                                    value={instituteData?.headMobileNumber} 
+                                    value={instituteDetails?.headMobileNumber} 
                                     readOnly 
                                     className="bg-gray-100 cursor-not-allowed" 
                                 />
@@ -336,7 +296,7 @@ const Profile = () => {
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Head Email Address</label>
                                 <Input 
-                                    value={instituteData?.headEmailId} 
+                                    value={instituteDetails?.headEmailId} 
                                     readOnly 
                                     className="bg-gray-100 cursor-not-allowed" 
                                 />

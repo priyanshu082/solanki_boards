@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import certificate from "../../assets/certificate.png";
+import { useRecoilValue } from 'recoil';
+import { instituteProfileSelector } from '@/store/atoms/instituteAtoms';
 
 interface CertificateData {
     name: string;
@@ -11,6 +13,7 @@ interface CertificateData {
 const Certificate = () => {
     const [certificateData, setCertificateData] = useState<CertificateData | null>(null);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const instituteProfile = useRecoilValue(instituteProfileSelector);
 
     useEffect(() => {
         // Preload the background image
@@ -21,7 +24,7 @@ const Certificate = () => {
         // Simulating fetching certificate data
         const fetchCertificateData = async () => {
             setCertificateData({
-                name: "Virendra Singh",
+                name: instituteProfile?.headName || "",
                 course: "Secondary School Examination",
                 date: "01 Feb 2025"
             });

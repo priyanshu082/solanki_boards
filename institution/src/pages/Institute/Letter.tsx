@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import letterBackground from "../../assets/letter.png"; // Your letter background image
+import { useRecoilValue } from 'recoil';
+import { instituteProfileSelector } from '@/store/atoms/instituteAtoms';
 
 interface LetterData {
     name: string;
@@ -14,6 +16,7 @@ interface LetterData {
 const LetterOverlay = () => {
     const [letterData, setLetterData] = useState<LetterData | null>(null);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const instituteProfile = useRecoilValue(instituteProfileSelector);
     
     const currentDate = new Date().toLocaleDateString('en-GB', {
         day: '2-digit',
@@ -30,11 +33,11 @@ const LetterOverlay = () => {
         const fetchLetterData = async () => {
             // Replace with your actual API call
             setLetterData({
-                name: "Virendra Singh",
+                name: instituteProfile?.headName || "",
                 referenceNumber: "2345", // This will come from backend
                 instituteDetails: {
-                    name: "Institute Name",
-                    address: "123 Street Name, City - 302020 123 Street Name, City - 302020"
+                    name: instituteProfile?.centerName || "",
+                    address: instituteProfile?.centerAddress || ""
                 }
             });
         };
