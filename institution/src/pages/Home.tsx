@@ -17,16 +17,6 @@ const Home: React.FC = () => {
         </p>
       </div>
 
-      {/* Action Buttons Section */}
-      {/* <div className="flex justify-center gap-4 mb-8">
-        <Button className="bg-blue-500 text-white hover:bg-blue-600">
-          Get Started
-        </Button>
-        <Button variant="outline" className="border-blue-500 text-blue-500 hover:bg-blue-100">
-          Learn More
-        </Button>
-      </div> */}
-
       {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
         {/* Register Student */}

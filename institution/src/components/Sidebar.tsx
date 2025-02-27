@@ -122,7 +122,7 @@ const Sidebar = () => {
     <>
       {/* Mobile Hamburger Button */}
       <button 
-        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg shadow-md"
+        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg shadow-md "
         onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
       >
         {isMobileSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -139,7 +139,7 @@ const Sidebar = () => {
       {/* Sidebar - Desktop and Mobile */}
       <div 
         className={`
-          fixed top-0 left-0 h-full w-[80vw] max-w-[300px] bg-white border-r border-gray-200 
+          fixed top-0 left-0 h-full bg-white border-r border-gray-200 
           transform transition-transform duration-300 z-50
           md:relative md:translate-x-0
           ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -162,7 +162,7 @@ const Sidebar = () => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 ">
           <nav className="space-y-2">
             {menuItems.map(section => (
               <MenuSection key={section.title} section={section} />

@@ -24,9 +24,9 @@ const ProtectedRoute = ({ children }: any) => {
   }
 
   // Redirect to payment page if payment is pending
-  if (paymentStatus === 'PENDING' && window.location.pathname !== '/payment-institute') {
-    return <Navigate to="/payment-institute" replace />
-  }
+  // if (paymentStatus === 'PENDING' && window.location.pathname !== '/payment-institute') {
+  //   return <Navigate to="/payment-institute" replace />
+  // }
   
   return children
 }

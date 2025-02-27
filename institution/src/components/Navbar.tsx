@@ -66,7 +66,7 @@ const Navbar: React.FC = () => {
 
   return (
     <div 
-      className="fixed top-0 left-[20vw] right-0 bg-white shadow-sm h-16 flex items-center justify-between px-8 z-20"
+      className="fixed top-0 md:left-[20vw] left-[5vw] right-0 bg-white shadow-sm h-16 flex items-center justify-between px-8 z-20"
     >
        <Link to="/" className="flex items-center space-x-2">
             <img 

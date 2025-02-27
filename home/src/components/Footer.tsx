@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Twitter, Linkedin, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
 import backgroundImage from "../assets/images/footer_bg.jpg";
 import { institutes } from "../data/footer";
 

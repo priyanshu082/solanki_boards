@@ -133,8 +133,19 @@ const Profile = () => {
         if (!file) return;
 
         try {
+            // Show loading state
+            Swal.fire({
+                title: 'Uploading...',
+                text: 'Please wait while we upload your photo',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             const token = localStorage.getItem('token');
             if (!token) {
+                Swal.close();
                 Swal.fire({
                     icon: 'error', 
                     title: 'Authentication Error',
