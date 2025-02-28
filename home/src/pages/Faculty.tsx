@@ -11,7 +11,6 @@ const Faculty = () => {
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 flex justify-between items-center">
           <div>
-           
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
               Faculty at SBCODL
             </h1>
