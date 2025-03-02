@@ -13,6 +13,7 @@ import { aboutDropdownItems, programDropdownItems, accreditedInstitutes, admissi
 
 const FixedNavbar = () => {
   const [openMenus, setOpenMenus] = React.useState<{[key: string]: boolean}>({})
+  const [sheetOpen, setSheetOpen] = React.useState(false)
   
   const MobileDropdownMenu = ({ 
     title, 
@@ -41,8 +42,11 @@ const FixedNavbar = () => {
               <Link
                 key={item.title}
                 to={item.href}
-                className="text-sm hover:text-primary py-1"
-                onClick={() => setOpenMenus(prev => ({...prev, [title]: false}))}
+                className="text-sm hover:text-primary hover:bg-white rounded-md p-2"
+                onClick={() => {
+                  setOpenMenus(prev => ({...prev, [title]: false}))
+                  setSheetOpen(false)
+                }}
               >
                 {item.title}
               </Link>
@@ -55,7 +59,7 @@ const FixedNavbar = () => {
 
   
   return (
-    <header className=" bg-white fixed md:top-0 md:left-0 md:right-0 z-[100] w-full">
+    <header className=" bg-white fixed md:top-0 md:left-0 md:right-0 z-[102] w-full">
    
 
       <div className="flex w-full py-2 flex-col lg:flex-row items-center justify-between gap-4">
@@ -94,7 +98,7 @@ const FixedNavbar = () => {
         </div>
 
         <div className="lg:hidden flex justify-center items-center z-[1001]">
-          <Sheet>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
                 <IoReorderThree className="text-primary h-[30px] w-[30px]" />
             </SheetTrigger>
@@ -106,7 +110,10 @@ const FixedNavbar = () => {
                 <Link 
                   to="/" 
                   className="px-4 py-2 hover:bg-accent"
-                  onClick={() => setOpenMenus({})}
+                  onClick={() => {
+                    setOpenMenus({})
+                    setSheetOpen(false)
+                  }}
                 >
                   Home
                 </Link>
@@ -117,7 +124,10 @@ const FixedNavbar = () => {
                 <Link 
                   to="/boarding" 
                   className="px-4 py-2 hover:bg-accent"
-                  onClick={() => setOpenMenus({})}
+                  onClick={() => {
+                    setOpenMenus({})
+                    setSheetOpen(false)
+                  }}
                 >
                   Boarding
                 </Link>
@@ -125,7 +135,10 @@ const FixedNavbar = () => {
                 <Link 
                   to="/port-activity" 
                   className="px-4 py-2 hover:bg-accent"
-                  onClick={() => setOpenMenus({})}
+                  onClick={() => {
+                    setOpenMenus({})
+                    setSheetOpen(false)
+                  }}
                 >
                   Port Activity
                 </Link>
@@ -139,7 +152,10 @@ const FixedNavbar = () => {
                 <Link 
                   to="/contact" 
                   className="px-4 py-2 hover:bg-accent"
-                  onClick={() => setOpenMenus({})}
+                  onClick={() => {
+                    setOpenMenus({})
+                    setSheetOpen(false)
+                  }}
                 >
                   Contact Us
                 </Link>

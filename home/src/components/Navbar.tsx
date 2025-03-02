@@ -20,7 +20,7 @@ export function Navbar() {
    
   
     return (
-      <div className=" flex-col z-[1000] md:mt-[80px] hidden lg:flex">
+      <div className=" flex-col z-[100] md:mt-[80px] hidden lg:flex">
         <NavigationMenu className="container mx-auto hidden lg:block">
      
           <NavigationMenuList>
