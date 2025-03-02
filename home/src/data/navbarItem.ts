@@ -119,7 +119,7 @@ export const aboutDropdownItems = [
   export const admissionItems = [
     {
       title: "Admission Process",
-      href: "/admission/process",
+      href: "/student-admission-form",
       description: "Step-by-step guide to admission.",
     },
   ]

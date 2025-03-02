@@ -32,7 +32,7 @@ import PG from "./pages/programmes/PG/PG";
 import Certificate from "./pages/programmes/Certificate";
 import Faculty from "./pages/Faculty";
 import ContactUs from "./pages/ContactUs";
-
+import StudentAdmissionForm from "./pages/StudentAdmissionForm";
 import CourseDetailPG from "./pages/programmes/PG/CourseDetailPG";
 import CourseDetailUG from "./pages/programmes/UG/CourseDetailUG";
 import Membership from "./pages/Recognition/Membership";
@@ -96,7 +96,8 @@ function App() {
           <Route path="/ugcourse/:id" element={<Layout><CourseDetailUG /></Layout>} />
           <Route path="/pgcourse/:id" element={<Layout><CourseDetailPG /></Layout>} />
           <Route path="/membership-accreditation" element={<Layout><Membership /></Layout>} />
-          <Route path="/accredited-institute-registration" element={<Layout><InstituteRegistrationForm /></Layout>} />  
+          <Route path="/accredited-institute-registration" element={<Layout><InstituteRegistrationForm /></Layout>} />
+          <Route path="/student-admission-form" element={<Layout><StudentAdmissionForm /></Layout>} />
         </Routes>
         
       </BrowserRouter>
