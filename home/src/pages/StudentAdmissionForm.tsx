@@ -191,7 +191,7 @@ const RegisterPage = () => {
 
         // Navigate after a fixed delay of 3 seconds
         setTimeout(() => {
-          navigate('/');
+          navigate('/payment');
         }, 3000);
       }
       

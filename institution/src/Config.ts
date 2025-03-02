@@ -19,7 +19,8 @@ export const paymentStatusUrl = PAYMENT_BASE_URL + '/check-payment-status';
 export const initiatePaymentUrl = PAYMENT_BASE_URL + '/initiate-payment';
 export const verifyPaymentUrl = PAYMENT_BASE_URL + '/verify-payment';
 
-
+export const courseFetchUrl = INSTITUTE_BASE_URL + '/course/all';
+export const instituteFetchUrl = INSTITUTE_BASE_URL + '/institute/all';
 
 
 

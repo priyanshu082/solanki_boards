@@ -36,7 +36,7 @@ import StudentAdmissionForm from "./pages/StudentAdmissionForm";
 import CourseDetailPG from "./pages/programmes/PG/CourseDetailPG";
 import CourseDetailUG from "./pages/programmes/UG/CourseDetailUG";
 import Membership from "./pages/Recognition/Membership";
-
+import PaymentPage from "./pages/PaymentPage";
 interface LayoutProps {
   children: ReactNode;
 }
@@ -98,6 +98,7 @@ function App() {
           <Route path="/membership-accreditation" element={<Layout><Membership /></Layout>} />
           <Route path="/accredited-institute-registration" element={<Layout><InstituteRegistrationForm /></Layout>} />
           <Route path="/student-admission-form" element={<Layout><StudentAdmissionForm /></Layout>} />
+          <Route path="/payment" element={<Layout><PaymentPage /></Layout>} />
         </Routes>
         
       </BrowserRouter>

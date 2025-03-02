@@ -4,32 +4,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { admissionFormState } from '@/store/atoms/formDataAtoms';
 import { staticDataAtoms } from '@/store/atoms/staticDataAtoms';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
+
 const SubjectForm = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [formData, setFormData] = useRecoilState(admissionFormState);
-  //@ts-ignore
-  const [subjectsList, setSubjectsList] = useRecoilState(staticDataAtoms.subjectsAtom);
+  const courses = useRecoilValue(staticDataAtoms.coursesAtom);
+  
+  // Find the selected course and its subjects
+  const selectedCourse = courses.find(course => course.id === formData.courseId);
+  const availableSubjects = selectedCourse?.subjects || [];
 
-  // Dummy subjects data with IDs
-  const subjects = [
-    { id: 'subject-1', name: 'Mathematics' },
-    { id: 'subject-2', name: 'Physics' },
-    { id: 'subject-3', name: 'Chemistry' },
-    { id: 'subject-4', name: 'Biology' },
-    { id: 'subject-5', name: 'English' },
-  ];
-
-  // Fetch subjects based on the selected course
+  // Handle when course changes
   useEffect(() => {
-    // TODO: Replace with actual API call to fetch subjects based on formData.courseId
-    console.log(`Fetching subjects for course ID: ${formData.courseId}`);
-  }, [formData.courseId]);
+    // Reset selected subjects when course changes
+    setSelectedSubjects([]);
+    
+    // Update form data to clear previous subject selections
+    setFormData(prevData => ({
+      ...prevData,
+      subjectIds: []
+    }));
+  }, [formData.courseId, setFormData]);
 
   const handleSubjectChange = (subjectId: string) => {
     setSelectedSubjects(prevSelected => 
@@ -40,19 +41,11 @@ const SubjectForm = () => {
   };
 
   const handleAddSubjects = () => {
-    // Update both atoms
-    setSubjectsList(
-      subjects.filter(subject => selectedSubjects.includes(subject.id))
-    );
-    
     // Update the subjectIds in the main form data
     setFormData(prevData => ({
       ...prevData,
       subjectIds: selectedSubjects
     }));
-
-    // Reset selected subjects after adding
-    setSelectedSubjects([]);
   };
 
   return (
@@ -62,47 +55,74 @@ const SubjectForm = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="border rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-4">Available Subjects</h3>
-            <div className="space-y-2">
-              {subjects.map(({ id, name }) => (
-                <div key={id} className="flex items-center space-x-2">
-                  <input 
-                    type="checkbox"
-                    id={id}
-                    value={id}
-                    checked={selectedSubjects.includes(id)}
-                    onChange={() => handleSubjectChange(id)}
-                    className="h-4 w-4"
-                  />
-                  <label htmlFor={id} className="text-sm">{name}</label>
-                </div>
-              ))}
+          {!selectedCourse ? (
+            <div className="text-center p-4 border rounded-lg">
+              <p className="text-gray-500">Please select a course first to view available subjects</p>
             </div>
-            <Button 
-              onClick={handleAddSubjects} 
-              className="mt-4"
-              disabled={selectedSubjects.length === 0}
-            >
-              Add Selected Subjects
-            </Button>
-          </div>
-
-          {/* Display currently selected subjects from form data */}
-          {formData.subjectIds.length > 0 && (
-            <div className="border rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-4">Selected Subjects</h3>
-              <div className="space-y-2">
-                {subjects
-                  .filter(subject => formData.subjectIds.includes(subject.id))
-                  .map(subject => (
-                    <div key={subject.id} className="text-sm">
-                      {subject.name}
-                    </div>
-                  ))
-                }
+          ) : (
+            <>
+              <div className="border rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-4">Available Subjects for {selectedCourse.name}</h3>
+                {availableSubjects.length === 0 ? (
+                  <p className="text-gray-500">No subjects available for this course</p>
+                ) : (
+                  <div className="space-y-2">
+                    {availableSubjects.map((subject) => (
+                      <div key={subject.id} className="flex items-center space-x-2">
+                        <input 
+                          type="checkbox"
+                          id={subject.id}
+                          value={subject.id}
+                          checked={selectedSubjects.includes(subject.id)}
+                          onChange={() => handleSubjectChange(subject.id)}
+                          className="h-4 w-4"
+                        />
+                        <label htmlFor={subject.id} className="text-sm">
+                          {subject.name} ({subject.type})
+                          {subject.fees && ` - ₹${subject.fees}`}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Button 
+                  onClick={handleAddSubjects} 
+                  className="mt-4"
+                  disabled={selectedSubjects.length === 0}
+                >
+                  Add Selected Subjects
+                </Button>
               </div>
-            </div>
+
+              {/* Display currently selected subjects from form data */}
+              {formData.subjectIds.length > 0 && (
+                <div className="border rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-4">Selected Subjects</h3>
+                  <div className="space-y-2">
+                    {availableSubjects
+                      .filter(subject => formData.subjectIds.includes(subject.id))
+                      .map(subject => (
+                        <div key={subject.id} className="flex justify-between items-center">
+                          <span className="text-sm">{subject.name} ({subject.type})</span>
+                          {subject.fees && <span className="text-sm font-medium">₹{subject.fees}</span>}
+                        </div>
+                      ))
+                    }
+                  </div>
+                  <div className="mt-4 pt-2 border-t">
+                    <div className="flex justify-between font-medium">
+                      <span>Total Fees:</span>
+                      <span>
+                        ₹{availableSubjects
+                          .filter(subject => formData.subjectIds.includes(subject.id))
+                          .reduce((total, subject) => total + (subject.fees || 0), 0)
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </CardContent>

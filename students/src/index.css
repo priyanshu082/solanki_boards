@@ -1,9 +1,3 @@
-@tailwind base;
-
-@custom-variant dark (&:is(.dark *));
-@tailwind components;
-@tailwind utilities;
-
 @import "tailwindcss";
 
 @layer base {
@@ -62,11 +56,11 @@
   }
 }
 
-@layer base {
+/* @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
   }
-}
+} */

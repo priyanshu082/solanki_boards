@@ -55,7 +55,7 @@ const FixedNavbar = () => {
 
   
   return (
-    <header className=" bg-white fixed md:top-0 md:left-0 md:right-0 z-[10000] w-full">
+    <header className=" bg-white fixed md:top-0 md:left-0 md:right-0 z-[100] w-full">
    
 
       <div className="flex w-full py-2 flex-col lg:flex-row items-center justify-between gap-4">
@@ -93,12 +93,12 @@ const FixedNavbar = () => {
          
         </div>
 
-        <div className="lg:hidden flex justify-center items-center  ">
+        <div className="lg:hidden flex justify-center items-center z-[1001]">
           <Sheet>
             <SheetTrigger asChild>
                 <IoReorderThree className="text-primary h-[30px] w-[30px]" />
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] z-[1002]">
               <SheetHeader>
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
