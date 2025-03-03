@@ -120,8 +120,10 @@ const Result = () => {
   const CLIENT_SECRET = import.meta.env.VITE_DIGILOCKER_CLIENT_SECRET;
   const REDIRECT_URI = import.meta.env.VITE_DIGILOCKER_REDIRECT_URI;
   const AUTH_URL = import.meta.env.VITE_DIGILOCKER_AUTH_URL;
+  const CODE_VERIFIER = import.meta.env.VITE_CODE_VERIFIER; 
 
-  // console.log(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, AUTH_URL);
+
+//   console.log(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, AUTH_URL);
 
   // Check if DigiLocker code exists on component mount
   useEffect(() => {
@@ -267,15 +269,7 @@ const Result = () => {
 
  
 
-  // Function to generate a code verifier for PKCE
-  const generateCodeVerifier = (): string => {
-    const array = new Uint8Array(32);
-    window.crypto.getRandomValues(array);
-    return btoa(String.fromCharCode.apply(null, [...array]))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-  };
+ 
 
 //   // Function to generate a code challenge from the verifier
 //   const generateCodeChallenge = async (verifier: string): Promise<string> => {
@@ -290,18 +284,8 @@ const Result = () => {
 
   // Function to redirect to DigiLocker authentication
   const authenticateWithDigilocker = async () => {
-    try {
-      // Generate and store code verifier for PKCE
-      const codeVerifier = generateCodeVerifier();
-      localStorage.setItem('digilockerCodeVerifier', codeVerifier);
-      
-      // Generate code challenge
-    //   const codeChallenge = await generateCodeChallenge(codeVerifier);
-      
-      // Construct the authorization URL with all parameters
+    try { 
       const authUrl = new URL(AUTH_URL);
-            
-      // Redirect to DigiLocker authentication
       window.location.href = authUrl.toString();
     } catch (error) {
       console.error('Error initiating DigiLocker authentication:', error);
@@ -312,10 +296,8 @@ const Result = () => {
   // Function to get access token using the code from DigiLocker
   const getAccessToken = async (code: string): Promise<string> => {
     try {
-      // Get the code verifier that was stored during authentication request
-      const codeVerifier = localStorage.getItem('digilockerCodeVerifier');
       
-      if (!codeVerifier) {
+      if (!CODE_VERIFIER) {
         throw new Error('Code verifier not found. Please authenticate again.');
       }
       
@@ -326,22 +308,20 @@ const Result = () => {
       formData.append('client_id', CLIENT_ID);
       formData.append('client_secret', CLIENT_SECRET);
       formData.append('redirect_uri', REDIRECT_URI);
-      formData.append('code_verifier', codeVerifier);
+      formData.append('code_verifier', CODE_VERIFIER);
       
-      const response = await fetch('https://api.digitallocker.gov.in/public/oauth2/1/token', {
-        method: 'POST',
+      const response = await axios.post('https://api.digitallocker.gov.in/public/oauth2/1/token', formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: formData
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (response.status !== 200) {
+        const errorData = response.data;
         throw new Error(`Failed to get access token: ${errorData.error_description || 'Unknown error'}`);
       }
       
-      const data = await response.json();
+      const data = response.data;
       return data.access_token;
     } catch (error) {
       console.error('Error getting access token:', error);
