@@ -9,7 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { jsPDF } from "jspdf";
 import { Printer, Download, Share2 } from 'lucide-react';
 import { motion } from "framer-motion";
-
+// import { TOKEN_API_URL, UPLOAD_API_URL, DIGILOCKER_AUTH_URL, CLIENT_ID } from '../Config';   
+import { downloadPDF, calculatePercentage } from '../Helper/pdfGenerator';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -18,7 +19,7 @@ declare module 'jspdf' {
 }
 
 // Define types based on your schema
-interface SubjectResultDetail {
+export interface SubjectResultDetail {
   id: string;
   code: string;
   name: string;
@@ -28,7 +29,7 @@ interface SubjectResultDetail {
   status: string;
 }
 
-interface Result {
+export interface Result {
   id: string;
   studentId: string;
   month: string;
@@ -114,6 +115,13 @@ const Result = () => {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [hasDigilockerCode, setHasDigilockerCode] = useState<boolean>(false);
 
+  // Use import.meta.env instead of process.env for Vite
+  const CLIENT_ID = import.meta.env.VITE_DIGILOCKER_CLIENT_ID 
+  const CLIENT_SECRET = import.meta.env.VITE_DIGILOCKER_CLIENT_SECRET;
+  const REDIRECT_URI = import.meta.env.VITE_DIGILOCKER_REDIRECT_URI || 'https://sbiea.co.in/';
+
+  console.log(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+
   // Check if DigiLocker code exists on component mount
   useEffect(() => {
     const digilockerCode = localStorage.getItem('digilockerCode');
@@ -165,9 +173,7 @@ const Result = () => {
     }
   };
 
-  const calculatePercentage = (obtained: number, total: number) => {
-    return ((obtained / total) * 100).toFixed(2);
-  };
+  
 
   const generatePDFBase64 = async (): Promise<string> => {
     if (!result) return '';
@@ -258,222 +264,130 @@ const Result = () => {
     }
   };
 
-  const downloadPDF = () => {
-    if (!result) return;
+ 
 
+  // Function to generate a code verifier for PKCE
+  const generateCodeVerifier = (): string => {
+    const array = new Uint8Array(32);
+    window.crypto.getRandomValues(array);
+    return btoa(String.fromCharCode.apply(null, [...array]))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  };
+
+  // Function to generate a code challenge from the verifier
+  const generateCodeChallenge = async (verifier: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const digest = await window.crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  };
+
+  // Function to redirect to DigiLocker authentication
+  const authenticateWithDigilocker = async () => {
     try {
-      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-
-      // Header
-      doc.setFontSize(24);
-      doc.setTextColor(0, 48, 87);
-      doc.text("STUDENT RESULT CARD", 105, 15, { align: "center" });
-
-      // Institution details
-      doc.setFontSize(12);
-      doc.setTextColor(100);
-      doc.text(`Academic Year: ${result.year}`, 20, 25);
-      doc.text(`Examination: ${result.month} ${result.year}`, 20, 32);
-
-      // Student details
-      doc.setDrawColor(0, 48, 87);
-      doc.rect(15, 38, 180, 30);
-      doc.setFontSize(11);
-      doc.setTextColor(0);
-      doc.text([
-        `Student Name: ${result.student.name}`,
-        `Roll Number: ${result.student.rollNumber}`,
-        `Total Marks: ${result.totalMarks}`,
-        `Marks Obtained: ${result.obtainedMarks}`,
-        `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
-        `Final Result: ${result.status}`
-      ], 20, 45);
-
-      // Try to use autoTable if available
-      try {
-        // Subject-wise results table
-        const headers = [["Code", "Subject", "Total", "Obtained", "Grade", "Status"]];
-        const data = result.details.map(sub => [
-          sub.code,
-          sub.name,
-          sub.totalMarks.toString(),
-          sub.obtainedMarks.toString(),
-          sub.grade,
-          sub.status
-        ]);
-
-        // AutoTable approach
-        doc.autoTable({
-          startY: 72,
-          head: headers,
-          body: data,
-          theme: 'striped',
-          headStyles: { fillColor: [0, 48, 87], textColor: 255, fontSize: 10 },
-          styles: { fontSize: 9, cellPadding: 2 },
-          columnStyles: { 1: { cellWidth: 60 } },
-          margin: { left: 15, right: 15 }
-        });
-
-        // Get the final Y position from autoTable
-        let finalY = (doc as any).lastAutoTable.finalY + 5;
-        
-        // Summary section after the table
-        doc.setFontSize(11);
-        doc.setDrawColor(0, 48, 87);
-        doc.rect(15, finalY, 180, 25);
-        doc.text([
-          "Final Summary",
-          `Total Marks: ${result.totalMarks}`,
-          `Marks Obtained: ${result.obtainedMarks}`,
-          `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
-          `Overall Grade: ${result.status}`
-        ], 20, finalY + 7);
-      } catch (autoTableError) {
-        console.log("AutoTable failed, using manual table approach");
-        
-        // Manual table approach - fallback if autoTable is not available
-        // Draw table header
-        let yPosition = 72;
-        doc.setFillColor(0, 48, 87);
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(10);
-        
-        // Header cells
-        const columns = [
-          { x: 15, width: 25, text: "Code" },
-          { x: 40, width: 60, text: "Subject" },
-          { x: 100, width: 25, text: "Total" },
-          { x: 125, width: 25, text: "Obtained" },
-          { x: 150, width: 20, text: "Grade" },
-          { x: 170, width: 25, text: "Status" }
-        ];
-        
-        // Draw header cells
-        doc.rect(15, yPosition, 180, 8, 'F');
-        columns.forEach(col => {
-          doc.text(col.text, col.x + 2, yPosition + 5.5);
-        });
-        yPosition += 8;
-        
-        // Draw data rows
-        doc.setTextColor(0);
-        doc.setFontSize(9);
-        
-        result.details.forEach((subject, index) => {
-          const rowHeight = 7;
-          // Alternate row colors for better readability
-          if (index % 2 === 0) {
-            doc.setFillColor(240, 240, 240);
-            doc.rect(15, yPosition, 180, rowHeight, 'F');
-          }
-          
-          // Draw cell content
-          doc.text(subject.code, columns[0].x + 2, yPosition + 5);
-          doc.text(subject.name, columns[1].x + 2, yPosition + 5);
-          doc.text(subject.totalMarks.toString(), columns[2].x + 2, yPosition + 5);
-          doc.text(subject.obtainedMarks.toString(), columns[3].x + 2, yPosition + 5);
-          doc.text(subject.grade, columns[4].x + 2, yPosition + 5);
-          doc.text(subject.status, columns[5].x + 2, yPosition + 5);
-          
-          // Draw cell borders
-          doc.setDrawColor(200, 200, 200);
-          doc.rect(15, yPosition, 180, rowHeight);
-          columns.forEach((col, i) => {
-            if (i > 0) {
-              doc.line(col.x, yPosition, col.x, yPosition + rowHeight);
-            }
-          });
-          
-          yPosition += rowHeight;
-        });
-        
-        // Summary section
-        yPosition += 5;
-        doc.setFontSize(11);
-        doc.setDrawColor(0, 48, 87);
-        doc.rect(15, yPosition, 180, 25);
-        doc.text([
-          "Final Summary",
-          `Total Marks: ${result.totalMarks}`,
-          `Marks Obtained: ${result.obtainedMarks}`,
-          `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
-          `Overall Grade: ${result.status}`
-        ], 20, yPosition + 7);
-      }
-
-      // Footer
-      doc.setFontSize(8);
-      doc.text("This is a computer-generated document", 105, 290, { align: "center" });
-
-      // Save PDF
-      doc.save(`Result_${result.student.rollNumber}_${result.month}${result.year}.pdf`);
+      // Generate and store code verifier for PKCE
+      const codeVerifier = generateCodeVerifier();
+      localStorage.setItem('digilockerCodeVerifier', codeVerifier);
+      
+      // Generate code challenge
+      const codeChallenge = await generateCodeChallenge(codeVerifier);
+      
+      // Construct the authorization URL with all parameters
+      const authUrl = new URL('https://digilocker.meripehchaan.gov.in/signin/oauth_partner/%252Foauth2%252F1%252Fconsent');
+      
+      authUrl.searchParams.append('logo', '');
+      authUrl.searchParams.append('response_type', 'code');
+      authUrl.searchParams.append('client_id', CLIENT_ID);
+      authUrl.searchParams.append('state', 'oidc_flow');
+      authUrl.searchParams.append('redirect_uri', REDIRECT_URI);
+      authUrl.searchParams.append('code_challenge', codeChallenge);
+      authUrl.searchParams.append('code_challenge_method', 'S256');
+      authUrl.searchParams.append('scope', 'openid');
+      authUrl.searchParams.append('orgid', '108138');
+      authUrl.searchParams.append('requst_pdf', 'Y');
+      authUrl.searchParams.append('app_name', 'dGVzdA%3D%3D');
+      authUrl.searchParams.append('signup', 'signup');
+      
+      // Redirect to DigiLocker authentication
+      window.location.href = authUrl.toString();
     } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Failed to generate PDF. Please try again later.");
+      console.error('Error initiating DigiLocker authentication:', error);
+      setError('Failed to initiate DigiLocker authentication');
     }
   };
 
-  // DigiLocker Authentication URL
-  const DIGILOCKER_AUTH_URL = "https://digilocker.meripehchaan.gov.in/signin/oauth_partner/%252Foauth2%252F1%252Fconsent%253Flogo%253D%2526response_type%253Dcode%2526client_id%253DCX18B80B79%2526state%253Doidc_flow%2526redirect_uri%253Dhttps%25253A%25252F%25252Fsbiea.co.in%25252F%2526code_challenge%253DL4_TbsMstNvZHy_R9GoyVTPiR7Vt7N-KryCI2Nse9J0%2526code_challenge_method%253DS256%2526scope%253Dopenid%2526orgid%253D108138%2526txn%253D67c58844c2e05oauth21740998724%2526hashkey%253D99d9abbfe34b1e5786f8f5e0f30c4b67491c3aea9b5c0355ad958e2b41aa9499%2526requst_pdf%253DY%2526app_name%253DdGVzdA%25253D%25253D%2526signup%253Dsignup";
-  
-  // DigiLocker Access Token and Upload Endpoints
-  const TOKEN_API_URL = "https://api.digitallocker.gov.in/public/oauth2/1/token";
-  const UPLOAD_API_URL = "https://api.digitallocker.gov.in/public/oauth2/1/file/upload";
-  
-  // DigiLocker Client ID and Secret (should be stored securely in a real application)
-  const CLIENT_ID = "CX18B80B79";
-  const CLIENT_SECRET = "your_client_secret_here"; // This should be stored securely, not hardcoded
-  
+  // Function to get access token using the code from DigiLocker
   const getAccessToken = async (code: string): Promise<string> => {
     try {
-      const response = await axios.post(TOKEN_API_URL, {
-        grant_type: 'authorization_code',
-        code: code,
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        redirect_uri: 'https://sbiea.co.in/'
-      }, {
+      // Get the code verifier that was stored during authentication request
+      const codeVerifier = localStorage.getItem('digilockerCodeVerifier');
+      
+      if (!codeVerifier) {
+        throw new Error('Code verifier not found. Please authenticate again.');
+      }
+      
+      // Create form data with all required parameters
+      const formData = new URLSearchParams();
+      formData.append('code', code);
+      formData.append('grant_type', 'authorization_code');
+      formData.append('client_id', CLIENT_ID);
+      formData.append('client_secret', CLIENT_SECRET);
+      formData.append('redirect_uri', REDIRECT_URI);
+      formData.append('code_verifier', codeVerifier);
+      
+      const response = await fetch('https://api.digitallocker.gov.in/public/oauth2/1/token', {
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
       });
       
-      // Store token in localStorage (optional)
-      localStorage.setItem('digilockerToken', response.data.access_token);
-      return response.data.access_token;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to get access token: ${errorData.error_description || 'Unknown error'}`);
+      }
+      
+      const data = await response.json();
+      return data.access_token;
     } catch (error) {
-      console.error("Error getting access token:", error);
-      throw new Error("Failed to get access token from DigiLocker");
+      console.error('Error getting access token:', error);
+      throw error;
     }
   };
 
-  const uploadFileToDigilocker = async (accessToken: string, fileBase64: string) => {
-    try {
-      // Create file path for DigiLocker
-      const fileName = `Result_${result?.student.rollNumber}_${result?.month}${result?.year}.pdf`;
-      const path = `/Results/${fileName}`;
+//   const uploadFileToDigilocker = async (accessToken: string, fileBase64: string) => {
+//     try {
+//       // Create file path for DigiLocker
+//       const fileName = `Result_${result?.student.rollNumber}_${result?.month}${result?.year}.pdf`;
+//       const path = `/Results/${fileName}`;
       
-      // Calculate HMAC for file integrity verification
-      // Note: In a real application, you should implement proper HMAC calculation
-      // This is a placeholder - you need to implement this correctly
-      const hmac = await calculateHmac(fileBase64, CLIENT_SECRET);
+//       // Calculate HMAC for file integrity verification
+//       // Note: In a real application, you should implement proper HMAC calculation
+//       // This is a placeholder - you need to implement this correctly
+//       const hmac = await calculateHmac(fileBase64, CLIENT_SECRET || '');
       
-      // Upload file to DigiLocker
-      const response = await axios.post(UPLOAD_API_URL, fileBase64, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/pdf',
-          'path': path,
-          'hmac': hmac
-        }
-      });
+//       // Upload file to DigiLocker
+//       const response = await axios.post(UPLOAD_API_URL, fileBase64, {
+//         headers: {
+//           'Authorization': `Bearer ${accessToken}`,
+//           'Content-Type': 'application/pdf',
+//           'path': path,
+//           'hmac': hmac
+//         }
+//       });
       
-      return response.data;
-    } catch (error) {
-      console.error("Error uploading file to DigiLocker:", error);
-      throw new Error("Failed to upload file to DigiLocker");
-    }
-  };
+//       return response.data;
+//     } catch (error) {
+//       console.error("Error uploading file to DigiLocker:", error);
+//       throw new Error("Failed to upload file to DigiLocker");
+//     }
+//   };
 
   // Helper function to calculate HMAC using SHA-256
   const calculateHmac = async (data: string, key: string): Promise<string> => {
@@ -499,38 +413,68 @@ const Result = () => {
   };
 
   const uploadToDigilocker = async () => {
-    // Check if DigiLocker code is available in localStorage
-    const digilockerCode = localStorage.getItem('digilockerCode');
-    
-    if (!digilockerCode) {
-      // Redirect to DigiLocker authentication
-      window.location.href = DIGILOCKER_AUTH_URL;
-      return;
-    }
-    
     try {
       setUploading(true);
-      setUploadStatus("Getting access token...");
+      setUploadStatus('Preparing to upload to DigiLocker...');
       
-      // Get access token
-      const accessToken = await getAccessToken(digilockerCode);
+      // Get code from localStorage
+      const code = localStorage.getItem('digilockerCode');
       
-      setUploadStatus("Generating PDF...");
-      // Generate PDF as base64
+      if (!code) {
+        // If no code, redirect to authentication
+        authenticateWithDigilocker();
+        return;
+      }
+      
+      setUploadStatus('Getting access token...');
+      const accessToken = await getAccessToken(code);
+      
+      setUploadStatus('Generating PDF...');
       const pdfBase64 = await generatePDFBase64();
       
-      setUploadStatus("Uploading to DigiLocker...");
-      // Upload to DigiLocker
-      await uploadFileToDigilocker(accessToken, pdfBase64);
+      setUploadStatus('Calculating HMAC...');
+      const hmac = await calculateHmac(pdfBase64, CLIENT_SECRET);
       
-      setUploadStatus("Success! Your result has been uploaded to DigiLocker.");
+      setUploadStatus('Uploading to DigiLocker...');
+      const studentName = result?.student?.name?.replace(/\s+/g, '_') || 'Result';
+      const fileName = `${studentName}_Result_${result?.month}_${result?.year}.pdf`;
+      const path = `/issued-documents/results/${fileName}`;
+      
+      // Convert base64 to blob
+      const binaryString = window.atob(pdfBase64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      
+      // Upload to DigiLocker
+      const uploadResponse = await fetch('https://api.digitallocker.gov.in/public/oauth2/1/file/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/pdf',
+          'path': path,
+          'hmac': hmac
+        },
+        body: blob
+      });
+      
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        throw new Error(`Upload failed: ${errorData.error_description || 'Unknown error'}`);
+      }
+      
+      setUploadStatus('Successfully uploaded to DigiLocker!');
+      
       // Clear the code after successful upload
       localStorage.removeItem('digilockerCode');
+      localStorage.removeItem('digilockerCodeVerifier');
+      setHasDigilockerCode(false);
+      
     } catch (error) {
-      console.error("DigiLocker upload failed:", error);
-      setUploadStatus("Failed to upload to DigiLocker. Please try again.");
-      // Optionally clear the code on error to start fresh
-      localStorage.removeItem('digilockerCode');
+      console.error('Error uploading to DigiLocker:', error);
+      setUploadStatus(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setUploading(false);
     }
@@ -732,7 +676,7 @@ const Result = () => {
               Print
             </Button>
             <Button 
-              onClick={downloadPDF} 
+              onClick={() => downloadPDF({ result })} 
               className="bg-green-700 hover:bg-green-600 text-white px-6"
               disabled={uploading}
             >
