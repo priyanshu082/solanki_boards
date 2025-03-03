@@ -87,7 +87,9 @@ const Navbar = () => {
             </NavigationMenuItem>
             
             <NavigationMenuItem>
+              <Link to="/result">
               <Button variant="ghost" className="text-slate-700 hover:bg-slate-200">Result</Button>
+              </Link>
             </NavigationMenuItem>
             
             <NavigationMenuItem>

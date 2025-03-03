@@ -60,6 +60,26 @@ const StudentProfile: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const studentId = localStorage.getItem('id');
 
+  // Add code extraction from URL for DigiLocker authentication
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
+    
+    // Check if the URL contains DigiLocker authentication code
+    if (code && state === 'oidc_flow') {
+      // Store the code in localStorage for later use
+      localStorage.setItem('digilockerCode', code);
+      
+      // Remove the parameters from URL for cleaner user experience
+      const cleanUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+      
+      // Redirect to the Result page
+      window.location.href = '/result';
+    }
+  }, []);
+
   useEffect(() => {
     const fetchStudentData = async () => {
       try {

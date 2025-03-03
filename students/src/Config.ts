@@ -11,5 +11,10 @@ export const studentLoginUrl = STUDENT_BASE_URL + '/login';
 export const studentDetailsUrl = STUDENT_BASE_URL + '/student';
 
 
+// Student Routes
+export const studentResultUrl = STUDENT_BASE_URL + '/result';
+
+
+
 
 

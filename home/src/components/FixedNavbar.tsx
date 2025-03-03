@@ -60,8 +60,6 @@ const FixedNavbar = () => {
   
   return (
     <header className=" bg-white fixed md:top-0 md:left-0 md:right-0 z-[102] w-full">
-   
-
       <div className="flex w-full py-2 flex-col lg:flex-row items-center justify-between gap-4">
         <div className="flex flex-col lg:flex-row items-center gap-4">
 
