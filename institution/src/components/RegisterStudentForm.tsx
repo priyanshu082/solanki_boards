@@ -66,6 +66,7 @@ const RegisterStudentForm: React.FC = () => {
   const [isLoadingCourses, setIsLoadingCourses] = useState<boolean>(false);
   const [courseError, setCourseError] = useState<string | null>(null);
   const [courses, setCourses] = useRecoilState(staticDataAtoms.coursesAtom);
+  //@ts-ignore
   const [selectedCourse, setSelectedCourse] = useRecoilState(staticDataAtoms.selectedCourseAtom);
 
   // Function to fetch courses based on course type
