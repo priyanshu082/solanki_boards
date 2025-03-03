@@ -118,9 +118,10 @@ const Result = () => {
   // Use import.meta.env instead of process.env for Vite
   const CLIENT_ID = import.meta.env.VITE_DIGILOCKER_CLIENT_ID 
   const CLIENT_SECRET = import.meta.env.VITE_DIGILOCKER_CLIENT_SECRET;
-  const REDIRECT_URI = import.meta.env.VITE_DIGILOCKER_REDIRECT_URI || 'https://sbiea.co.in/';
+  const REDIRECT_URI = import.meta.env.VITE_DIGILOCKER_REDIRECT_URI;
+  const AUTH_URL = import.meta.env.VITE_DIGILOCKER_AUTH_URL;
 
-  console.log(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+  // console.log(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, AUTH_URL);
 
   // Check if DigiLocker code exists on component mount
   useEffect(() => {
@@ -276,16 +277,16 @@ const Result = () => {
       .replace(/=/g, '');
   };
 
-  // Function to generate a code challenge from the verifier
-  const generateCodeChallenge = async (verifier: string): Promise<string> => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(verifier);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-  };
+//   // Function to generate a code challenge from the verifier
+//   const generateCodeChallenge = async (verifier: string): Promise<string> => {
+//     const encoder = new TextEncoder();
+//     const data = encoder.encode(verifier);
+//     const digest = await window.crypto.subtle.digest('SHA-256', data);
+//     return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
+//       .replace(/\+/g, '-')
+//       .replace(/\//g, '_')
+//       .replace(/=/g, '');
+//   };
 
   // Function to redirect to DigiLocker authentication
   const authenticateWithDigilocker = async () => {
@@ -295,24 +296,11 @@ const Result = () => {
       localStorage.setItem('digilockerCodeVerifier', codeVerifier);
       
       // Generate code challenge
-      const codeChallenge = await generateCodeChallenge(codeVerifier);
+    //   const codeChallenge = await generateCodeChallenge(codeVerifier);
       
       // Construct the authorization URL with all parameters
-      const authUrl = new URL('https://digilocker.meripehchaan.gov.in/signin/oauth_partner/%252Foauth2%252F1%252Fconsent');
-      
-      authUrl.searchParams.append('logo', '');
-      authUrl.searchParams.append('response_type', 'code');
-      authUrl.searchParams.append('client_id', CLIENT_ID);
-      authUrl.searchParams.append('state', 'oidc_flow');
-      authUrl.searchParams.append('redirect_uri', REDIRECT_URI);
-      authUrl.searchParams.append('code_challenge', codeChallenge);
-      authUrl.searchParams.append('code_challenge_method', 'S256');
-      authUrl.searchParams.append('scope', 'openid');
-      authUrl.searchParams.append('orgid', '108138');
-      authUrl.searchParams.append('requst_pdf', 'Y');
-      authUrl.searchParams.append('app_name', 'dGVzdA%3D%3D');
-      authUrl.searchParams.append('signup', 'signup');
-      
+      const authUrl = new URL(AUTH_URL);
+            
       // Redirect to DigiLocker authentication
       window.location.href = authUrl.toString();
     } catch (error) {
