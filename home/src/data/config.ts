@@ -1,5 +1,8 @@
-export const BASE_URL = 'http://localhost:8080/api';
+export const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+export const PUBLIC_URL = BASE_URL + '/api/public';
+
+export const createEnquiryUrl = PUBLIC_URL + '/enquiry';
 
 export const ADMIN_BASE_URL = BASE_URL + '/admin';
 export const INSTITUTE_BASE_URL = BASE_URL + '/institute';
@@ -15,3 +18,6 @@ export const initiatePaymentUrl = PAYMENT_BASE_URL + '/initiate-payment';
 export const paymentStatusUrl = PAYMENT_BASE_URL + '/check-payment-status';
 export const verifyPaymentUrl = PAYMENT_BASE_URL + '/verify-payment';
 
+export const fetchallinstitutesUrl = INSTITUTE_BASE_URL + '/all';
+
+export const fetchallcoursesUrl = PUBLIC_URL + '/course/list';

@@ -1,10 +1,58 @@
+import { useState } from 'react';
+import axios from 'axios';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
+import { createEnquiryUrl } from '../data/config';
+
+
 
 const ContactSection = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phoneNumber: '',
+    title: '', // Using course name as title
+    description: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      await axios.post(createEnquiryUrl, {
+        ...formData,
+      });
+      
+      setSuccess(true);
+      setFormData({
+        name: '',
+        email: '',
+        phoneNumber: '',
+        title: '',
+        description: '',
+      });
+    } catch (err) {
+      console.error('Error submitting enquiry:', err);
+      setError('Failed to submit your enquiry. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 text-primary my-8">
       <h1 className="text-3xl font-bold text-center mb-8">SBCODL: Empowering Learning, Anytime, Anywhere</h1>
@@ -68,50 +116,88 @@ const ContactSection = () => {
         </div>
 
         {/* Right side - Contact Form */}
-        <div className='bg-white'>
-          <Card className='bg-primary text-foreground border-none shadow-lg bg'>
+        <div>
+          <Card className='bg-primary text-foreground border-none shadow-lg'>
             <CardHeader>
               <CardTitle className='text-2xl'>Contact Us</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4">
+              {success && (
+                <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-md">
+                  Your enquiry has been submitted successfully! We'll get back to you soon.
+                </div>
+              )}
+              
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
+                  {error}
+                </div>
+              )}
+              
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
                   <Input
                     type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     placeholder="Full Name"
                     className="w-full border-gray-300"
+                    required
                   />
                 </div>
                 <div>
                   <Input
                     type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     placeholder="Email Address"
                     className="w-full border-gray-300"
+                    required
                   />
                 </div>
                 <div>
                   <Input
                     type="tel"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
                     placeholder="Mobile Number"
                     className="w-full border-gray-300"
+                    required
                   />
                 </div>
                 <div>
                   <Input
                     type="text"
-                    placeholder="Course Name"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder="Title"
                     className="w-full border-gray-300"
+                    required
                   />
                 </div>
+                
                 <div>
                   <Textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
                     placeholder="Your Message"
                     className="w-full border-gray-300"
                     rows={4}
+                    required
                   />
                 </div>
-                <Button variant="destructive" type="submit" className="w-full">
-                  Send Message
+                <Button 
+                  variant="destructive" 
+                  type="submit" 
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading ? 'Sending...' : 'Send Message'}
                 </Button>
               </form>
             </CardContent>

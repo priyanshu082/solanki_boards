@@ -1,22 +1,18 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { studentResultUrl } from '../Config';
+import { studentDetailsUrl } from '../Config';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { jsPDF } from "jspdf";
-import { Printer, Download, Share2 } from 'lucide-react';
-import { motion } from "framer-motion";
-// import { TOKEN_API_URL, UPLOAD_API_URL, DIGILOCKER_AUTH_URL, CLIENT_ID } from '../Config';   
-import { downloadPDF, calculatePercentage } from '../Helper/pdfGenerator';
 
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-  }
-}
+import { Printer, Download } from 'lucide-react';
+import { motion } from "framer-motion";
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+
+import { ResultStatus, Grade, Month, Year } from "../lib/Interfaces";
 
 // Define types based on your schema
 export interface SubjectResultDetail {
@@ -25,18 +21,23 @@ export interface SubjectResultDetail {
   name: string;
   totalMarks: number;
   obtainedMarks: number;
-  grade: string;
-  status: string;
+  grade: Grade;
+  status: ResultStatus;
+  resultId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Result {
   id: string;
   studentId: string;
-  month: string;
-  year: string;
+  month: Month;
+  year: Year;
   totalMarks: number;
   obtainedMarks: number;
-  status: string;
+  status: ResultStatus;
+  createdAt: Date;
+  updatedAt: Date;
   details: SubjectResultDetail[];
   student: {
     name: string;
@@ -44,142 +45,104 @@ export interface Result {
   };
 }
 
-// Dummy data for testing
-const dummyResult: Result = {
-  id: "result123",
-  studentId: "student456", 
-  month: "May",
-  year: "2023",
-  totalMarks: 500,
-  obtainedMarks: 425,
-  status: "PASS",
-  student: {
-    name: "John Doe",
-    rollNumber: "R2023001"
-  },
-  details: [
-    {
-      id: "sub1",
-      code: "CS101",
-      name: "Introduction to Computer Science",
-      totalMarks: 100,
-      obtainedMarks: 85,
-      grade: "A",
-      status: "PASS"
-    },
-    {
-      id: "sub2", 
-      code: "MA101",
-      name: "Mathematics for Computing",
-      totalMarks: 100,
-      obtainedMarks: 78,
-      grade: "B",
-      status: "PASS"
-    },
-    {
-      id: "sub3",
-      code: "EN101", 
-      name: "Technical Communication",
-      totalMarks: 100,
-      obtainedMarks: 92,
-      grade: "A",
-      status: "PASS"
-    },
-    {
-      id: "sub4",
-      code: "PH101",
-      name: "Physics",
-      totalMarks: 100,
-      obtainedMarks: 88,
-      grade: "A", 
-      status: "PASS"
-    },
-    {
-      id: "sub5",
-      code: "DS101",
-      name: "Data Structures",
-      totalMarks: 100,
-      obtainedMarks: 82,
-      grade: "B",
-      status: "PASS"
-    }
-  ]
-};
-
 const Result = () => {
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [uploading, setUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
-  const [hasDigilockerCode, setHasDigilockerCode] = useState<boolean>(false);
-
-  // Use import.meta.env instead of process.env for Vite
-  const CLIENT_ID = import.meta.env.VITE_DIGILOCKER_CLIENT_ID 
-  const CLIENT_SECRET = import.meta.env.VITE_DIGILOCKER_CLIENT_SECRET;
-  const REDIRECT_URI = import.meta.env.VITE_DIGILOCKER_REDIRECT_URI;
-  const AUTH_URL = import.meta.env.VITE_DIGILOCKER_AUTH_URL;
-  const CODE_VERIFIER = import.meta.env.VITE_CODE_VERIFIER; 
-
-
-//   console.log(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, AUTH_URL);
-
-  // Check if DigiLocker code exists on component mount
-  useEffect(() => {
-    const digilockerCode = localStorage.getItem('digilockerCode');
-    setHasDigilockerCode(!!digilockerCode);
-  }, []);
+  const [student, setStudent] = useState<any>(null);
 
   useEffect(() => {
-    const fetchResult = async () => {
+    const fetchStudentData = async () => {
       try {
         setLoading(true);
         const studentId = localStorage.getItem('id');
         
-        try {
-          const response = await axios.get(`${studentResultUrl}/${studentId}`);
-          setResult(response.data);
-        } catch (apiError) {
-          console.error("API error:", apiError);
-          setResult(dummyResult);
+        if (!studentId) {
+          throw new Error("Student ID not found");
+        }
+        
+        // Fetch student details which includes results
+        const response = await axios.get(`${studentDetailsUrl}/${studentId}`,{
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        const studentData = response.data;
+        setStudent(studentData);
+        console.log(studentData)
+        // Check if student has results
+        if (studentData.results && studentData.results.length > 0) {
+          // Get the most recent result
+          const studentResult = studentData.results[0];
+          setResult(studentResult);
+        } else {
+          // If no results found in API, use dummy data for testing
+          console.warn("No results found for student, using dummy data");
+          
         }
       } catch (err) {
+        console.error("Error fetching student data:", err);
         setError("Failed to load result. Please try again later.");
-        console.error(err);
-        setResult(dummyResult);
+        // Use dummy data as fallback
+        
       } finally {
         setLoading(false);
       }
     };
 
-    fetchResult();
+    fetchStudentData();
   }, []);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: ResultStatus) => {
     switch (status) {
-      case 'PASS': return 'bg-emerald-500';
-      case 'FAIL': return 'bg-red-500';
-      case 'SUPPLEMENTARY': return 'bg-amber-500';
+      case ResultStatus.PASS: return 'bg-emerald-500';
+      case ResultStatus.FAIL: return 'bg-red-500';
+      case ResultStatus.PENDING: return 'bg-amber-500';
+      case ResultStatus.INCOMPLETE: return 'bg-orange-500';
+      case ResultStatus.WITHHELD: return 'bg-purple-500';
+      case ResultStatus.CANCELLED: return 'bg-gray-500';
       default: return 'bg-gray-500';
     }
   };
 
-  const getGradeColor = (grade: string) => {
+  const getGradeColor = (grade: Grade) => {
     switch (grade) {
-      case 'A': return 'bg-emerald-500';
-      case 'B': return 'bg-blue-600';
-      case 'C': return 'bg-amber-500';
-      case 'D': return 'bg-orange-500';
-      case 'F': return 'bg-red-500';
+      case Grade.A_PLUS: return 'bg-emerald-500';
+      case Grade.A: return 'bg-emerald-600';
+      case Grade.B_PLUS: return 'bg-blue-500';
+      case Grade.B: return 'bg-blue-600';
+      case Grade.C_PLUS: return 'bg-amber-500';
+      case Grade.C: return 'bg-amber-600';
+      case Grade.D: return 'bg-orange-500';
+      case Grade.F: return 'bg-red-500';
       default: return 'bg-gray-500';
     }
   };
 
-  
+  const formatGrade = (grade: Grade) => {
+    switch (grade) {
+      case Grade.A_PLUS: return 'A+';
+      case Grade.A: return 'A';
+      case Grade.B_PLUS: return 'B+';
+      case Grade.B: return 'B';
+      case Grade.C_PLUS: return 'C+';
+      case Grade.C: return 'C';
+      case Grade.D: return 'D';
+      case Grade.F: return 'F';
+      default: return grade;
+    }
+  };
 
-  const generatePDFBase64 = async (): Promise<string> => {
-    if (!result) return '';
+  const formatMonth = (month: Month) => {
+    return month.charAt(0) + month.slice(1).toLowerCase();
+  };
+
+  const calculatePercentage = (obtained: number, total: number) => {
+    return ((obtained / total) * 100).toFixed(2);
+  };
+
+  const handleDownloadPDF = () => {
+    if (!result) return;
 
     try {
       const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -193,7 +156,7 @@ const Result = () => {
       doc.setFontSize(12);
       doc.setTextColor(100);
       doc.text(`Academic Year: ${result.year}`, 20, 25);
-      doc.text(`Examination: ${result.month} ${result.year}`, 20, 32);
+      doc.text(`Examination: ${formatMonth(result.month)} ${result.year}`, 20, 32);
 
       // Student details
       doc.setDrawColor(0, 48, 87);
@@ -201,250 +164,61 @@ const Result = () => {
       doc.setFontSize(11);
       doc.setTextColor(0);
       doc.text([
-        `Student Name: ${result.student.name}`,
-        `Roll Number: ${result.student.rollNumber}`,
+        `Student Name: ${student.name  || 'N/A'}`,
         `Total Marks: ${result.totalMarks}`,
         `Marks Obtained: ${result.obtainedMarks}`,
         `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
         `Final Result: ${result.status}`
       ], 20, 45);
 
-      // Try to use autoTable if available
-      try {
-        // Subject-wise results table
-        const headers = [["Code", "Subject", "Total", "Obtained", "Grade", "Status"]];
-        const data = result.details.map(sub => [
-          sub.code,
-          sub.name,
-          sub.totalMarks.toString(),
-          sub.obtainedMarks.toString(),
-          sub.grade,
-          sub.status
-        ]);
+      // Subject-wise results table
+      const headers = [["Code", "Subject", "Total", "Obtained", "Grade", "Status"]];
+      const data = result.details.map(sub => [
+        sub.code,
+        sub.name,
+        sub.totalMarks.toString(),
+        sub.obtainedMarks.toString(),
+        formatGrade(sub.grade),
+        sub.status
+      ]);
 
-        // AutoTable approach
-        doc.autoTable({
-          startY: 72,
-          head: headers,
-          body: data,
-          theme: 'striped',
-          headStyles: { fillColor: [0, 48, 87], textColor: 255, fontSize: 10 },
-          styles: { fontSize: 9, cellPadding: 2 },
-          columnStyles: { 1: { cellWidth: 60 } },
-          margin: { left: 15, right: 15 }
-        });
+      // @ts-ignore - Using autoTable from the imported jspdf-autotable
+      doc.autoTable({
+        startY: 72,
+        head: headers,
+        body: data,
+        theme: 'striped',
+        headStyles: { fillColor: [0, 48, 87], textColor: 255, fontSize: 10 },
+        styles: { fontSize: 9, cellPadding: 2 },
+        columnStyles: { 1: { cellWidth: 60 } },
+        margin: { left: 15, right: 15 }
+      });
 
-        // Get the final Y position from autoTable
-        let finalY = (doc as any).lastAutoTable.finalY + 5;
-        
-        // Summary section after the table
-        doc.setFontSize(11);
-        doc.setDrawColor(0, 48, 87);
-        doc.rect(15, finalY, 180, 25);
-        doc.text([
-          "Final Summary",
-          `Total Marks: ${result.totalMarks}`,
-          `Marks Obtained: ${result.obtainedMarks}`,
-          `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
-          `Overall Grade: ${result.status}`
-        ], 20, finalY + 7);
-      } catch (autoTableError) {
-        console.log("AutoTable failed, using manual table approach");
-        
-        // Manual table implementation (same as in downloadPDF)
-        // ...omitted for brevity...
-      }
+      // Get the final Y position from autoTable
+      // @ts-ignore
+      let finalY = doc.lastAutoTable.finalY + 5;
+      
+      // Summary section after the table
+      doc.setFontSize(11);
+      doc.setDrawColor(0, 48, 87);
+      doc.rect(15, finalY, 180, 25);
+      doc.text([
+        "Final Summary",
+        `Total Marks: ${result.totalMarks}`,
+        `Marks Obtained: ${result.obtainedMarks}`,
+        `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
+        `Overall Grade: ${result.status}`
+      ], 20, finalY + 7);
 
       // Footer
       doc.setFontSize(8);
       doc.text("This is a computer-generated document", 105, 290, { align: "center" });
 
-      // Return base64 string instead of saving
-      return doc.output('datauristring').split(',')[1];
+      // Save PDF
+      doc.save(`Result_${result.month}${result.year}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
-      throw new Error("Failed to generate PDF base64");
-    }
-  };
-
- 
-
- 
-
-//   // Function to generate a code challenge from the verifier
-//   const generateCodeChallenge = async (verifier: string): Promise<string> => {
-//     const encoder = new TextEncoder();
-//     const data = encoder.encode(verifier);
-//     const digest = await window.crypto.subtle.digest('SHA-256', data);
-//     return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
-//       .replace(/\+/g, '-')
-//       .replace(/\//g, '_')
-//       .replace(/=/g, '');
-//   };
-
-  // Function to redirect to DigiLocker authentication
-  const authenticateWithDigilocker = async () => {
-    try { 
-      const authUrl = new URL(AUTH_URL);
-      window.location.href = authUrl.toString();
-    } catch (error) {
-      console.error('Error initiating DigiLocker authentication:', error);
-      setError('Failed to initiate DigiLocker authentication');
-    }
-  };
-
-  // Function to get access token using the code from DigiLocker
-  const getAccessToken = async (code: string): Promise<string> => {
-    try {
-      
-      if (!CODE_VERIFIER) {
-        throw new Error('Code verifier not found. Please authenticate again.');
-      }
-      
-      // Create form data with all required parameters
-      const formData = new URLSearchParams();
-      formData.append('code', code);
-      formData.append('grant_type', 'authorization_code');
-      formData.append('client_id', CLIENT_ID);
-      formData.append('client_secret', CLIENT_SECRET);
-      formData.append('redirect_uri', REDIRECT_URI);
-      formData.append('code_verifier', CODE_VERIFIER);
-      
-      const response = await axios.post('https://api.digitallocker.gov.in/public/oauth2/1/token', formData, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
-      
-      if (response.status !== 200) {
-        const errorData = response.data;
-        throw new Error(`Failed to get access token: ${errorData.error_description || 'Unknown error'}`);
-      }
-      
-      const data = response.data;
-      return data.access_token;
-    } catch (error) {
-      console.error('Error getting access token:', error);
-      throw error;
-    }
-  };
-
-//   const uploadFileToDigilocker = async (accessToken: string, fileBase64: string) => {
-//     try {
-//       // Create file path for DigiLocker
-//       const fileName = `Result_${result?.student.rollNumber}_${result?.month}${result?.year}.pdf`;
-//       const path = `/Results/${fileName}`;
-      
-//       // Calculate HMAC for file integrity verification
-//       // Note: In a real application, you should implement proper HMAC calculation
-//       // This is a placeholder - you need to implement this correctly
-//       const hmac = await calculateHmac(fileBase64, CLIENT_SECRET || '');
-      
-//       // Upload file to DigiLocker
-//       const response = await axios.post(UPLOAD_API_URL, fileBase64, {
-//         headers: {
-//           'Authorization': `Bearer ${accessToken}`,
-//           'Content-Type': 'application/pdf',
-//           'path': path,
-//           'hmac': hmac
-//         }
-//       });
-      
-//       return response.data;
-//     } catch (error) {
-//       console.error("Error uploading file to DigiLocker:", error);
-//       throw new Error("Failed to upload file to DigiLocker");
-//     }
-//   };
-
-  // Helper function to calculate HMAC using SHA-256
-  const calculateHmac = async (data: string, key: string): Promise<string> => {
-    // This is a placeholder - in a real application, you should use a proper HMAC implementation
-    // Example implementation using Web Crypto API:
-    try {
-      const encoder = new TextEncoder();
-      const keyData = encoder.encode(key);
-      const message = encoder.encode(data);
-      
-      const cryptoKey = await window.crypto.subtle.importKey(
-        'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
-      );
-      
-      const signature = await window.crypto.subtle.sign('HMAC', cryptoKey, message);
-      
-      // Convert to Base64
-      return btoa(String.fromCharCode(...new Uint8Array(signature)));
-    } catch (error) {
-      console.error("Error calculating HMAC:", error);
-      return "HMAC_CALCULATION_FAILED"; // This is just a fallback, won't work in production
-    }
-  };
-
-  const uploadToDigilocker = async () => {
-    try {
-      setUploading(true);
-      setUploadStatus('Preparing to upload to DigiLocker...');
-      
-      // Get code from localStorage
-      const code = localStorage.getItem('digilockerCode');
-      
-      if (!code) {
-        // If no code, redirect to authentication
-        authenticateWithDigilocker();
-        return;
-      }
-      
-      setUploadStatus('Getting access token...');
-      const accessToken = await getAccessToken(code);
-      
-      setUploadStatus('Generating PDF...');
-      const pdfBase64 = await generatePDFBase64();
-      
-      setUploadStatus('Calculating HMAC...');
-      const hmac = await calculateHmac(pdfBase64, CLIENT_SECRET);
-      
-      setUploadStatus('Uploading to DigiLocker...');
-      const studentName = result?.student?.name?.replace(/\s+/g, '_') || 'Result';
-      const fileName = `${studentName}_Result_${result?.month}_${result?.year}.pdf`;
-      const path = `/issued-documents/results/${fileName}`;
-      
-      // Convert base64 to blob
-      const binaryString = window.atob(pdfBase64);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      
-      // Upload to DigiLocker
-      const uploadResponse = await fetch('https://api.digitallocker.gov.in/public/oauth2/1/file/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/pdf',
-          'path': path,
-          'hmac': hmac
-        },
-        body: blob
-      });
-      
-      if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json();
-        throw new Error(`Upload failed: ${errorData.error_description || 'Unknown error'}`);
-      }
-      
-      setUploadStatus('Successfully uploaded to DigiLocker!');
-      
-      // Clear the code after successful upload
-      localStorage.removeItem('digilockerCode');
-      localStorage.removeItem('digilockerCodeVerifier');
-      setHasDigilockerCode(false);
-      
-    } catch (error) {
-      console.error('Error uploading to DigiLocker:', error);
-      setUploadStatus(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setUploading(false);
+      alert("Failed to generate PDF. Please try again later.");
     }
   };
 
@@ -528,7 +302,7 @@ const Result = () => {
               <div>
                 <CardTitle className="text-4xl font-bold">Examination Result</CardTitle>
                 <CardDescription className="text-blue-100 text-xl mt-2">
-                  {result.month} {result.year}
+                  {formatMonth(result.month)} {result.year}
                 </CardDescription>
               </div>
               <Badge className={`${getStatusColor(result.status)} text-white px-6 py-2 text-lg font-medium rounded-full`}>
@@ -540,8 +314,8 @@ const Result = () => {
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {[
-                { label: "Student Name", value: result.student?.name || 'N/A' },
-                { label: "Roll Number", value: result.student?.rollNumber || 'N/A' },
+                { label: "Student Name", value: student?.name || 'N/A' },
+                { label: "Roll Number", value: student?.rollNumber || 'N/A' },
                 { label: "Percentage", value: `${calculatePercentage(result.obtainedMarks, result.totalMarks)}%` },
                 { label: "Result Status", value: result.status, isBadge: true }
               ].map((item, index) => (
@@ -592,7 +366,7 @@ const Result = () => {
                       <TableCell className="text-right">{subject.obtainedMarks}</TableCell>
                       <TableCell>
                         <Badge className={`${getGradeColor(subject.grade)} text-white px-3 py-1`}>
-                          {subject.grade}
+                          {formatGrade(subject.grade)}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -638,38 +412,16 @@ const Result = () => {
               variant="outline" 
               onClick={() => window.print()} 
               className="border-blue-800 text-blue-800 hover:bg-blue-50 text-base px-6"
-              disabled={uploading}
             >
               <Printer className="mr-2 h-5 w-5" />
               Print
             </Button>
             <Button 
-              onClick={() => downloadPDF({ result })} 
+              onClick={handleDownloadPDF} 
               className="bg-green-700 hover:bg-green-600 text-white px-6"
-              disabled={uploading}
             >
               <Download className="mr-2 h-5 w-5" />
               Download PDF
-            </Button>
-            <Button 
-              onClick={uploadToDigilocker} 
-              className="bg-blue-800 hover:bg-blue-700 text-white px-6"
-              disabled={uploading}
-            >
-              <Share2 className="mr-2 h-5 w-5" />
-              {uploading ? (
-                <div className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  {uploadStatus || "Processing..."}
-                </div>
-              ) : hasDigilockerCode ? (
-                "Upload to DigiLocker"
-              ) : (
-                "Authenticate with DigiLocker"
-              )}
             </Button>
           </CardFooter>
         </Card>

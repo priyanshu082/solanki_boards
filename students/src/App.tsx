@@ -1,5 +1,5 @@
 // import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import StudentIDCard from './pages/IDCard'
 import StudentLogin from './pages/Login'
@@ -7,11 +7,11 @@ import Layout from './Layout'; // Import Layout component
 import Result from './pages/Result';
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }: any) => {
-  // const id = localStorage.getItem('id')
+  const id = localStorage.getItem('id')
   
-  // if (!id) {
-  //   return <Navigate to="/login" replace />
-  // }
+  if (!id) {
+    return <Navigate to="/login" replace />
+  }
   
   return children
 }
