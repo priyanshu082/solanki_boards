@@ -2,6 +2,8 @@
 export const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const ADMIN_URL = BASE_URL + "/api/admin";
 
+export const updateenquiry = ADMIN_URL + "/enquiry";
+
 export const getallstudents = ADMIN_URL + "/student/list";
 export const getallinstitute = ADMIN_URL + "/institute/list";
 export const getallcourse = ADMIN_URL + "/course/list";

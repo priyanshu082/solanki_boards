@@ -173,7 +173,7 @@ const Sidebar = () => {
         `}
       >
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <Link to="/profile" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <img 
               src={logo} 
               alt="Logo" 
