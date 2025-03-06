@@ -46,13 +46,7 @@ const AllStudentDetails = () => {
         }
         
         setLoading(false)
-        await Swal.fire({
-          icon: 'success',
-          title: 'Success', 
-          text: 'Students loaded successfully',
-          timer: 1500,
-          showConfirmButton: false
-        })
+        
       } catch (error: any) {
         console.error('Error fetching students:', error)
         if (error.response?.status === 401) {
