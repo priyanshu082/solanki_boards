@@ -39,6 +39,7 @@ interface RegisterStudentFormProps {
   courseError: string | null;
   courseType: string | undefined;
   isLoadingCourses: boolean;
+  setSelectedCourse: (course: any) => void;
 }
 
 // Main Registration Form Component
@@ -47,7 +48,8 @@ const RegisterStudentForm: React.FC<RegisterStudentFormProps> = ({
   courses,
   courseError,
   courseType,
-  isLoadingCourses
+  isLoadingCourses,
+  setSelectedCourse,
 }) => {
   const [formData, setFormData] = useRecoilState(admissionFormState);
   const [sameAddress, setSameAddress] = useRecoilState(sameAsPermanentState);
@@ -398,7 +400,14 @@ const RegisterStudentForm: React.FC<RegisterStudentFormProps> = ({
                 <FormField label="Course" required>
                   <Select 
                     value={formData.courseId}
-                    onValueChange={(value) => updateField('courseId', value)}
+                    onValueChange={(value) => {
+                      updateField('courseId', value);
+                      // Find the selected course and set it
+                      const selectedCourse = courses.find((course: any) => course.id === value);
+                      if (selectedCourse) {
+                        setSelectedCourse(selectedCourse);
+                      }
+                    }}
                     disabled={isLoadingCourses || courses.length === 0}
                   >
                     <SelectTrigger>

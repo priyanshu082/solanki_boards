@@ -47,13 +47,14 @@ const RegisterPage = () => {
         courseType: type
       });
       const data = response.data;
-     
+      
       
       if (data && Array.isArray(data)) {
         // Update the courses atom with fetched data
         setCourses(data);
-        // Reset selected course when course type changes
-        setSelectedCourse(null);
+       
+        
+        
         
         // Update form data to clear previous course selection
         setFormData(prevData => ({
@@ -214,7 +215,9 @@ const RegisterPage = () => {
         ...formData,
         lastPassedExam: formData.lastPassedExam.length > 0 ? formData.lastPassedExam[0] : null,
         dob: formData.dob.split('T')[0],
-        instituteId: localStorage.getItem('id') || '' // Added instituteId from localStorage
+        instituteId: localStorage.getItem('id') || '',
+        courseId: selectedCourse?.id || '',
+        paymentAmount: selectedCourse?.fees || 0
       };
 
       // Add all form fields directly
@@ -302,10 +305,10 @@ const RegisterPage = () => {
 
   const forms: Record<FormType, JSX.Element> = {
     //@ts-ignore
-    student: <RegisterStudentForm  setCourseType={setCourseType} courses={courses} courseError={courseError} courseType={courseType} isLoadingCourses={isLoadingCourses}/>,
+    student: <RegisterStudentForm  setCourseType={setCourseType} courses={courses} courseError={courseError} courseType={courseType} isLoadingCourses={isLoadingCourses} setSelectedCourse={setSelectedCourse} />,
     EducationalQualification: <EducationQualificationForm />,
     Subjects: <SubjectForm courses={selectedCourse}/>
-  };
+};
 
   return (
     <div className=" mx-auto p-6 md:w-[80vw]">

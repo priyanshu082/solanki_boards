@@ -2,14 +2,7 @@ import { Address, AdmissionType, BatchType, Country, EducationalQualification, G
 import { AdmissionFormData } from '@/lib/Interfaces';
 import { atom } from 'recoil';
 
-// Import static data atoms from separate file to avoid duplication
 
-
-
-// Enum Definitions
-
-
-// Initial State
 const initialFormState: AdmissionFormData = {
   admissionType: AdmissionType.FRESH,
   name: '',
@@ -20,7 +13,7 @@ const initialFormState: AdmissionFormData = {
   category: StudentCategory.GENERAL,
   gender: Gender.MALE,
   nationality: '',
-  courseId: 'dummy-course-id',
+  courseId: '',
   batch: BatchType.BATCH_1_2024_O_24,
   subjectIds: [],
   phoneNumber: '',

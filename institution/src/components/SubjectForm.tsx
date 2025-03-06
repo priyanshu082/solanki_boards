@@ -8,16 +8,15 @@ import { useRecoilState } from 'recoil';
 import { admissionFormState } from '@/store/atoms/formDataAtoms';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { InterfaceCourse, InterfaceSubject } from '@/lib/Interfaces';
+import {  InterfaceSubject } from '@/lib/Interfaces';
 
 const SubjectForm = ({courses}:any) => {
+  console.log(courses);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [formData, setFormData] = useRecoilState(admissionFormState);
   
-  
-  // Find the selected course and its subjects
-  const selectedCourse = courses.find((course: InterfaceCourse) => course.id === formData.courseId);
-  const availableSubjects = selectedCourse?.subjects || [];
+  // Use the course passed from props directly
+  const availableSubjects = courses?.subjects || [];
 
   // Handle when course changes
   useEffect(() => {
@@ -54,14 +53,14 @@ const SubjectForm = ({courses}:any) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {!selectedCourse ? (
+          {!courses ? (
             <div className="text-center p-4 border rounded-lg">
               <p className="text-gray-500">Please select a course first to view available subjects</p>
             </div>
           ) : (
             <>
               <div className="border rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-4">Available Subjects for {selectedCourse.name}</h3>
+                <h3 className="text-lg font-semibold mb-4">Available Subjects for {courses.name}</h3>
                 {availableSubjects.length === 0 ? (
                   <p className="text-gray-500">No subjects available for this course</p>
                 ) : (
@@ -77,8 +76,8 @@ const SubjectForm = ({courses}:any) => {
                           className="h-4 w-4"
                         />
                         <label htmlFor={subject.id} className="text-sm">
-                          {subject.name} ({subject.type})
-                          {subject.fees && ` - ₹${subject.fees}`}
+                          {subject.name.toUpperCase()} ({subject.type}) 
+                          {subject.fees}
                         </label>
                       </div>
                     ))}
