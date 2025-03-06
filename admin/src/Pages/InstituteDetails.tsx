@@ -151,6 +151,7 @@ const InstituteDetails = () => {
               <p className="flex items-center">
                 <span className="font-medium w-24">City:</span> 
                 <span className="text-gray-700">{institute.centerCity}</span>
+                <span className="text-gray-700">{institute.unionTerritory}</span>
               </p>
               <p className="flex items-center">
                 <span className="font-medium w-24">State:</span> 

@@ -133,6 +133,7 @@ export interface InstituteDetails {
   centerState: string;
   centerPincode: string;
   centerWebsiteUrl?: string;
+  unionTerritory?: string;
 }
 
 export interface CoursePreview {
