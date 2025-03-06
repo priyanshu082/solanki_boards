@@ -5,8 +5,6 @@ import Layout from './Layout'
 import Home from './Pages/Home'
 import AllInstituteDetails from './Pages/AllInstituteDetails'
 import AllStudentDetails from './Pages/AllStudentDetails'
-import CourseDetails from './Pages/CourseDetails'
-import SubjectDetails from './Pages/SubjectDetails'
 import CourseCreate from './Pages/CourseCreate'
 import CreateSubject from './Pages/CreateSubject'
 import Enquiry from './Pages/Enquiry'
@@ -17,7 +15,7 @@ import StudentDetails from './Pages/StudentDetails'
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }: any) => {
-  const id = localStorage.getItem('id')
+  // const id = localStorage.getItem('id')
   
   // if (!id) {
   //   return <Navigate to="/login" replace />
@@ -31,19 +29,17 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Wrap pages with the Layout */}
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Home />} />
           <Route path="/all-institutes" element={<AllInstituteDetails />} />
           <Route path="/all-students" element={<AllStudentDetails />} />
           <Route path="/create-course" element={<CourseCreate />} />
-          <Route path="/course-details/:id" element={<CourseDetails />} />
           <Route path="/create-subject" element={<CreateSubject />} />
           <Route path="/enquiry" element={<Enquiry />} />
           <Route path="/institute-details/:id" element={<InstituteDetails />} />
           <Route path="/notice-update" element={<NoticeUpdate />} />
           <Route path="/result-upload" element={<ResultUpload />} />
           <Route path="/student-details/:id" element={<StudentDetails />} />
-          <Route path="/subject-details/:id" element={<SubjectDetails />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>

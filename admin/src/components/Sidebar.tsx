@@ -53,7 +53,7 @@ const Sidebar = () => {
       icon: <Users className="h-5 w-5" />,
       items: [
         { name: "All Students", path: "/all-students" },
-        { name: "Student Details", path: "/student-details" },
+        // { name: "Student Details", path: "/student-details" },
       ]
     },
     {
@@ -62,7 +62,7 @@ const Sidebar = () => {
       icon: <BookOpen className="h-5 w-5" />,
       items: [
         { name: "Create Course", path: "/create-course" },
-        { name: "Course Details", path: "/course-details" },
+        // { name: "Course Details", path: "/course-details" },
       ]
     },
     {
@@ -71,7 +71,7 @@ const Sidebar = () => {
       icon: <GraduationCap className="h-5 w-5" />,
       items: [
         { name: "Create Subject", path: "/create-subject" },
-        { name: "Subject Details", path: "/subject-details" },
+        // { name: "Subject Details", path: "/subject-details" },
       ]
     },
     {

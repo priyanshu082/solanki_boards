@@ -140,7 +140,20 @@ export interface CoursePreview {
   name: string;
   code?: string;
   courseType: string;
+  subjects?: SubjectPreview[];
+  fees?: number;
 }
+
+export interface SubjectPreview {
+    id: string;
+    name: string;
+    code: string;
+    type: string;
+    courseId: string;
+    course?: {
+      name: string;
+    };
+  }
 
 export interface CourseDetails {
   id: string;
