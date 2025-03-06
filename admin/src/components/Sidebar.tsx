@@ -81,7 +81,7 @@ const Sidebar = () => {
       items: [
         { name: "Enquiry", path: "/enquiry" },
         { name: "Notice Update", path: "/notice-update" },
-        { name: "Result Upload", path: "/result-upload" },
+        { name: "Result Upload", path: "/all-students" },
       ]
     }
   ];
