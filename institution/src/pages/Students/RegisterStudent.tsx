@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
-import { AdmissionFormData, admissionFormState } from '@/store/atoms/formDataAtoms';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { admissionFormState } from '@/store/atoms/formDataAtoms';
+import { AdmissionFormData } from '@/lib/Interfaces';
 import RegisterStudentForm from '@/components/RegisterStudentForm';
 import EducationQualificationForm from '@/components/EducationQualificationForm';
 import SubjectForm from '@/components/SubjectForm';
@@ -9,17 +10,95 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { admissionRegistrationUrl } from '@/Config';
 import { useNavigate } from 'react-router-dom';
+import { InterfaceCourse } from '@/lib/Interfaces';
+import { courseFetchUrl } from '@/Config';
 
 type FormType = 'student' | 'EducationalQualification' | 'Subjects';
 
 const RegisterPage = () => {
   const [activeForm, setActiveForm] = useState<FormType>('student');
   const formData = useRecoilValue(admissionFormState);
+  const setFormData = useSetRecoilState(admissionFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
   const navigate = useNavigate();
 
+
+  const [courseError, setCourseError] = useState<string | null>(null);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<InterfaceCourse | null>(null);
+  const [courseType, setCourseType] = useState<string | null>(null);
+  const [courses, setCourses] = useState<InterfaceCourse[]>([]);
+ 
+
   // Validation functions remain the same...
+
+
+
+  const fetchCoursesByType = async (type: string) => {
+    if (!type) return;
+    
+    setIsLoadingCourses(true);
+    setCourseError(null);
+    
+    try {
+      // Using axios to make a PUT request with course type in the body
+      const response = await axios.post(courseFetchUrl, {
+        courseType: type
+      });
+      const data = response.data;
+     
+      
+      if (data && Array.isArray(data)) {
+        // Update the courses atom with fetched data
+        setCourses(data);
+        // Reset selected course when course type changes
+        setSelectedCourse(null);
+        
+        // Update form data to clear previous course selection
+        setFormData(prevData => ({
+          ...prevData,
+          courseId: '',
+          subjectIds: []
+        }));
+        
+        // Use SweetAlert for success notification
+        Swal.fire({
+          title: "Success!",
+          text: `Found ${data.length} courses for ${type}`,
+          icon: "success",
+          confirmButtonText: "OK"
+        });
+      } else {
+        setCourseError("Invalid data format received from server");
+        
+        // Use SweetAlert for error notification
+        Swal.fire({
+          title: "Error!",
+          text: "Invalid data format received from server",
+          icon: "error",
+          confirmButtonText: "OK"
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch courses:', error);
+      setCourseError("Failed to fetch courses. Please try again.");
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to fetch courses. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK"
+      });     
+    } finally {
+      setIsLoadingCourses(false);
+    }
+  };
+
+  useEffect(() => {
+    if (courseType) {
+      fetchCoursesByType(courseType);
+    }
+  }, [courseType]);
 
   console.log(formData);  
   const validateStudentForm = (): boolean => {
@@ -222,9 +301,10 @@ const RegisterPage = () => {
   }, [formData, activeForm]);
 
   const forms: Record<FormType, JSX.Element> = {
-    student: <RegisterStudentForm />,
+    //@ts-ignore
+    student: <RegisterStudentForm  setCourseType={setCourseType} courses={courses} courseError={courseError} courseType={courseType} isLoadingCourses={isLoadingCourses}/>,
     EducationalQualification: <EducationQualificationForm />,
-    Subjects: <SubjectForm />
+    Subjects: <SubjectForm courses={selectedCourse}/>
   };
 
   return (

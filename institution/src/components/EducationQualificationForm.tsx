@@ -23,9 +23,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button"; // Assuming there's a Button component
 import { useRecoilState } from 'recoil';
-import { admissionFormState, ExaminationType } from '@/store/atoms/formDataAtoms';
+import { admissionFormState } from '@/store/atoms/formDataAtoms';
 import { useState } from 'react';
-import { EducationalQualification } from "@/store/atoms/formDataAtoms";
+import { EducationalQualification, ExaminationType } from "@/lib/Interfaces";
 
 const EducationQualificationForm = () => {
   const [formData, setFormData] = useRecoilState(admissionFormState);

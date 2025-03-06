@@ -4,20 +4,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { admissionFormState } from '@/store/atoms/formDataAtoms';
-import { staticDataAtoms } from '@/store/atoms/staticDataAtoms';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { InterfaceCourse, InterfaceSubject } from '@/lib/Interfaces';
 
-
-const SubjectForm = () => {
+const SubjectForm = ({courses}:any) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [formData, setFormData] = useRecoilState(admissionFormState);
-  const courses = useRecoilValue(staticDataAtoms.coursesAtom);
+  
   
   // Find the selected course and its subjects
-  const selectedCourse = courses.find(course => course.id === formData.courseId);
+  const selectedCourse = courses.find((course: InterfaceCourse) => course.id === formData.courseId);
   const availableSubjects = selectedCourse?.subjects || [];
 
   // Handle when course changes
@@ -67,7 +66,7 @@ const SubjectForm = () => {
                   <p className="text-gray-500">No subjects available for this course</p>
                 ) : (
                   <div className="space-y-2">
-                    {availableSubjects.map((subject) => (
+                    {availableSubjects.map((subject:InterfaceSubject) => (
                       <div key={subject.id} className="flex items-center space-x-2">
                         <input 
                           type="checkbox"
@@ -100,8 +99,8 @@ const SubjectForm = () => {
                   <h3 className="text-lg font-semibold mb-4">Selected Subjects</h3>
                   <div className="space-y-2">
                     {availableSubjects
-                      .filter(subject => formData.subjectIds.includes(subject.id))
-                      .map(subject => (
+                      .filter((subject:InterfaceSubject) => formData.subjectIds.includes(subject.id))
+                      .map((subject:InterfaceSubject) => (
                         <div key={subject.id} className="flex justify-between items-center">
                           <span className="text-sm">{subject.name} ({subject.type})</span>
                           {subject.fees && <span className="text-sm font-medium">₹{subject.fees}</span>}
@@ -114,8 +113,8 @@ const SubjectForm = () => {
                       <span>Total Fees:</span>
                       <span>
                         ₹{availableSubjects
-                          .filter(subject => formData.subjectIds.includes(subject.id))
-                          .reduce((total, subject) => total + (subject.fees || 0), 0)
+                          .filter((subject:InterfaceSubject) => formData.subjectIds.includes(subject.id))
+                          .reduce((total:number, subject:InterfaceSubject) => total + (subject.fees || 0), 0)
                         }
                       </span>
                     </div>

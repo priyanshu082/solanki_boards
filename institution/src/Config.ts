@@ -3,6 +3,7 @@ export const BASE_URL = import.meta.env.VITE_API_URL;
 export const ADMIN_BASE_URL = BASE_URL + '/admin';
 export const INSTITUTE_BASE_URL = BASE_URL + '/institute';
 export const STUDENT_BASE_URL = BASE_URL + '/student';
+export const PUBLIC_BASE_URL = BASE_URL + '/public';
 export const PAYMENT_BASE_URL = BASE_URL + '/payment';
 // From this onwards, create particular routes of admin,instiute and student using their respective base url.
 
@@ -19,8 +20,8 @@ export const paymentStatusUrl = PAYMENT_BASE_URL + '/check-payment-status';
 export const initiatePaymentUrl = PAYMENT_BASE_URL + '/initiate-payment';
 export const verifyPaymentUrl = PAYMENT_BASE_URL + '/verify-payment';
 
-export const courseFetchUrl = INSTITUTE_BASE_URL + '/course/all';
-export const instituteFetchUrl = INSTITUTE_BASE_URL + '/institute/all';
+export const courseFetchUrl = PUBLIC_BASE_URL + '/course/list';
+export const instituteFetchUrl = PUBLIC_BASE_URL + '/institute/list';
 
 
 

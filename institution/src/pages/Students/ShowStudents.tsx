@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AdmissionType, BatchType, PaymentStatus } from '@/store/atoms/formDataAtoms';
+import { AdmissionType, BatchType, PaymentStatus } from '@/lib/Interfaces';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import {  allStudentsSearchUrl } from '@/Config';

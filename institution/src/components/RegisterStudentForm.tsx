@@ -1,24 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { 
-  admissionFormState,
-  AdmissionType,
-  StudentCategory,
-  Gender,
-  BatchType,
-  IndianState,
-  Country,
-  sameAsPermanentState,
-  LastPassedExam,
-  SubjectType,
-  staticDataAtoms,
-  lastPassedExamState, // Import the lastPassedExamState atom
- // Import CourseType enum
-} from '@/store/atoms/formDataAtoms';
-import { CourseType, DEFAULT_COURSES } from '@/store/atoms/staticDataAtoms'; 
+import { useRecoilState } from 'recoil';
+import { admissionFormState,sameAsPermanentState,lastPassedExamState} from '@/store/atoms/formDataAtoms';
+import { AdmissionType, StudentCategory, Gender, BatchType, IndianState, Country, LastPassedExam, SubjectType, CourseType } from '../lib/Interfaces';
 import dummyAvatar from '../assets/dummy.jpeg'; // Updated import for dummy image
-import { courseFetchUrl } from '@/Config';
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { 
@@ -31,8 +15,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { toast } from "@/hooks/use-toast";
-import Swal from 'sweetalert2'; // Import Swal properly
-import axios from 'axios';
+
 
 // Reusable Form Field Component
 const FormField: React.FC<{
@@ -50,8 +33,22 @@ const FormField: React.FC<{
   </div>
 );
 
+interface RegisterStudentFormProps {
+  setCourseType: (type: string) => void;
+  courses: any[];
+  courseError: string | null;
+  courseType: string | undefined;
+  isLoadingCourses: boolean;
+}
+
 // Main Registration Form Component
-const RegisterStudentForm: React.FC = () => {
+const RegisterStudentForm: React.FC<RegisterStudentFormProps> = ({
+  setCourseType,
+  courses,
+  courseError,
+  courseType,
+  isLoadingCourses
+}) => {
   const [formData, setFormData] = useRecoilState(admissionFormState);
   const [sameAddress, setSameAddress] = useRecoilState(sameAsPermanentState);
   //@ts-ignore
@@ -60,87 +57,8 @@ const RegisterStudentForm: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [lastPassedExams, setLastPassedExams] = useRecoilState(lastPassedExamState); // Use the atom for last passed exams
   const [showLastPassedExamForm, setShowLastPassedExamForm] = useState(false); // State to control visibility of last passed exam form
-  const [courseType, setCourseType] = useState<string>(""); // State for course type
 
-  // State for storing courses fetched from API
-  const [isLoadingCourses, setIsLoadingCourses] = useState<boolean>(false);
-  const [courseError, setCourseError] = useState<string | null>(null);
-  const [courses, setCourses] = useRecoilState(staticDataAtoms.coursesAtom);
-  //@ts-ignore
-  const [selectedCourse, setSelectedCourse] = useRecoilState(staticDataAtoms.selectedCourseAtom);
-
-  // Function to fetch courses based on course type
-  const fetchCoursesByType = async (type: string) => {
-    if (!type) return;
-    
-    setIsLoadingCourses(true);
-    setCourseError(null);
-    
-    try {
-      // Using axios to make a PUT request with course type in the body
-      const response = await axios.put(courseFetchUrl, {
-        type: type
-      });
-      
-      const data = response.data;
-      
-      if (data && Array.isArray(data)) {
-        // Update the courses atom with fetched data
-        setCourses(data);
-        
-        // Reset selected course when course type changes
-        setSelectedCourse(null);
-        
-        // Update form data to clear previous course selection
-        setFormData(prevData => ({
-          ...prevData,
-          courseId: '',
-          subjectIds: []
-        }));
-        
-        // Use SweetAlert for success notification
-        Swal.fire({
-          title: "Success!",
-          text: `Found ${data.length} courses for ${type}`,
-          icon: "success",
-          confirmButtonText: "OK"
-        });
-      } else {
-        setCourseError("Invalid data format received from server");
-        
-        // Use SweetAlert for error notification
-        Swal.fire({
-          title: "Error!",
-          text: "Invalid data format received from server",
-          icon: "error",
-          confirmButtonText: "OK"
-        });
-      }
-    } catch (error) {
-      console.error('Failed to fetch courses:', error);
-      setCourseError("Failed to fetch courses. Please try again.");
-      
-      // Use SweetAlert for error notification
-      Swal.fire({
-        title: "Error!",
-        text: "Failed to fetch courses. Please try again.",
-        icon: "error",
-        confirmButtonText: "OK"
-      });
-      
-      // Fallback to dummy data in case of error
-      setCourses(DEFAULT_COURSES);
-    } finally {
-      setIsLoadingCourses(false);
-    }
-  };
-
-  // Watch for changes in courseType and fetch courses accordingly
-  useEffect(() => {
-    if (courseType) {
-      fetchCoursesByType(courseType);
-    }
-  }, [courseType]);
+  
   
   const [newSubject, setNewSubject] = useState<LastPassedExam>({
     subjectType: SubjectType.LANGUAGE, // Default value, adjust as necessary
@@ -169,8 +87,6 @@ const RegisterStudentForm: React.FC = () => {
       maximumMarks: 0,
     });
   };
-
-  const subjects = useRecoilValue(staticDataAtoms.coursesAtom); // Fetching subjects from atoms
 
   useEffect(() => {
     // Set the avatar to the dummy image if no image is uploaded
@@ -493,7 +409,7 @@ const RegisterStudentForm: React.FC = () => {
                       )}
                     </SelectTrigger>
                     <SelectContent>
-                      {courses.map(course => (
+                      {courses.map((course:any) => (
                         <SelectItem key={course.id} value={course.id}>{course.name}</SelectItem>
                       ))}
                     </SelectContent>
@@ -536,8 +452,8 @@ const RegisterStudentForm: React.FC = () => {
                         <SelectValue placeholder="Select subject" />
                       </SelectTrigger>
                       <SelectContent>
-                        {subjects.map((subject) => (
-                          <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
+                        {courses.map((course:any) => (
+                          <SelectItem key={course.id} value={course.id}>{course.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2, X, RotateCcw } from "lucide-react";
 import axios from 'axios';
-import { DocumentType } from '@/store/atoms/formDataAtoms';
+import { DocumentType } from '@/lib/Interfaces';
 import { addmisionPutUrl, studentSearchUrl } from '@/Config';
 import Swal from 'sweetalert2';
 import {
