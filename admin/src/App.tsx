@@ -16,10 +16,11 @@ import StudentDetails from './Pages/StudentDetails'
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }: any) => {
   // const id = localStorage.getItem('id')
+  const id = '1'
   
-  // if (!id) {
-  //   return <Navigate to="/login" replace />
-  // }
+  if (!id) {
+    return <Navigate to="/login" replace />
+  }
   
   return children
 }
