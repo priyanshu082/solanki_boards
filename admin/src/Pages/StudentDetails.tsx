@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getstudentbyid } from '@/Config'
 import Swal from 'sweetalert2'
 import { Button } from '@/components/ui/button'
-import { InterfaceStudentDetails } from '@/lib/Interfaces'
+import { InterfaceStudentDetails, ResultDetails, ResultStatus } from '@/lib/Interfaces'
 
 const StudentDetails = () => {
   const [student, setStudent] = useState<InterfaceStudentDetails | null>(null)
+  const [results, setResults] = useState<ResultDetails[]>([])
   const [loading, setLoading] = useState(true)
   const { id } = useParams()
   const navigate = useNavigate()
@@ -27,6 +28,12 @@ const StudentDetails = () => {
         console.log(response.data)
         
         setStudent(response.data)
+        
+        // Extract results if they exist in the response
+        if (response.data.results && Array.isArray(response.data.results)) {
+          setResults(response.data.results)
+        }
+        
         setLoading(false)
         await Swal.fire({
           icon: 'success',
@@ -178,6 +185,95 @@ const StudentDetails = () => {
           </div>
         </CardContent>
       </Card>
+
+      {results && results.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-2xl">Examination Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {results.map((result) => (
+              <div key={result.id} className="mb-6 border-b pb-6 last:border-b-0 last:pb-0">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-semibold">
+                    {result.month} {result.year.replace('Y', '')} Examination
+                  </h3>
+                  <div className="flex items-center">
+                    <span className="mr-2">Status:</span>
+                    <span className={`px-2 py-1 rounded text-sm ${
+                      result.status === ResultStatus.PASS 
+                        ? 'bg-green-100 text-green-800' 
+                        : result.status === ResultStatus.FAIL 
+                          ? 'bg-red-100 text-red-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {result.status}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <h3 className="font-semibold text-gray-700">Total Marks</h3>
+                    <p>{result.totalMarks}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-700">Obtained Marks</h3>
+                    <p>{result.obtainedMarks}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-700">Percentage</h3>
+                    <p>{((result.obtainedMarks / result.totalMarks) * 100).toFixed(2)}%</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-700">Date</h3>
+                    <p>{formatDate(result.createdAt)}</p>
+                  </div>
+                </div>
+                
+                {result.details && result.details.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border p-2 text-left">Subject Code</th>
+                          <th className="border p-2 text-left">Subject Name</th>
+                          <th className="border p-2 text-left">Total Marks</th>
+                          <th className="border p-2 text-left">Obtained Marks</th>
+                          <th className="border p-2 text-left">Grade</th>
+                          <th className="border p-2 text-left">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {result.details.map((detail) => (
+                          <tr key={detail.id}>
+                            <td className="border p-2">{detail.code}</td>
+                            <td className="border p-2">{detail.name}</td>
+                            <td className="border p-2">{detail.totalMarks}</td>
+                            <td className="border p-2">{detail.obtainedMarks}</td>
+                            <td className="border p-2">{detail.grade}</td>
+                            <td className="border p-2">
+                              <span className={`px-2 py-1 rounded text-xs ${
+                                detail.status === ResultStatus.PASS 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : detail.status === ResultStatus.FAIL 
+                                    ? 'bg-red-100 text-red-800' 
+                                    : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {detail.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {student.correspondenceAddress && student.correspondenceAddress.length > 0 && (
         <Card className="mb-6">

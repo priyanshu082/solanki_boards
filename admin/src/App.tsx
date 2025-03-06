@@ -38,7 +38,7 @@ function App() {
           <Route path="/enquiry" element={<Enquiry />} />
           <Route path="/institute-details/:id" element={<InstituteDetails />} />
           <Route path="/notice-update" element={<NoticeUpdate />} />
-          <Route path="/result-upload" element={<ResultUpload />} />
+          <Route path="/result-upload/:id/:courseId" element={<ResultUpload />} />
           <Route path="/student-details/:id" element={<StudentDetails />} />
         </Route>
         <Route path="/login" element={<Login />} />

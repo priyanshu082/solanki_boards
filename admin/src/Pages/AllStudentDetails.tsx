@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getallstudents } from '@/Config'
 import Swal from 'sweetalert2'
 import { StudentPreview } from '@/lib/Interfaces'
 import { Button } from '@/components/ui/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 const AllStudentDetails = () => {
   const [students, setStudents] = useState<StudentPreview[]>([])
@@ -85,6 +85,10 @@ const AllStudentDetails = () => {
     navigate(`/student-details/${id}`)
   }
 
+  const handleResultUpload = (studentId: string, courseId: string) => {
+    navigate(`/result-upload/${studentId}/${courseId}`)
+  }
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
   }
@@ -96,22 +100,43 @@ const AllStudentDetails = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">All Students</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {students.map((student) => (
-          <Card 
-            key={student.id}
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => handleStudentClick(student.id)}
-          >
-            <CardHeader>
-              <CardTitle className="text-xl">{student.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Enrollment: {student.enrollmentNumber || 'Not assigned'}</p>
-              <p className="text-gray-600">Application: {student.applicationNumber}</p>
-            </CardContent>
-          </Card>
-        ))}
+      
+      <div className="rounded-md border mb-6">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Enrollment Number</TableHead>
+              <TableHead>Application Number</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {students.map((student) => (
+              <TableRow key={student.id}>
+                <TableCell className="font-medium">{student.name}</TableCell>
+                <TableCell>{student.enrollmentNumber || 'Not assigned'}</TableCell>
+                <TableCell>{student.applicationNumber}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleStudentClick(student.id)}
+                    >
+                      View Details
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      onClick={() => handleResultUpload(student.id, student.courseId)}
+                    >
+                      Upload Result
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
       
       {/* Pagination Controls */}

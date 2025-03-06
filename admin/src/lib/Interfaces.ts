@@ -64,6 +64,55 @@ export enum SubjectType {
   BOTH = 'BOTH'
 }
 
+export enum ResultStatus {
+    PASS = 'PASS',
+    FAIL = 'FAIL',
+    PENDING = 'PENDING',
+    INCOMPLETE = 'INCOMPLETE',
+    WITHHELD = 'WITHHELD',
+    CANCELLED = 'CANCELLED'
+}
+
+export enum Grade {
+  A_PLUS = 'A_PLUS',
+  A = 'A',
+  B_PLUS = 'B_PLUS',
+  B = 'B',
+  C_PLUS = 'C_PLUS',
+  C = 'C',
+  D = 'D',
+  F = 'F'
+}
+
+export enum Month {
+  JANUARY = 'JANUARY',
+  FEBRUARY = 'FEBRUARY',
+  MARCH = 'MARCH',
+  APRIL = 'APRIL',
+  MAY = 'MAY',
+  JUNE = 'JUNE',
+  JULY = 'JULY',
+  AUGUST = 'AUGUST',
+  SEPTEMBER = 'SEPTEMBER',
+  OCTOBER = 'OCTOBER',
+  NOVEMBER = 'NOVEMBER',
+  DECEMBER = 'DECEMBER'
+}
+
+export enum Year {
+  Y2020 = '2020',
+  Y2021 = '2021',
+  Y2022 = '2022',
+  Y2023 = '2023',
+  Y2024 = '2024',
+  Y2025 = '2025',
+  Y2026 = '2026',
+  Y2027 = '2027',
+  Y2028 = '2028',
+  Y2029 = '2029',
+  Y2030 = '2030'
+}
+
 export enum IndianState {
   ANDHRA_PRADESH = 'ANDHRA_PRADESH',
   ARUNACHAL_PRADESH = 'ARUNACHAL_PRADESH',
@@ -176,6 +225,7 @@ export interface StudentPreview {
   name: string;
   enrollmentNumber?: string;
   applicationNumber: string;
+  courseId:string
 }
 
 export interface InterfaceStudentDetails {
@@ -289,30 +339,38 @@ export interface NoticeDetails {
   updatedAt: Date;
 }
 
+export interface SubjectResultDetail {
+  id: string;
+  code: string;
+  name: string;
+  totalMarks: number;
+  obtainedMarks: number;
+  grade: Grade;
+  status: ResultStatus;
+  resultId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface ResultPreview {
   id: string;
   studentId: string;
-  month: string;
-  year: string;
-  status: string;
+  month: Month;
+  year: Year;
+  status: ResultStatus;
 }
 
 export interface ResultDetails {
   id: string;
   studentId: string;
-  month: string;
-  year: string;
+  month: Month;
+  year: Year;
   totalMarks: number;
   obtainedMarks: number;
-  status: string;
-  details: Array<{
-    code: string;
-    name: string;
-    totalMarks: number;
-    obtainedMarks: number;
-    grade: string;
-    status: string;
-  }>;
+  status: ResultStatus;
+  createdAt: Date;
+  updatedAt: Date;
+  details: SubjectResultDetail[];
 }
 
 export interface EnquiryPreview {
