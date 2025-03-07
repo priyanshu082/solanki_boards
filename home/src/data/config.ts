@@ -1,6 +1,6 @@
 export const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-export const PUBLIC_URL = BASE_URL + '/api/public';
+export const PUBLIC_URL = BASE_URL + '/public';
 
 export const createEnquiryUrl = PUBLIC_URL + '/enquiry';
 

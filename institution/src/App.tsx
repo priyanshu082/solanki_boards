@@ -23,10 +23,10 @@ const ProtectedRoute = ({ children }: any) => {
     return <Navigate to="/login" replace />
   }
 
-  // Redirect to payment page if payment is pending
-  // if (paymentStatus === 'PENDING' && window.location.pathname !== '/payment-institute') {
-  //   return <Navigate to="/payment-institute" replace />
-  // }
+  //Redirect to payment page if payment is pending
+  if (paymentStatus === 'PENDING' && window.location.pathname !== '/payment-institute') {
+    return <Navigate to="/payment-institute" replace />
+  }
   
   return children
 }

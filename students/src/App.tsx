@@ -6,6 +6,7 @@ import StudentLogin from './pages/Login'
 import Layout from './Layout'; // Import Layout component
 import Result from './pages/Result';
 // Protected Route wrapper component
+
 const ProtectedRoute = ({ children }: any) => {
   const id = localStorage.getItem('id')
   
