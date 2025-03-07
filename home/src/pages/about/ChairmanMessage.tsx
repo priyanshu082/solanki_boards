@@ -29,29 +29,33 @@ const ChairmanMessage = () => {
           {/* Message Column */}
           <div className="md:w-2/3 text-black">
             <div className="prose max-w-none">
+              <h3 className="font-bold mb-4">Solanki Brothers Council for Open and Distance Learning (SBCODL)</h3>
               <p className="mb-6">
-                The founders established the Solanki Brothers Council for Open and Distance Learning (SBCODL) to contribute toward creating open-access opportunities for learners, especially those unable to attend regular classroom sessions. By offering flexible and accessible instructional delivery, we ensure an educational experience that is just as effective as conventional in-person learning.
+                The Solanki Brothers Council for Open and Distance Learning (SBCODL) has been created with a focus on giving good quality education to everyone. SBCODL is working actively towards spreading educational, social, and economic improvement among individuals from all over India. The Council is also involved in uplifting economically backward learners through Open Schooling and Distance Education courses that help in offering flexible and inclusive study opportunities.
               </p>
               <p className="mb-6">
-                Leveraging online platforms has allowed us to overcome geographical limitations and deliver educational resources efficiently. Guided by the National Policy on Education, SBCODL is committed to strengthening and expanding open learning opportunities across K-12 education, Undergraduate, Postgraduate, and Doctoral (Ph.D.) programs, serving students both within and outside India. Our independent education system operates with its own curriculum and examinations, issuing valid certificates that cater to the needs of diverse learners and working professionals worldwide.
+                SBCODL aims to build a world-class education system that promotes innovation, creativity, and excellence. We are of the opinion that excellence is a mindset, and we aim to instill it in our students by adopting contemporary, flexible, and technology-based learning methods.
               </p>
               <p className="mb-6">
-                At SBCODL, we prioritize practical and convenient education delivery. Upon completing a simple online admission process, students gain instant access to comprehensive study materials. Our language-neutral instructional resources enable learners to choose their preferred language for study, fostering inclusivity and adaptability. Additionally, we maintain transparency and trust by allowing online verification of successful students' results.
+                The Open Learning System developed by SBCODL seeks to democratize learning, as it provides education to everyone as a lifelong learning process. The flexibility and innovativeness of the system meet the varied learning needs of learners, ranging from those seeking vocational education and skill acquisition.
               </p>
               <p className="mb-6">
-                This initiative has followed the vision of the National Policy on Education to make learning accessible and convenient through digital platforms. By embracing this innovative model, SBCODL continues to extend its reach, empowering learners across the globe.
+                In the highly competitive world we live in today, remaining ahead means that there must be ongoing learning and development of skills. Education has to be action-based, and our committed instructors take up the important job of molding the future of the students. Teachers are capable of changing people, we think, and through our challenging academic framework, we equip students to succeed professionally.
               </p>
               <p className="mb-6">
-                Students can choose their subjects under a well-planned scheme of studies. Students qualify for certification by passing at least five subjects, including at least one language, according to prescribed norms.
+                The need for good education is increasing, and a large number of students tend to look for opportunities in education overseas. Understanding this, SBCODL has introduced UG & PG, Certificate, Diploma, PG Diploma, Diploma Engineering, and Management Courses using the Open and Distance Learning Mode, providing access to students of high-quality education that is globally relevant in India.
               </p>
               <p className="mb-6">
-                We are proud of our steps toward the construction of a worldwide network of accessible education and stay committed to fostering learning opportunities across borders.
+                We believe in empowering students, academic excellence, and creating improved career opportunities for all our students.
               </p>
-              <p className="mb-6">
-                Sincerely,
+              <p className="mb-2">
+                Sd/-
               </p>
               <p className="font-semibold">
-                Chairman, SBCODL
+                The Chairman
+              </p>
+              <p className="font-semibold">
+                Solanki Brothers Council for Open and Distance Learning (SBCODL)
               </p>
             </div>
           </div>

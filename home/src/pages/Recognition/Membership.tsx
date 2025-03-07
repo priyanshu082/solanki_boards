@@ -58,7 +58,7 @@ const AccreditationCards = () => {
 
       {isDialogOpen && selectedMembership && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50">
-          <div className="bg-white rounded-xl w-full max-w-4xl h-fit max-h-[90vh] flex flex-col md:flex-row overflow-hidden">
+          <div className="bg-white rounded-xl w-full max-w-4xl h-fit max-h-[70vh] flex flex-col md:flex-row overflow-hidden">
             <div className="w-full md:w-2/5 p-6 bg-gray-50">
               <img
                 src={selectedMembership.image}

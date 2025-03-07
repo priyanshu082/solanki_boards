@@ -29,7 +29,7 @@ export const aboutDropdownItems = [
     },
     {
       title: "Recognitions",
-      href: "/recognitions",
+      href: "/recognition",
       description: "Learn about the recognitions we have received for our excellence.",
     },
     {

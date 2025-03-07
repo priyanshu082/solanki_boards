@@ -37,6 +37,9 @@ import CourseDetailPG from "./pages/programmes/PG/CourseDetailPG";
 import CourseDetailUG from "./pages/programmes/UG/CourseDetailUG";
 import Membership from "./pages/Recognition/Membership";
 import PaymentPage from "./pages/PaymentPage";
+import Recognition from "./pages/Recognition/Recognition";
+import Constitutional from "./pages/Recognition/Constitutional";
+import Autonomous from "./pages/Recognition/autonomous";
 interface LayoutProps {
   children: ReactNode;
 }
@@ -99,6 +102,9 @@ function App() {
           <Route path="/accredited-institute-registration" element={<Layout><InstituteRegistrationForm /></Layout>} />
           <Route path="/student-admission-form" element={<Layout><StudentAdmissionForm /></Layout>} />
           <Route path="/payment" element={<Layout><PaymentPage /></Layout>} />
+          <Route path="/recognition" element={<Layout><Recognition /></Layout>} />
+          <Route path="/constitutional-reliability" element={<Layout><Constitutional /></Layout>} />
+          <Route path="/autonomous-institution" element={<Layout><Autonomous /></Layout>} />
         </Routes>
         
       </BrowserRouter>
