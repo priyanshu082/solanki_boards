@@ -6,7 +6,7 @@ services:
     environment:
       - VITE_BASE_URL=http://localhost:8080
     ports:
-      - "3001:3000"
+      - "3001:5173"
     container_name: admin
 
   home:
@@ -14,7 +14,7 @@ services:
     environment:
       - VITE_BASE_URL=http://localhost:8080
     ports:
-      - "3002:3000"
+      - "3002:5173"
     container_name: home
 
   institution:
@@ -22,7 +22,7 @@ services:
     environment:
       - VITE_BASE_URL=http://localhost:8080/api
     ports:
-      - "3003:3000"
+      - "3003:5173"
     container_name: institution
 
   students:
@@ -30,5 +30,5 @@ services:
     environment:
       - VITE_BASE_URL=http://localhost:8080/api
     ports:
-      - "3004:3000"
+      - "3004:5173"
     container_name: students
