@@ -1,5 +1,5 @@
 # Use official Node.js image
-FROM node:18
+FROM node:22
 
 # Set working directory
 WORKDIR /app
@@ -13,8 +13,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build TypeScript code
-RUN npm run build
+# # Build TypeScript code
+# RUN npm run build
 
 # Expose the port
 EXPOSE 5173
