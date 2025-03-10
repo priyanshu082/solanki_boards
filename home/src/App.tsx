@@ -1,45 +1,45 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import Home from "./pages/home/Home";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import FixedNavbar from "./components/FixedNavbar";
-import NotFound from "./pages/NotFound";
+import NotFound from "./pages/home/NotFound";
 import Footer from "./components/Footer";
 import { Navbar } from "./components/Navbar";
 import { ReactNode } from 'react';
-import ChildPolicy from "./pages/policyPages/ChildPolicy";
-import WhySBCODL from "./pages/WhySBCODL";
-import ChairmanMessage from "./pages/about/ChairmanMessage";
-import CookiePolicy from "./pages/policyPages/CookiePolicy";
-import PrivacyPolicy from "./pages/policyPages/PrivacyPolicy";
-import SafeguardingPolicy from "./pages/policyPages/SafeGuardingPolicy";
-import SaferRecruitmentPolicy from "./pages/policyPages/SaferRecruitmentPolicy";
-import AdmissionPolicy from "./pages/policyPages/AdmissionPage";
-import InstituteRegistrationForm from "./pages/accredited/InstituteForm";
-import BoardProfile from "./pages/about/BoardProfile";
-import COE from "./pages/about/COE";
-import MissionVision from "./pages/about/MissionVission";
-import GoverningBody from "./pages/council/GoverningBody";
-import ExcecutiveCommittee from "./pages/council/ExcecutiveCommittee";
-import PowersOfSBCODL from "./pages/council/PowerOfSBCODL";
-import ByeLawsRules from "./pages/council/ByeLawsRules";
-import Prospectus from "./pages/council/Prospectus";
-import MiddleYears from "./pages/programmes/MiddleYears";
-import Diploma from "./pages/programmes/Diploma";
-import UpperYears from "./pages/programmes/UpperYears";
-import UG from "./pages/programmes/UG/UG";
-import Research from "./pages/programmes/Research";
-import PG from "./pages/programmes/PG/PG";
-import Certificate from "./pages/programmes/Certificate";
-import Faculty from "./pages/Faculty";
-import ContactUs from "./pages/ContactUs";
-import StudentAdmissionForm from "./pages/StudentAdmissionForm";
-import CourseDetailPG from "./pages/programmes/PG/CourseDetailPG";
-import CourseDetailUG from "./pages/programmes/UG/CourseDetailUG";
-import Membership from "./pages/Recognition/Membership";
-import PaymentPage from "./pages/PaymentPage";
-import Recognition from "./pages/Recognition/Recognition";
-import Constitutional from "./pages/Recognition/Constitutional";
-import Autonomous from "./pages/Recognition/autonomous";
+import ChildPolicy from "./pages/home/policyPages/ChildPolicy";
+import WhySBCODL from "./pages/home/WhySBCODL";
+import ChairmanMessage from "./pages/home/about/ChairmanMessage";
+import CookiePolicy from "./pages/home/policyPages/CookiePolicy";
+import PrivacyPolicy from "./pages/home/policyPages/PrivacyPolicy";
+import SafeguardingPolicy from "./pages/home/policyPages/SafeGuardingPolicy";
+import SaferRecruitmentPolicy from "./pages/home/policyPages/SaferRecruitmentPolicy";
+import AdmissionPolicy from "./pages/home/policyPages/AdmissionPage";
+import InstituteRegistrationForm from "./pages/home/accredited/InstituteForm";
+import BoardProfile from "./pages/home/about/BoardProfile";
+import COE from "./pages/home/about/COE";
+import MissionVision from "./pages/home/about/MissionVission";
+import GoverningBody from "./pages/home/council/GoverningBody";
+import ExcecutiveCommittee from "./pages/home/council/ExcecutiveCommittee";
+import PowersOfSBCODL from "./pages/home/council/PowerOfSBCODL";
+import ByeLawsRules from "./pages/home/council/ByeLawsRules";
+import Prospectus from "./pages/home/council/Prospectus";
+import MiddleYears from "./pages/home/programmes/MiddleYears";
+import Diploma from "./pages/home/programmes/Diploma";
+import UpperYears from "./pages/home/programmes/UpperYears";
+import UG from "./pages/home/programmes/UG/UG";
+import Research from "./pages/home/programmes/Research";
+import PG from "./pages/home/programmes/PG/PG";
+import Certificate from "./pages/home/programmes/Certificate";
+import Faculty from "./pages/home/Faculty";
+import ContactUs from "./pages/home/ContactUs";
+import StudentAdmissionForm from "./pages/home/StudentAdmissionForm";
+import CourseDetailPG from "./pages/home/programmes/PG/CourseDetailPG";
+import CourseDetailUG from "./pages/home/programmes/UG/CourseDetailUG";
+import Membership from "./pages/home/Recognition/Membership";
+import PaymentPage from "./pages/home/PaymentPage";
+import Recognition from "./pages/home/Recognition/Recognition";
+import Constitutional from "./pages/home/Recognition/Constitutional";
+import Autonomous from "./pages/home/Recognition/autonomous";
 interface LayoutProps {
   children: ReactNode;
 }
@@ -69,9 +69,9 @@ function App() {
           <Route path="*" element={<NotFound />} />
           
           {/* Routes with Layout (Navbar and Footer) */}
-          <Route path="/" element={<Layout><Home /></Layout>} />
-          <Route path="/child-policy" element={<Layout><ChildPolicy /></Layout>} />
+          <Route path="/" element={<Layout><Home /></Layout>} />``
           <Route path="/admission" element={<Layout><AdmissionPolicy /></Layout>} />
+          <Route path="/child-policy" element={<Layout><ChildPolicy /></Layout>} />
           <Route path="/cookie-policy" element={<Layout><CookiePolicy /></Layout>} />
           <Route path="/privacy-policy" element={<Layout><PrivacyPolicy /></Layout>} />
           <Route path="/institute-registration" element={<Layout><InstituteRegistrationForm /></Layout>} />
