@@ -80,12 +80,12 @@ const FixedNavbar = () => {
 
         <div className="flex justify-center gap-2 sm:gap-4 ">
      
-        <Link to="/student-login">
+        <Link to="https://student.sbiea.co.in/login">
             <Button variant="secondary" className="text-sm">
               Student Login
             </Button>
           </Link>
-          <Link to="/institute-login">
+          <Link to="https://institution.sbiea.co.in/login">
             <Button variant="secondary" className="text-sm">
               Institute Login
             </Button>
