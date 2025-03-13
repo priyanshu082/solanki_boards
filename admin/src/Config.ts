@@ -1,5 +1,5 @@
 
-export const BASE_URL = import.meta.env.VITE_BASE_URL;
+export const BASE_URL = "https://sbiea.co.in/api/api";
 export const ADMIN_URL = BASE_URL + "/admin";
 export const PUBLIC_URL = BASE_URL + "/public";
 export const updateenquiry = BASE_URL + "/enquiry";
