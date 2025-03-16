@@ -37,9 +37,11 @@ export const Auth = () => {
             );
 
             const institute = response.data.institute;
-
+            console.log(institute)
             localStorage.setItem("id", institute.id);
             localStorage.setItem("paymentStatus", institute.paymentStatus);
+            localStorage.setItem("instituteName", institute.centerName);
+            localStorage.setItem("instituteNumber", institute.headMobileNumber);
             localStorage.setItem("role", "institute");
             localStorage.setItem("token", response.data.accessToken);
             localStorage.setItem("refreshToken", response.data.refreshToken);

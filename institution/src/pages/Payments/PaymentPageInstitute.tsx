@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft, CreditCard, RefreshCw } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { initiatePaymentUrl, paymentStatusUrl, verifyPaymentUrl, InstituteAmount } from '@/Config';
+import { initiatePaymentUrl, paymentStatusUrl, InstituteAmount } from '@/Config';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { instituteState, instituteDetailsSelector, PaymentStatus } from '@/store/atoms/instituteAtoms';
 
@@ -97,8 +97,14 @@ const PaymentPageInstitute = () => {
   const handlePhonePePayment = async () => {
     try {
       const instituteId = localStorage.getItem("id");
+      const name= localStorage.getItem("instituteName");
+      const number=localStorage.getItem("instituteNumber");
+      
+
       const merchantTransactionId = `TXN_${Date.now()}`;
       localStorage.setItem("merchantTransactionId", merchantTransactionId);
+      
+      
 
       Swal.fire({
         title: 'Initiating Payment',
@@ -113,17 +119,21 @@ const PaymentPageInstitute = () => {
         amount: InstituteAmount,
         instituteId,
         paymentType: 'INSTITUTE',
-        redirectUrl: `${window.location.origin}/payment-institute`,
-        callbackUrl: `${verifyPaymentUrl}`
+        name,
+        number
       });
 
       console.log(response.data);
 
-      if (response.data.redirectUrl) {
-        window.location.href = response.data.redirectUrl;
-      } else {
-        throw new Error('Payment initiation failed');
-      }
+
+
+      // if (response.data.redirectUrl) {
+      //   window.location.href = response.data.redirectUrl;
+      // } else {
+      //  
+      // }
+      // if(!response.)
+      // throw new Error('Payment initiation failed');
     } catch (error: any) {
       Swal.fire({
         icon: 'error',
