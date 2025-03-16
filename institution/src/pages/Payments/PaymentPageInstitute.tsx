@@ -52,7 +52,7 @@ const PaymentPageInstitute = () => {
         }
 
         const response = await axios.get(`${paymentStatusUrl}/${merchantTransactionId}`);
-        
+
         if (response.data.status === "SUCCESS") {
           setInstituteDetails(prev => prev ? { ...prev, paymentStatus: PaymentStatus.SUCCESS } : null);
           Swal.fire({
@@ -69,13 +69,13 @@ const PaymentPageInstitute = () => {
         }
 
         setPollingCount(prev => prev + 1);
-        const interval = pollingCount < 1 ? 20000 : 
-                        pollingCount < 11 ? 3000 :
-                        pollingCount < 21 ? 6000 :
-                        pollingCount < 27 ? 10000 :
-                        pollingCount < 29 ? 30000 :
-                        60000;
-        
+        const interval = pollingCount < 1 ? 20000 :
+          pollingCount < 11 ? 3000 :
+            pollingCount < 21 ? 6000 :
+              pollingCount < 27 ? 10000 :
+                pollingCount < 29 ? 30000 :
+                  60000;
+
         setTimeout(pollStatus, interval);
       };
 
@@ -97,14 +97,14 @@ const PaymentPageInstitute = () => {
   const handlePhonePePayment = async () => {
     try {
       const instituteId = localStorage.getItem("id");
-      const name= localStorage.getItem("instituteName");
-      const number=localStorage.getItem("instituteNumber");
-      
+      const name = localStorage.getItem("instituteName");
+      const number = localStorage.getItem("instituteNumber");
+
 
       const merchantTransactionId = `TXN_${Date.now()}`;
       localStorage.setItem("merchantTransactionId", merchantTransactionId);
-      
-      
+
+
 
       Swal.fire({
         title: 'Initiating Payment',
@@ -123,15 +123,15 @@ const PaymentPageInstitute = () => {
         number
       });
 
-      console.log(response.data);
+      // console.log(response.data);
 
 
 
-      // if (response.data.redirectUrl) {
-      //   window.location.href = response.data.redirectUrl;
-      // } else {
-      //  
-      // }
+      if (response.data.redirectUrl) {
+        window.location.href = response.data.redirectUrl;
+      } else {
+        throw new Error('Payment initiation failed');
+      }
       // if(!response.)
       // throw new Error('Payment initiation failed');
     } catch (error: any) {
@@ -146,7 +146,7 @@ const PaymentPageInstitute = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-     
+
       <div className=" mx-auto space-y-6">
         <Card className="shadow-lg">
           <CardHeader>
@@ -170,7 +170,7 @@ const PaymentPageInstitute = () => {
               </div>
             </div>
           </CardHeader>
-          
+
           <CardContent className="p-6">
             <div className="flex justify-center">
               <button
