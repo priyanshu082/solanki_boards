@@ -125,10 +125,10 @@ const PaymentPageInstitute = () => {
 
       // console.log(response.data);
 
-
+      const PhonePeCheckout = (window as any).PhonePeCheckout;
 
       if (response.data.redirectUrl) {
-        window.location.href = response.data.redirectUrl;
+        PhonePeCheckout.transact({ tokenUrl: response.data.redirectUrl });
       } else {
         throw new Error('Payment initiation failed');
       }
