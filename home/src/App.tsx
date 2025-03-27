@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from 'react';
+import ReactGA from "react-ga4";
 import Home from "./pages/home/Home";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import FixedNavbar from "./components/FixedNavbar";
@@ -40,6 +42,22 @@ import PaymentPage from "./pages/home/PaymentPage";
 import Recognition from "./pages/home/Recognition/Recognition";
 import Constitutional from "./pages/home/Recognition/Constitutional";
 import Autonomous from "./pages/home/Recognition/autonomous";
+
+// Initialize Google Analytics with your tracking ID
+ReactGA.initialize("G-WDZG6SYQFM"); // Replace with your actual Google Analytics measurement ID
+
+// Analytics tracking component
+function AnalyticsTracker() {
+  const location = useLocation();
+  
+  useEffect(() => {
+    // Track pageview when location changes
+    ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
+  }, [location]);
+  
+  return null;
+}
+
 interface LayoutProps {
   children: ReactNode;
 }
@@ -64,12 +82,15 @@ function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
+        {/* This component tracks all page views */}
+        <AnalyticsTracker />
+        
         <Routes>
           {/* NotFound route without Layout */}
           <Route path="*" element={<NotFound />} />
           
           {/* Routes with Layout (Navbar and Footer) */}
-          <Route path="/" element={<Layout><Home /></Layout>} />``
+          <Route path="/" element={<Layout><Home /></Layout>} />
           <Route path="/admission" element={<Layout><AdmissionPolicy /></Layout>} />
           <Route path="/child-policy" element={<Layout><ChildPolicy /></Layout>} />
           <Route path="/cookie-policy" element={<Layout><CookiePolicy /></Layout>} />
