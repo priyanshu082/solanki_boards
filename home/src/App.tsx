@@ -42,6 +42,7 @@ import PaymentPage from "./pages/home/PaymentPage";
 import Recognition from "./pages/home/Recognition/Recognition";
 import Constitutional from "./pages/home/Recognition/Constitutional";
 import Autonomous from "./pages/home/Recognition/autonomous";
+import VisitorCounter from "./components/VisitorCounter";
 
 // Initialize Google Analytics with your tracking ID
 ReactGA.initialize("G-WDZG6SYQFM"); // Replace with your actual Google Analytics measurement ID
@@ -73,6 +74,7 @@ const Layout = ({ children }: LayoutProps) => {
       <div className="mt-[165px] lg:mt-[0px]">
       {children}
       </div>
+      <VisitorCounter/>
       <Footer />
     </>
   );
@@ -84,7 +86,6 @@ function App() {
       <BrowserRouter>
         {/* This component tracks all page views */}
         <AnalyticsTracker />
-        
         <Routes>
           {/* NotFound route without Layout */}
           <Route path="*" element={<NotFound />} />

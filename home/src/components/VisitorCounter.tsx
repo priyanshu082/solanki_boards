@@ -37,7 +37,7 @@ const VisitorCounter = () => {
             Loading...
           </span>
         ) : (
-          `Total Visits: ${visits}`
+          `Visitors: ${visits}`
         )}
       </span>
     </div>
