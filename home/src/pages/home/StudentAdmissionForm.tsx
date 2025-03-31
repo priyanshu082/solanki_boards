@@ -21,8 +21,6 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   // Validation functions remain the same...
-
-  console.log(formData);  
   const validateStudentForm = (): boolean => {
     const requiredFields = [
       'name',
@@ -39,22 +37,22 @@ const RegisterPage = () => {
       'courseId',
       'studentPhoto'
     ] as const;
-  
+
     const addressFields = ['address', 'city', 'district', 'state', 'pincode'] as const;
-    
+
     type AddressKey = typeof addressFields[number];
-  
-    const hasBasicFields = requiredFields.every(field => 
+
+    const hasBasicFields = requiredFields.every(field =>
       formData[field as keyof AdmissionFormData] && String(formData[field as keyof AdmissionFormData]).trim() !== ''
     );
-  
-    const hasValidAddresses = addressFields.every((field: AddressKey) => 
-      formData.permanentAddress[field as keyof typeof formData.permanentAddress] && 
-      formData.correspondenceAddress[field as keyof typeof formData.correspondenceAddress] && 
+
+    const hasValidAddresses = addressFields.every((field: AddressKey) =>
+      formData.permanentAddress[field as keyof typeof formData.permanentAddress] &&
+      formData.correspondenceAddress[field as keyof typeof formData.correspondenceAddress] &&
       String(formData.permanentAddress[field as keyof typeof formData.permanentAddress]).trim() !== '' &&
       String(formData.correspondenceAddress[field as keyof typeof formData.correspondenceAddress]).trim() !== ''
     );
-  
+
     return hasBasicFields && hasValidAddresses;
   };
 
@@ -68,7 +66,7 @@ const RegisterPage = () => {
       const hasSubjects = Boolean(qual.subjects);
       const hasYearOfPassing = Boolean(qual.yearOfPassing);
       const hasPercentage = typeof qual.percentage === 'number' && !isNaN(qual.percentage);
-      
+
       return hasExamination && hasSubjects && hasYearOfPassing && hasPercentage;
     });
   };
@@ -81,26 +79,26 @@ const RegisterPage = () => {
     if (formData.admissionType === AdmissionType.FRESH) {
       return true; // Not required for fresh admission
     }
-    
+
     if (formData.lastPassedExam.length === 0) {
       return false;
     }
-    
+
     const exam = formData.lastPassedExam[0];
-    return Boolean(exam.subject) && 
-           Boolean(exam.subjectType) && 
-           exam.practicalMarks >= 0 && 
-           exam.assignmentMarks >= 0 && 
-           exam.theoryMarks >= 0 && 
-           exam.obtainedMarks >= 0 && 
-           exam.maximumMarks > 0;
+    return Boolean(exam.subject) &&
+      Boolean(exam.subjectType) &&
+      exam.practicalMarks >= 0 &&
+      exam.assignmentMarks >= 0 &&
+      exam.theoryMarks >= 0 &&
+      exam.obtainedMarks >= 0 &&
+      exam.maximumMarks > 0;
   };
 
   const validateAllForms = (): boolean => {
-    return validateStudentForm() && 
-           validateEducationalQualifications() && 
-           validateSubjects() &&
-           validateLastPassedExam();
+    return validateStudentForm() &&
+      validateEducationalQualifications() &&
+      validateSubjects() &&
+      validateLastPassedExam();
   };
 
   const handleNext = () => {
@@ -121,7 +119,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
-    
+
     if (!validateAllForms()) {
       Swal.fire({
         icon: 'error',
@@ -173,8 +171,6 @@ const RegisterPage = () => {
         }
       });
 
-      console.log('Submitting form data:', Object.fromEntries(data.entries()));
-
       const response = await axios.post(studentAdmissionUrl, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -194,7 +190,7 @@ const RegisterPage = () => {
           navigate('/payment');
         }, 3000);
       }
-      
+
     } catch (error: any) {
       console.error('Submission error:', error);
       if (error.response?.status === 401) {
@@ -268,14 +264,14 @@ const RegisterPage = () => {
 
       <div className="mt-6 flex justify-end gap-4">
         {activeForm !== 'Subjects' ? (
-          <Button 
+          <Button
             onClick={handleNext}
             disabled={!canProceed}
           >
             Next
           </Button>
         ) : (
-          <Button 
+          <Button
             onClick={handleSubmit}
             disabled={!validateAllForms() || isSubmitting}
             className="bg-green-600 hover:bg-green-700"

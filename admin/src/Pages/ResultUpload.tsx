@@ -59,7 +59,6 @@ const ResultUpload = () => {
         })
         
         if (studentResponse.data && studentResponse.data[0]) {
-          console.log(studentResponse.data[0])
           setStudentData(studentResponse.data[0])
         }
         
@@ -67,7 +66,6 @@ const ResultUpload = () => {
         try {
           const courseResponse = await axios.get(`${getcoursebyid}/${courseId}`)
           setCourseData(courseResponse.data)
-          console.log(courseResponse.data)
           
           // Initialize subject results from course subjects
           if (courseResponse.data.subjects && courseResponse.data.subjects.length > 0) {

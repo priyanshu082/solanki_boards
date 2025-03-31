@@ -34,11 +34,11 @@ export const instituteDashboardUrl = INSTITUTE_BASE_URL + '/dashboard';
 
 
 
-export enum alertTypeEnum{
-    success="success",
-    error="error",
-    info="error",
-    warning="warning"
+export enum alertTypeEnum {
+    success = "success",
+    error = "error",
+    info = "error",
+    warning = "warning"
 }
 
 

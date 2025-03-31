@@ -33,8 +33,6 @@ const AllInstituteDetails = () => {
           limit
         })
         
-        console.log(response.data)
-        
         if (response.data.institutes) {
           setInstitutes(response.data.institutes)
           setTotalItems(response.data.total || response.data.institutes.length)

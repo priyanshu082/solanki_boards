@@ -3,17 +3,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { ArrowLeft, CreditCard, RefreshCw } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useSearchParams } from 'react-router-dom';
 
-import { initiatePaymentUrl, paymentStatusUrl, verifyPaymentUrl } from '../../data/config';
+import { initiatePaymentUrl, paymentStatusUrl } from '../../data/config';
 
 const PaymentPage = () => {
-  const InstituteAmount = 1000;
+  // const InstituteAmount = 1000;
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   //@ts-ignore
   const [paymentStatus, setPaymentStatus] = useState<string | null>("");
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [pollingCount, setPollingCount] = useState(0);
   const maxPollingAttempts = 48;
+
+  const [searchParams] = useSearchParams();
+  const instituteId = searchParams.get("instituteId");
+  const studentId = searchParams.get("studentId");
+  const name = searchParams.get("name");
+  const number = searchParams.get("number");
+  const amount = searchParams.get("amount");
+  const paymentType = searchParams.get("paymentType");
 
   useEffect(() => {
     const status = localStorage.getItem("paymentStatus");
@@ -33,7 +42,7 @@ const PaymentPage = () => {
     try {
       setIsCheckingStatus(true);
       const merchantTransactionId = localStorage.getItem("merchantTransactionId");
-      
+
       if (!merchantTransactionId) {
         Swal.fire({
           icon: 'error',
@@ -50,7 +59,7 @@ const PaymentPage = () => {
         }
 
         const response = await axios.get(`${paymentStatusUrl}/${merchantTransactionId}`);
-        
+
         if (response.data.status === "SUCCESS") {
           localStorage.setItem("paymentStatus", "COMPLETED");
           Swal.fire({
@@ -67,13 +76,13 @@ const PaymentPage = () => {
         }
 
         setPollingCount(prev => prev + 1);
-        const interval = pollingCount < 1 ? 20000 : 
-                        pollingCount < 11 ? 3000 :
-                        pollingCount < 21 ? 6000 :
-                        pollingCount < 27 ? 10000 :
-                        pollingCount < 29 ? 30000 :
-                        60000;
-        
+        const interval = pollingCount < 1 ? 20000 :
+          pollingCount < 11 ? 3000 :
+            pollingCount < 21 ? 6000 :
+              pollingCount < 27 ? 10000 :
+                pollingCount < 29 ? 30000 :
+                  60000;
+
         setTimeout(pollStatus, interval);
       };
 
@@ -94,9 +103,9 @@ const PaymentPage = () => {
 
   const handlePhonePePayment = async () => {
     try {
-      const studentId = localStorage.getItem("id");
-      const merchantTransactionId = `TXN_${Date.now()}`;
-      localStorage.setItem("merchantTransactionId", merchantTransactionId);
+      // const studentId = localStorage.getItem("id");
+      // const merchantTransactionId = `TXN_${Date.now()}`;
+      // localStorage.setItem("merchantTransactionId", merchantTransactionId);
 
       Swal.fire({
         title: 'Initiating Payment',
@@ -108,16 +117,19 @@ const PaymentPage = () => {
       });
 
       const response = await axios.post(initiatePaymentUrl, {
-        amount: InstituteAmount,
-        merchantTransactionId,
-        studentId,
-        paymentType: 'STUDENT',
-        redirectUrl: `${window.location.origin}/payment-student`,
-        callbackUrl: `${verifyPaymentUrl}`
+        amount: amount,
+        [paymentType === 'INSTITUTE' ? 'instituteId' : 'studentId']: paymentType === 'INSTITUTE' ? instituteId : studentId,
+        paymentType: paymentType,
+        name,
+        number
       });
 
+      // console.log(response.data);
+
+      const PhonePeCheckout = (window as any).PhonePeCheckout;
+
       if (response.data.redirectUrl) {
-        window.location.href = response.data.redirectUrl;
+        PhonePeCheckout.transact({ tokenUrl: response.data.redirectUrl });
       } else {
         throw new Error('Payment initiation failed');
       }
@@ -156,7 +168,7 @@ const PaymentPage = () => {
               </div>
             </div>
           </CardHeader>
-          
+
           <CardContent className="p-6">
             <div className="flex justify-center">
               <button
@@ -168,7 +180,7 @@ const PaymentPage = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900">Pay with PhonePe</h3>
                 <p className="mt-2 text-sm text-gray-500 text-center">
-                  Amount to pay: ₹{InstituteAmount}
+                  Amount to pay: ₹{amount}
                 </p>
               </button>
             </div>

@@ -54,7 +54,6 @@ const Profile = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(response.data);
                 setInstituteDetails(response.data);
                 
                 // Set form default values

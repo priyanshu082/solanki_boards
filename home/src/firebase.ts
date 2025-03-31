@@ -20,7 +20,6 @@ const firebaseConfig = {
     const docRef = doc(db, "visitors", "counter");
     const docSnap = await getDoc(docRef);
     
-    console.log(docSnap)
     if (docSnap.exists()) {
       await updateDoc(docRef, { count: docSnap.data().count + 1 });
     } else {

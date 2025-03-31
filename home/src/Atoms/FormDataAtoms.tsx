@@ -5,9 +5,9 @@ export { staticDataAtoms } from './staticDataAtoms';
 
 // Enum Definitions
 export enum AdmissionType {
-    FRESH = "FRESH",
-    TOC = "TOC",
-    PART_ADMISSION = "PART_ADMISSION",
+  FRESH = "FRESH",
+  TOC = "TOC",
+  PART_ADMISSION = "PART_ADMISSION",
 }
 
 export enum StudentCategory {
@@ -25,11 +25,11 @@ export enum Gender {
 }
 
 export enum BatchType {
-    BATCH_1_2024_O_24 = "BATCH_1_2024_O_24",
-    BATCH_2_2024_M_25 = "BATCH_2_2024_M_25",
+  BATCH_1_2024_O_24 = "BATCH_1_2024_O_24",
+  BATCH_2_2024_M_25 = "BATCH_2_2024_M_25",
 }
 
-export enum IndianState { 
+export enum IndianState {
   ANDHRA_PRADESH = "ANDHRA_PRADESH",
   ARUNACHAL_PRADESH = "ARUNACHAL_PRADESH",
   ASSAM = "ASSAM",
@@ -73,8 +73,8 @@ export enum ExaminationType {
 
 export enum SubjectType {
   LANGUAGE = "LANGUAGE",
-  ELECTIVE = "ELECTIVE",
-  CORE = "CORE"
+  NON_LANGUAGE = "NON_LANGUAGE",
+  VOCATIONAL = "VOCATIONAL",
 }
 
 export const DocumentType = {
@@ -178,7 +178,7 @@ const initialFormState: AdmissionFormData = {
   name: '',
   dob: '',
   fatherName: '',
-  motherName: '',   
+  motherName: '',
   category: StudentCategory.GENERAL,
   gender: Gender.MALE,
   nationality: '',

@@ -20,7 +20,6 @@ type YearKey = 'firstYear' | 'secondYear';
 
 const CourseDetails = () => {
   const { id } = useParams();
-  console.log(id);  
   const [activeYear, setActiveYear] = useState(1);
   
   const program = PGprograms.find(course => course.id === id || '') as unknown as PGCourse;  

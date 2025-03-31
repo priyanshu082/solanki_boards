@@ -5,15 +5,22 @@ import StudentIDCard from './pages/IDCard'
 import StudentLogin from './pages/Login'
 import Layout from './Layout'; // Import Layout component
 import Result from './pages/Result';
+import PaymentPage from './pages/Payment';
 // Protected Route wrapper component
 
 const ProtectedRoute = ({ children }: any) => {
   const id = localStorage.getItem('id')
-  
+  const paymentStatus = localStorage.getItem('paymentStatus')
+
   if (!id) {
     return <Navigate to="/login" replace />
   }
-  
+
+  //Redirect to payment page if payment is pending
+  if (paymentStatus !== 'SUCCESS' && window.location.pathname !== '/payment') {
+    return <Navigate to="/payment" replace />
+  }
+
   return children
 }
 
@@ -26,6 +33,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/id-card" element={<StudentIDCard />} />
           <Route path="/result" element={<Result />} />
+          <Route path="/payment" element={<PaymentPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

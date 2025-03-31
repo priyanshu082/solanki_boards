@@ -1,20 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, CreditCard, RefreshCw } from 'lucide-react';
-import axios from 'axios';
+import { ArrowLeft, CreditCard } from 'lucide-react';
+// import axios from 'axios';
 import Swal from 'sweetalert2';
-import { initiatePaymentUrl, paymentStatusUrl, InstituteAmount } from '@/Config';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { instituteState, instituteDetailsSelector, PaymentStatus } from '@/store/atoms/instituteAtoms';
+import {
+  useRecoilValue,
+  // useSetRecoilState 
+} from 'recoil';
+import {
+  // instituteState, 
+  instituteDetailsSelector, PaymentStatus
+} from '@/store/atoms/instituteAtoms';
+import { InstituteAmount } from '../../Config';
 
 const PaymentPageInstitute = () => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
-  const [pollingCount, setPollingCount] = useState(0);
-  const maxPollingAttempts = 48;
+  // const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  // const [pollingCount, setPollingCount] = useState(0);
+  // const maxPollingAttempts = 48;
 
   const instituteDetails = useRecoilValue(instituteDetailsSelector);
-  const setInstituteDetails = useSetRecoilState(instituteState);
+  // const setInstituteDetails = useSetRecoilState(instituteState);
 
   useEffect(() => {
     if (instituteDetails?.paymentStatus === PaymentStatus.PENDING) {
@@ -27,72 +33,72 @@ const PaymentPageInstitute = () => {
     }
   }, [instituteDetails]);
 
-  const checkPaymentStatus = async () => {
-    try {
-      setIsCheckingStatus(true);
+  // const checkPaymentStatus = async () => {
+  //   try {
+  //     setIsCheckingStatus(true);
 
-      if (!instituteDetails) return;
+  //     if (!instituteDetails) return;
 
-      const lastPayment = instituteDetails.payments?.[instituteDetails.payments.length - 1];
-      const merchantTransactionId = lastPayment?.merchantTransactionId;
+  //     const lastPayment = instituteDetails.payments?.[instituteDetails.payments.length - 1];
+  //     const merchantTransactionId = lastPayment?.merchantTransactionId;
 
-      if (!merchantTransactionId) {
-        Swal.fire({
-          icon: 'error',
-          title: 'No Payment Found',
-          text: 'No recent payment transaction was found',
-          confirmButtonColor: '#3085d6'
-        });
-        return;
-      }
+  //     if (!merchantTransactionId) {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'No Payment Found',
+  //         text: 'No recent payment transaction was found',
+  //         confirmButtonColor: '#3085d6'
+  //       });
+  //       return;
+  //     }
 
-      const pollStatus = async () => {
-        if (pollingCount >= maxPollingAttempts) {
-          throw new Error('Payment status check timed out');
-        }
+  //     const pollStatus = async () => {
+  //       if (pollingCount >= maxPollingAttempts) {
+  //         throw new Error('Payment status check timed out');
+  //       }
 
-        const response = await axios.get(`${paymentStatusUrl}/${merchantTransactionId}`);
+  //       const response = await axios.get(`${paymentStatusUrl}/${merchantTransactionId}`);
 
-        if (response.data.status === "SUCCESS") {
-          setInstituteDetails(prev => prev ? { ...prev, paymentStatus: PaymentStatus.SUCCESS } : null);
-          Swal.fire({
-            icon: 'success',
-            title: 'Payment Successful!',
-            text: 'Your payment has been processed successfully',
-            confirmButtonColor: '#10B981'
-          }).then(() => {
-            window.location.href = '/';
-          });
-          return;
-        } else if (response.data.status === "FAILED") {
-          throw new Error('Payment failed');
-        }
+  //       if (response.data.status === "SUCCESS") {
+  //         setInstituteDetails(prev => prev ? { ...prev, paymentStatus: PaymentStatus.SUCCESS } : null);
+  //         Swal.fire({
+  //           icon: 'success',
+  //           title: 'Payment Successful!',
+  //           text: 'Your payment has been processed successfully',
+  //           confirmButtonColor: '#10B981'
+  //         }).then(() => {
+  //           window.location.href = '/';
+  //         });
+  //         return;
+  //       } else if (response.data.status === "FAILED") {
+  //         throw new Error('Payment failed');
+  //       }
 
-        setPollingCount(prev => prev + 1);
-        const interval = pollingCount < 1 ? 20000 :
-          pollingCount < 11 ? 3000 :
-            pollingCount < 21 ? 6000 :
-              pollingCount < 27 ? 10000 :
-                pollingCount < 29 ? 30000 :
-                  60000;
+  //       setPollingCount(prev => prev + 1);
+  //       const interval = pollingCount < 1 ? 20000 :
+  //         pollingCount < 11 ? 3000 :
+  //           pollingCount < 21 ? 6000 :
+  //             pollingCount < 27 ? 10000 :
+  //               pollingCount < 29 ? 30000 :
+  //                 60000;
 
-        setTimeout(pollStatus, interval);
-      };
+  //       setTimeout(pollStatus, interval);
+  //     };
 
-      await pollStatus();
+  //     await pollStatus();
 
-    } catch (error: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Payment Failed',
-        text: error.message || 'Payment verification failed. Please try again.',
-        confirmButtonColor: '#EF4444'
-      });
-    } finally {
-      setIsCheckingStatus(false);
-      setPollingCount(0);
-    }
-  };
+  //   } catch (error: any) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Payment Failed',
+  //       text: error.message || 'Payment verification failed. Please try again.',
+  //       confirmButtonColor: '#EF4444'
+  //     });
+  //   } finally {
+  //     setIsCheckingStatus(false);
+  //     setPollingCount(0);
+  //   }
+  // };
 
   const handlePhonePePayment = async () => {
     try {
@@ -108,30 +114,32 @@ const PaymentPageInstitute = () => {
 
       Swal.fire({
         title: 'Initiating Payment',
-        text: 'Please wait while we redirect you to PhonePe...',
+        text: 'Please wait while we redirect you to Payment Page...',
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
         }
       });
 
-      const response = await axios.post(initiatePaymentUrl, {
-        amount: InstituteAmount,
-        instituteId,
-        paymentType: 'INSTITUTE',
-        name,
-        number
-      });
+      window.location.href = `https://www.sbiea.co.in/payment?amount=${InstituteAmount}&instituteId=${instituteId}&paymentType=INSTITUTE&name=${name}&number=${number}`;
+
+      // const response = await axios.post(initiatePaymentUrl, {
+      //   amount: InstituteAmount,
+      //   instituteId,
+      //   paymentType: 'INSTITUTE',
+      //   name,
+      //   number
+      // });
 
       // console.log(response.data);
 
-      const PhonePeCheckout = (window as any).PhonePeCheckout;
+      // const PhonePeCheckout = (window as any).PhonePeCheckout;
 
-      if (response.data.redirectUrl) {
-        PhonePeCheckout.transact({ tokenUrl: response.data.redirectUrl });
-      } else {
-        throw new Error('Payment initiation failed');
-      }
+      // if (response.data.redirectUrl) {
+      //   PhonePeCheckout.transact({ tokenUrl: response.data.redirectUrl });
+      // } else {
+      //   throw new Error('Payment initiation failed');
+      // }
       // if(!response.)
       // throw new Error('Payment initiation failed');
     } catch (error: any) {
@@ -190,7 +198,7 @@ const PaymentPageInstitute = () => {
         </Card>
 
         {/* Payment Status Check Section */}
-        <Card className="shadow-lg">
+        {/* <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-xl font-semibold text-gray-900">
               Check Payment Status
@@ -211,7 +219,7 @@ const PaymentPageInstitute = () => {
               </button>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

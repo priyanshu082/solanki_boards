@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import {  InterfaceSubject } from '@/lib/Interfaces';
 
 const SubjectForm = ({courses}:any) => {
-  console.log(courses);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [formData, setFormData] = useRecoilState(admissionFormState);
   

@@ -69,7 +69,6 @@ const Result = () => {
         });
         const studentData = response.data;
         setStudent(studentData);
-        console.log(studentData)
         // Check if student has results
         if (studentData.results && studentData.results.length > 0) {
           // Get the most recent result

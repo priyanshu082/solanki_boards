@@ -63,7 +63,6 @@ const ShowStudents = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      console.log(token);
       if (!token) {
         Swal.fire({
           icon: 'error',

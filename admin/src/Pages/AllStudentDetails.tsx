@@ -33,8 +33,6 @@ const AllStudentDetails = () => {
           limit
         })
         
-        console.log(response.data)
-        
         if (response.data.students) {
           setStudents(response.data.students)
           setTotalItems(response.data.total || response.data.students.length)

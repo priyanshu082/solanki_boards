@@ -18,7 +18,7 @@ import PaymentPageInstitute from './pages/Payments/PaymentPageInstitute'
 const ProtectedRoute = ({ children }: any) => {
   const id = localStorage.getItem('id')
   const paymentStatus = localStorage.getItem('paymentStatus')
-  
+
   if (!id) {
     return <Navigate to="/login" replace />
   }
@@ -27,7 +27,7 @@ const ProtectedRoute = ({ children }: any) => {
   if (paymentStatus !== 'SUCCESS' && window.location.pathname !== '/payment-institute') {
     return <Navigate to="/payment-institute" replace />
   }
-  
+
   return children
 }
 
@@ -48,19 +48,19 @@ function App() {
 
           <Route path="/payment-student" element={<ProtectedRoute><PaymentPageStudent /></ProtectedRoute>} />
           <Route path="/payment-institute" element={<ProtectedRoute><PaymentPageInstitute /></ProtectedRoute>} />
-          
+
           {/* PhonePe callback handler */}
           <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
-          
+
           {/* Success/Error pages */}
           <Route path="/payment/success" element={<ProtectedRoute> <PaymentStatus status="success" /></ProtectedRoute>} />
-          <Route path="/payment/error" element={ <ProtectedRoute> <PaymentStatus status="error" /></ProtectedRoute>} />
+          <Route path="/payment/error" element={<ProtectedRoute> <PaymentStatus status="error" /></ProtectedRoute>} />
         </Route>
         <Route path="/login" element={<Auth />} />
-       
-        
+
+
         {/* Payment initiation page */}
-        
+
       </Routes>
     </BrowserRouter>
   )

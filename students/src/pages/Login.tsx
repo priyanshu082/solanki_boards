@@ -42,6 +42,9 @@ export const Auth = () => {
 
             localStorage.setItem("id", student.id);
             localStorage.setItem("name", student.name);
+            localStorage.setItem("paymentAmount", student.paymentAmount);
+            localStorage.setItem("paymentStatus", student.paymentStatus);
+            localStorage.setItem("number", student.phoneNumber);
             localStorage.setItem("role", "student");
             localStorage.setItem("token", response.data.accessToken);
             localStorage.setItem("refreshToken", response.data.refreshToken);

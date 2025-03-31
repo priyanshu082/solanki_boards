@@ -25,8 +25,6 @@ const StudentDetails = () => {
 
         const response = await axios.get(`${getstudentbyid}/${id}`)
         
-        console.log(response.data)
-        
         setStudent(response.data)
         
         // Extract results if they exist in the response

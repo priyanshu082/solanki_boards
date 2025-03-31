@@ -10,6 +10,8 @@ import { instituteRegistrationUrl } from '../../../data/config';
 import axios from 'axios';
 import dummyImage from '../../../assets/images/patners/patner_logo_4.png';
 import { Oval } from 'react-loader-spinner'
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 // Enums
 export enum Gender {
   MALE = "MALE",
@@ -22,7 +24,7 @@ export enum IndianState {
   ARUNACHAL_PRADESH = "ARUNACHAL_PRADESH",
   ASSAM = "ASSAM",
   BIHAR = "BIHAR",
-  CHHATTISGARH = "CHHATTISGARH", 
+  CHHATTISGARH = "CHHATTISGARH",
   GOA = "GOA",
   GUJARAT = "GUJARAT",
   HARYANA = "HARYANA",
@@ -61,36 +63,73 @@ export enum Country {
   INDIA = "INDIA",
 }
 
-// Update the FormData type to match your form fields
-type FormData = {
-  headName: string;
-  headFatherName: string;
-  headDob: string;
-  headAadharNumber: string;
-  headPanCardNumber: string;
-  headMobileNumber: string;
-  headEmailId: string;
-  headGender: string;
-  headAddress: string;
-  headCity: string;
-  headState: string;
-  headUnionTerritory: string;
-  headCountry: string;
-  headPincode: string;
-  headBankName: string;
-  headAccountNumber: string;
-  headIfscCode: string;
-  centerName: string;
-  centerEmailId: string;
-  centerWebsiteUrl: string;
-  centerPhoneNumber: string;
-  centerAddress: string;
-  centerCity: string;
-  centerState: string;
-  centerUnionTerritory: string;
-  centerCountry: string;
-  centerPincode: string;
-};
+// // Update the FormData type to match your form fields
+// type FormData = {
+//   headName: string;
+//   headFatherName: string;
+//   headDob: string;
+//   headAadharNumber: string;
+//   headPanCardNumber: string;
+//   headMobileNumber: string;
+//   headEmailId: string;
+//   headGender: string;
+//   headAddress: string;
+//   headCity: string;
+//   headState: string;
+//   headUnionTerritory: string;
+//   headCountry: string;
+//   headPincode: string;
+//   headBankName: string;
+//   headAccountNumber: string;
+//   headIfscCode: string;
+//   centerName: string;
+//   centerEmailId: string;
+//   centerWebsiteUrl: string;
+//   centerPhoneNumber: string;
+//   centerAddress: string;
+//   centerCity: string;
+//   centerState: string;
+//   centerUnionTerritory: string;
+//   centerCountry: string;
+//   centerPincode: string;
+// };
+
+type FormData = z.infer<typeof formSchema>;
+
+const formSchema = z.object({
+  headName: z.string().min(2, "Name must be at least 2 characters"),
+  headFatherName: z.string().min(2, "Father's name must be at least 2 characters"),
+  headDob: z.string().refine((val) => {
+    const date = new Date(val);
+    const now = new Date();
+    return date < now;
+  }, "Date of birth must be in the past"),
+  headAadharNumber: z.string().regex(/^\d{12}$/, "Aadhar number must be 12 digits"),
+  headPanCardNumber: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN card format"),
+  headMobileNumber: z.string().regex(/^[6-9]\d{9}$/, "Invalid mobile number"),
+  headEmailId: z.string().email("Invalid email address"),
+  headGender: z.string().min(1, "Please select a gender"),
+  headAddress: z.string().min(5, "Address must be at least 5 characters"),
+  headCity: z.string().min(2, "City name must be at least 2 characters"),
+  headState: z.string().optional(),
+  headUnionTerritory: z.string().optional(),
+  headCountry: z.string().min(1, "Please select a country"),
+  headPincode: z.string().regex(/^\d{6}$/, "Pincode must be 6 digits"),
+  headBankName: z.string().min(3, "Bank name must be at least 3 characters"),
+  headAccountNumber: z.string().min(9, "Invalid account number"),
+  headIfscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code"),
+
+  centerName: z.string().min(3, "Institution name must be at least 3 characters"),
+  centerEmailId: z.string().email("Invalid email address"),
+  centerWebsiteUrl: z.string().url("Invalid website URL").or(z.string().length(0)),
+  centerPhoneNumber: z.string().regex(/^[0-9]{10,12}$/, "Invalid phone number"),
+  centerAddress: z.string().min(5, "Address must be at least 5 characters"),
+  centerCity: z.string().min(2, "City name must be at least 2 characters"),
+  centerState: z.string().optional(),
+  centerUnionTerritory: z.string().optional(),
+  centerCountry: z.string().min(1, "Please select a country"),
+  centerPincode: z.string().regex(/^\d{6}$/, "Pincode must be 6 digits"),
+});
 
 const InstituteRegistrationForm = () => {
   const [registrationResponse, setRegistrationResponse] = useState<any>(null);
@@ -130,7 +169,8 @@ const InstituteRegistrationForm = () => {
       centerCountry: Country.INDIA,
       centerPincode: '',
     },
-    mode: 'onSubmit'
+    mode: 'onBlur', 
+    resolver: zodResolver(formSchema),
   });
 
 
@@ -138,6 +178,11 @@ const InstituteRegistrationForm = () => {
     try {
       console.log('Form submitted with data:', data);
       const formData = new FormData();
+
+      if (Object.keys(form.formState.errors).length > 0) {
+        alert("Please fix all errors before submitting");
+        return;
+      }
 
       // Add image
       try {
@@ -168,9 +213,9 @@ const InstituteRegistrationForm = () => {
         if (value && value !== 'undefined' && value !== '') {
           // Skip the field that wasn't selected based on location type
           if ((key === 'centerState' && centerLocationType === 'unionTerritory') ||
-              (key === 'centerUnionTerritory' && centerLocationType === 'state') ||
-              (key === 'headState' && headLocationType === 'unionTerritory') ||
-              (key === 'headUnionTerritory' && headLocationType === 'state')) {
+            (key === 'centerUnionTerritory' && centerLocationType === 'state') ||
+            (key === 'headState' && headLocationType === 'unionTerritory') ||
+            (key === 'headUnionTerritory' && headLocationType === 'state')) {
             return;
           }
           formData.append(key, String(value));
@@ -190,6 +235,7 @@ const InstituteRegistrationForm = () => {
       }
     } catch (error) {
       console.error('Submission error:', error);
+      alert('Error submitting form. Please try again.');
     }
   };
 
@@ -220,9 +266,9 @@ const InstituteRegistrationForm = () => {
           <CardTitle className='text-2xl font-semibold text-white text-center tracking-wide drop-shadow-lg'> Apply for Accreditation </CardTitle>
         </CardHeader>
         <CardContent>
-         
+
           {!registrationResponse ? (
-           
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit((data) => {
                 console.log('Form submitted!');
@@ -382,8 +428,8 @@ const InstituteRegistrationForm = () => {
                         <div className="space-y-4">
                           <div className="flex gap-4 items-center">
                             <label className="text-sm font-medium">Select Location Type:</label>
-                            <Select 
-                              value={headLocationType} 
+                            <Select
+                              value={headLocationType}
                               onValueChange={(value: 'state' | 'unionTerritory') => setHeadLocationType(value)}
                             >
                               <SelectTrigger className="w-[200px]">
@@ -526,7 +572,7 @@ const InstituteRegistrationForm = () => {
                         />
                       </div>
                     </TabsContent>
-                    
+
                     <TabsContent value="center">
                       <div className="grid md:grid-cols-2 gap-4">
                         <FormField
@@ -611,8 +657,8 @@ const InstituteRegistrationForm = () => {
                         <div className="space-y-4">
                           <div className="flex gap-4 items-center">
                             <label className="text-sm font-medium">Select Location Type:</label>
-                            <Select 
-                              value={centerLocationType} 
+                            <Select
+                              value={centerLocationType}
                               onValueChange={(value: 'state' | 'unionTerritory') => setCenterLocationType(value)}
                             >
                               <SelectTrigger className="w-[200px]">
@@ -725,7 +771,7 @@ const InstituteRegistrationForm = () => {
                   )}
                 </Tabs>
 
-                <Button 
+                <Button
                   type="submit"
                   className="w-full bg-primary text-white hover:bg-primary mt-4"
                 >
@@ -741,17 +787,17 @@ const InstituteRegistrationForm = () => {
                 <p>  Check Your Email for Password</p>
               </div>
               <div className="flex gap-4 justify-center">
-                <Button 
+                <Button
                   onClick={() => {
                     navigator.clipboard.writeText(registrationResponse.applicationNumber);
                     alert('Application number copied to clipboard!');
-                  }} 
-                variant="outline" 
-                className="border-primary text-foreground hover:bg-primary"
-              >
-                Copy Application Number
-              </Button>
-              <Button onClick={handleDownloadPDF} variant="outline" className="border-primary text-foreground hover:bg-primary ">
+                  }}
+                  variant="outline"
+                  className="border-primary text-foreground hover:bg-primary"
+                >
+                  Copy Application Number
+                </Button>
+                <Button onClick={handleDownloadPDF} variant="outline" className="border-primary text-foreground hover:bg-primary ">
                   Download Registration Details
                 </Button>
               </div>

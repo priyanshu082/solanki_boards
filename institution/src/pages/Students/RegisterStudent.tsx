@@ -29,7 +29,7 @@ const RegisterPage = () => {
   const [selectedCourse, setSelectedCourse] = useState<InterfaceCourse | null>(null);
   const [courseType, setCourseType] = useState<string | null>(null);
   const [courses, setCourses] = useState<InterfaceCourse[]>([]);
- 
+
 
   // Validation functions remain the same...
 
@@ -37,32 +37,32 @@ const RegisterPage = () => {
 
   const fetchCoursesByType = async (type: string) => {
     if (!type) return;
-    
+
     setIsLoadingCourses(true);
     setCourseError(null);
-    
+
     try {
       // Using axios to make a PUT request with course type in the body
       const response = await axios.post(courseFetchUrl, {
         courseType: type
       });
       const data = response.data;
-      
-      
+
+
       if (data && Array.isArray(data)) {
         // Update the courses atom with fetched data
         setCourses(data);
-       
-        
-        
-        
+
+
+
+
         // Update form data to clear previous course selection
         setFormData(prevData => ({
           ...prevData,
           courseId: '',
           subjectIds: []
         }));
-        
+
         // Use SweetAlert for success notification
         Swal.fire({
           title: "Success!",
@@ -72,7 +72,7 @@ const RegisterPage = () => {
         });
       } else {
         setCourseError("Invalid data format received from server");
-        
+
         // Use SweetAlert for error notification
         Swal.fire({
           title: "Error!",
@@ -89,7 +89,7 @@ const RegisterPage = () => {
         text: "Failed to fetch courses. Please try again.",
         icon: "error",
         confirmButtonText: "OK"
-      });     
+      });
     } finally {
       setIsLoadingCourses(false);
     }
@@ -100,8 +100,6 @@ const RegisterPage = () => {
       fetchCoursesByType(courseType);
     }
   }, [courseType]);
-
-  console.log(formData);  
   const validateStudentForm = (): boolean => {
     const requiredFields = [
       'name',
@@ -118,22 +116,22 @@ const RegisterPage = () => {
       'courseId',
       'studentPhoto'
     ] as const;
-  
+
     const addressFields = ['address', 'city', 'district', 'state', 'pincode'] as const;
-    
+
     type AddressKey = typeof addressFields[number];
-  
-    const hasBasicFields = requiredFields.every(field => 
+
+    const hasBasicFields = requiredFields.every(field =>
       formData[field as keyof AdmissionFormData] && String(formData[field as keyof AdmissionFormData]).trim() !== ''
     );
-  
-    const hasValidAddresses = addressFields.every((field: AddressKey) => 
-      formData.permanentAddress[field as keyof typeof formData.permanentAddress] && 
-      formData.correspondenceAddress[field as keyof typeof formData.correspondenceAddress] && 
+
+    const hasValidAddresses = addressFields.every((field: AddressKey) =>
+      formData.permanentAddress[field as keyof typeof formData.permanentAddress] &&
+      formData.correspondenceAddress[field as keyof typeof formData.correspondenceAddress] &&
       String(formData.permanentAddress[field as keyof typeof formData.permanentAddress]).trim() !== '' &&
       String(formData.correspondenceAddress[field as keyof typeof formData.correspondenceAddress]).trim() !== ''
     );
-  
+
     return hasBasicFields && hasValidAddresses;
   };
 
@@ -147,7 +145,7 @@ const RegisterPage = () => {
       const hasSubjects = Boolean(qual.subjects);
       const hasYearOfPassing = Boolean(qual.yearOfPassing);
       const hasPercentage = typeof qual.percentage === 'number' && !isNaN(qual.percentage);
-      
+
       return hasExamination && hasSubjects && hasYearOfPassing && hasPercentage;
     });
   };
@@ -157,9 +155,9 @@ const RegisterPage = () => {
   };
 
   const validateAllForms = (): boolean => {
-    return validateStudentForm() && 
-           validateEducationalQualifications() && 
-           validateSubjects();
+    return validateStudentForm() &&
+      validateEducationalQualifications() &&
+      validateSubjects();
   };
 
   const handleNext = () => {
@@ -180,7 +178,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
-    
+
     if (!validateAllForms()) {
       Swal.fire({
         icon: 'error',
@@ -246,7 +244,7 @@ const RegisterPage = () => {
         return;
       }
 
-      console.log('Submitting form data:', Object.fromEntries(data.entries()));
+      // console.log('Submitting form data:', Object.fromEntries(data.entries()));
 
       const response = await axios.post(admissionRegistrationUrl, data, {
         headers: {
@@ -268,7 +266,7 @@ const RegisterPage = () => {
           navigate('/');
         }, 3000);
       }
-      
+
     } catch (error: any) {
       console.error('Submission error:', error);
       if (error.response?.status === 401) {
@@ -305,10 +303,10 @@ const RegisterPage = () => {
 
   const forms: Record<FormType, JSX.Element> = {
     //@ts-ignore
-    student: <RegisterStudentForm  setCourseType={setCourseType} courses={courses} courseError={courseError} courseType={courseType} isLoadingCourses={isLoadingCourses} setSelectedCourse={setSelectedCourse} />,
+    student: <RegisterStudentForm setCourseType={setCourseType} courses={courses} courseError={courseError} courseType={courseType} isLoadingCourses={isLoadingCourses} setSelectedCourse={setSelectedCourse} />,
     EducationalQualification: <EducationQualificationForm />,
-    Subjects: <SubjectForm courses={selectedCourse}/>
-};
+    Subjects: <SubjectForm courses={selectedCourse} />
+  };
 
   return (
     <div className=" mx-auto p-6 md:w-[80vw]">
@@ -343,14 +341,14 @@ const RegisterPage = () => {
 
       <div className="mt-6 flex justify-end gap-4">
         {activeForm !== 'Subjects' ? (
-          <Button 
+          <Button
             onClick={handleNext}
             disabled={!canProceed}
           >
             Next
           </Button>
         ) : (
-          <Button 
+          <Button
             onClick={handleSubmit}
             disabled={!validateAllForms() || isSubmitting}
             className="bg-green-600 hover:bg-green-700"

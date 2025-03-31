@@ -20,4 +20,5 @@ export const verifyPaymentUrl = PAYMENT_BASE_URL + '/verify-payment';
 
 export const fetchallinstitutesUrl = INSTITUTE_BASE_URL + '/all';
 
-export const fetchallcoursesUrl = PUBLIC_URL + '/course/list';
+export const fetchAllCoursesUrl = PUBLIC_URL + '/course/list';
+export const fetchAllSubjectsByCourseIdUrl = PUBLIC_URL + '/subject/list';

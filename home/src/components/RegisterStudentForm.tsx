@@ -1,34 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { 
+import { useRecoilState } from 'recoil';
+import {
   admissionFormState,
   AdmissionType,
   StudentCategory,
   Gender,
   BatchType,
   IndianState,
-  Country,
+  // Country,
   sameAsPermanentState,
   LastPassedExam,
   SubjectType,
   staticDataAtoms,
   lastPassedExamState // Import the lastPassedExamState atom
 } from '../Atoms/FormDataAtoms';
+import { CourseType } from '../Atoms/staticDataAtoms';
 
 import dummyAvatar from '../assets/images/dummy.jpeg'; // Updated import for dummy image
 import Swal from 'sweetalert2'; // Import SweetAlert
 
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '../components/ui/select';
 import { Checkbox } from '../components/ui/checkbox';
 import { Button } from '../components/ui/button';
+import axios from 'axios';
+import { fetchAllCoursesUrl } from '../data/config';
 
 // Reusable Form Field Component
 const FormField: React.FC<{
@@ -52,11 +55,10 @@ const RegisterStudentForm: React.FC = () => {
   const [sameAddress, setSameAddress] = useRecoilState(sameAsPermanentState);
   //@ts-ignore
   const [avatar, setAvatar] = useState<string | ArrayBuffer | null>(null);
-  //@ts-ignore
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFile] = useState<File | null>(null);
   const [lastPassedExams, setLastPassedExams] = useRecoilState(lastPassedExamState); // Use the atom for last passed exams
   const [showLastPassedExamForm, setShowLastPassedExamForm] = useState(false); // State to control visibility of last passed exam form
-  
+
   const [newSubject, setNewSubject] = useState<LastPassedExam>({
     subjectType: SubjectType.LANGUAGE, // Default value, adjust as necessary
     subject: '',
@@ -72,7 +74,7 @@ const RegisterStudentForm: React.FC = () => {
     const updatedExams = [...lastPassedExams, newSubject];
     setLastPassedExams(updatedExams);
     setFormData(prev => ({ ...prev, lastPassedExam: updatedExams }));
-    
+
     // Reset the form
     setNewSubject({
       subjectType: SubjectType.LANGUAGE,
@@ -85,8 +87,7 @@ const RegisterStudentForm: React.FC = () => {
     });
   };
 
-  const courses = useRecoilValue(staticDataAtoms.coursesAtom); // Fetching courses from atoms
-  const subjects = useRecoilValue(staticDataAtoms.subjectsAtom); // Fetching subjects from atoms
+  const [courses, setCoursesList] = useRecoilState(staticDataAtoms.coursesAtom); // Fetching courses from atoms
 
   useEffect(() => {
     // Set the avatar to the dummy image if no image is uploaded
@@ -96,6 +97,11 @@ const RegisterStudentForm: React.FC = () => {
   }, [imageFile]);
 
   const admissionTypes = Object.entries(AdmissionType).map(([key, value]) => ({
+    id: value.toString(),
+    name: key.replace(/_/g, ' ')
+  }));
+
+  const coursesTypes = Object.entries(CourseType).map(([key, value]) => ({
     id: value.toString(),
     name: key.replace(/_/g, ' ')
   }));
@@ -120,12 +126,10 @@ const RegisterStudentForm: React.FC = () => {
     name: key.replace(/_/g, ' ')
   }));
 
-  //@ts-ignore
-
-  const countries = Object.entries(Country).map(([key, value]) => ({
-    id: value.toString(),
-    name: key
-  }));
+  // const countries = Object.entries(Country).map(([key, value]) => ({
+  //   id: value.toString(),
+  //   name: key
+  // }));
 
   // Handle form updates
   const updateField = (field: keyof typeof formData, value: any) => {
@@ -196,6 +200,38 @@ const RegisterStudentForm: React.FC = () => {
     setShowLastPassedExamForm(value === AdmissionType.TOC.toString() || value === AdmissionType.PART_ADMISSION.toString());
   };
 
+  const fetchCoursesByCourseType = async (courseType: CourseType) => {
+    try {
+      // Replace with your actual API endpoint
+      const response = await axios.post(fetchAllCoursesUrl, {
+        courseType: courseType
+      });
+
+      if (response.status !== 200) {
+        throw new Error('Failed to fetch courses');
+      }
+
+      const data = response.data;
+      setCoursesList(data);
+
+      // Reset selected course when course type changes
+      updateField('courseId', '');
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to fetch courses. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#3085d6"
+      });
+      setCoursesList([]);
+    }
+  };
+
+  const handleCourseTypeChange = (value: CourseType) => {
+    fetchCoursesByCourseType(value);
+  };
+
   return (
     <Card className="w-full mx-auto bg-white rounded-lg shadow-md text-primary">
       <CardHeader>
@@ -222,18 +258,18 @@ const RegisterStudentForm: React.FC = () => {
               <div className="flex flex-col justify-center">
                 <div className='flex flex-col justify-center items-center md:items-start'>
                   <h3 className="text-lg font-normal mb-2">Student Photo</h3>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="bg-blue-500 text-white hover:bg-blue-600 w-fit"
                     onClick={() => document.getElementById('fileInput')?.click()} // Open file dialog on button click
                   >
                     Upload Photo
                   </Button>
-                  <Input 
+                  <Input
                     id="fileInput" // Hidden file input
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleFileChange} 
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
                     className="hidden"
                   />
                 </div>
@@ -252,7 +288,7 @@ const RegisterStudentForm: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 <FormField label="Full Name" required>
-                  <Input 
+                  <Input
                     value={formData.name}
                     onChange={(e) => updateField('name', e.target.value)}
                     placeholder="Enter full name"
@@ -284,7 +320,7 @@ const RegisterStudentForm: React.FC = () => {
                 </FormField>
 
                 <FormField label="Gender" required>
-                  <Select 
+                  <Select
                     value={formData.gender.toString()}
                     onValueChange={(value) => updateField('gender', value)}
                   >
@@ -300,7 +336,7 @@ const RegisterStudentForm: React.FC = () => {
                 </FormField>
 
                 <FormField label="Category" required>
-                  <Select 
+                  <Select
                     value={formData.category.toString()}
                     onValueChange={(value) => updateField('category', value)}
                   >
@@ -346,7 +382,7 @@ const RegisterStudentForm: React.FC = () => {
               <h3 className="text-lg font-semibold mb-4">Academic Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Admission Type" required>
-                  <Select 
+                  <Select
                     value={formData.admissionType.toString()}
                     onValueChange={handleAdmissionTypeChange}
                   >
@@ -361,7 +397,7 @@ const RegisterStudentForm: React.FC = () => {
                   </Select>
                 </FormField>
                 <FormField label="Batch" required>
-                  <Select 
+                  <Select
                     value={formData.batch.toString()}
                     onValueChange={(value) => updateField('batch', value)}
                   >
@@ -375,14 +411,33 @@ const RegisterStudentForm: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </FormField>
+                <FormField label="Course Type" required>
+                  <Select
+                    // value="ACADEMIC"
+                    onValueChange={handleCourseTypeChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Course Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {coursesTypes.map(({ id, name }) => (
+                        <SelectItem key={id} value={id}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
 
                 <FormField label="Course" required>
-                  <Select 
+                  <Select
                     value={formData.courseId}
                     onValueChange={(value) => updateField('courseId', value)}
                   >
                     <SelectTrigger>
-                      <SelectValue>{formData.courseId || "Select course"}</SelectValue>
+                      <SelectValue>
+                        {formData.courseId
+                          ? courses.find(course => course.id === formData.courseId)?.name || "Select course"
+                          : "Select course"}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {courses.map(course => (
@@ -391,7 +446,7 @@ const RegisterStudentForm: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </FormField>
-                
+
               </div>
             </section>
 
@@ -402,7 +457,7 @@ const RegisterStudentForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                   <FormField label="Subject Type" required>
-                    <Select 
+                    <Select
                       value={newSubject.subjectType.toString()}
                       onValueChange={(value) => setNewSubject((prev: LastPassedExam) => ({ ...prev, subjectType: value as SubjectType }))}
                     >
@@ -417,21 +472,14 @@ const RegisterStudentForm: React.FC = () => {
                     </Select>
                   </FormField>
 
-                  
+
                   <FormField label="Subject" required>
-                    <Select
-                      value={newSubject.subject}
-                      onValueChange={(value) => setNewSubject((prev: LastPassedExam) => ({ ...prev, subject: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select subject" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {subjects.map((subject) => (
-                          <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      value={newSubject.subject || ''}
+                      onChange={(e) => setNewSubject((prev: LastPassedExam) => ({ ...prev, subject: e.target.value ? String(e.target.value) : '' }))}
+                      placeholder="Enter subject name"
+                      className="border-gray-800" // Change border color for this field
+                    />
                   </FormField>
                   <FormField label="Practical Marks" required>
                     <Input
@@ -517,7 +565,7 @@ const RegisterStudentForm: React.FC = () => {
             {/* Address Details */}
             <section>
               <h3 className="text-lg font-semibold mb-4">Address Details</h3>
-              
+
               {/* Permanent Address */}
               <div className="space-y-4 mb-4">
                 <h4 className="font-medium">Permanent Address</h4>
@@ -544,7 +592,7 @@ const RegisterStudentForm: React.FC = () => {
                     />
                   </FormField>
                   <FormField label="State" required>
-                    <Select 
+                    <Select
                       value={formData.permanentAddress.state.toString()}
                       onValueChange={(value) => updateAddress('permanentAddress', 'state', value)}
                     >
@@ -575,8 +623,8 @@ const RegisterStudentForm: React.FC = () => {
                   checked={sameAddress}
                   onCheckedChange={handleSameAddressCheckbox}
                 />
-                <label 
-                  htmlFor="sameAddress" 
+                <label
+                  htmlFor="sameAddress"
                   className="text-sm font-medium leading-none"
                 >
                   Correspondence Address Same as Permanent Address
@@ -610,7 +658,7 @@ const RegisterStudentForm: React.FC = () => {
                       />
                     </FormField>
                     <FormField label="State" required>
-                      <Select 
+                      <Select
                         value={formData.correspondenceAddress.state.toString()}
                         onValueChange={(value) => updateAddress('correspondenceAddress', 'state', value)}
                       >

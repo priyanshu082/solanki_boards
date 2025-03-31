@@ -80,7 +80,6 @@ const UploadDocuments = () => {
       });
 
       if (response.data) {
-        console.log(response.data);
         setStudentData(response.data);
         setUploadError('');
         setSelectedFile(null);

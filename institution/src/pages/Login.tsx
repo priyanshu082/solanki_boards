@@ -37,7 +37,6 @@ export const Auth = () => {
             );
 
             const institute = response.data.institute;
-            console.log(institute)
             localStorage.setItem("id", institute.id);
             localStorage.setItem("paymentStatus", institute.paymentStatus);
             localStorage.setItem("instituteName", institute.centerName);
@@ -46,7 +45,6 @@ export const Auth = () => {
             localStorage.setItem("token", response.data.accessToken);
             localStorage.setItem("refreshToken", response.data.refreshToken);
             localStorage.setItem("avatarUrl", institute.headProfileImage);
-            console.log(response.data);
             setAlertMessage("Login Successful");
             setAlertType(alertTypeEnum.success);
 
