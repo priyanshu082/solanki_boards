@@ -1,3 +1,3 @@
 export * from './PaymentForm';
 export * from './PaymentCallback';
-export * from './PaymentStatus';
+export * from '../../pages/Payments/PaymentDetails';

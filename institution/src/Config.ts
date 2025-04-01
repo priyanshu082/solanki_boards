@@ -17,6 +17,7 @@ export const addmisionPutUrl = INSTITUTE_BASE_URL + '/admission';
 export const instituteDetailsUrl = INSTITUTE_BASE_URL + '/institute'; //it will get param as instituteId
 export const instituteUpdateUrl = INSTITUTE_BASE_URL + '/institute'; //put request 
 export const paymentStatusUrl = PAYMENT_BASE_URL + '/check-payment-status';
+export const getPaymentDetailsUrl = PAYMENT_BASE_URL + '/get-payment-details';
 export const initiatePaymentUrl = PAYMENT_BASE_URL + '/initiate-payment';
 export const verifyPaymentUrl = PAYMENT_BASE_URL + '/verify-payment';
 
@@ -34,11 +35,11 @@ export const instituteDashboardUrl = INSTITUTE_BASE_URL + '/dashboard';
 
 
 
-export enum alertTypeEnum {
-    success = "success",
-    error = "error",
-    info = "error",
-    warning = "warning"
+export enum alertTypeEnum{
+    success="success",
+    error="error",
+    info="error",
+    warning="warning"
 }
 
 

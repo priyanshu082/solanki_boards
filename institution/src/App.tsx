@@ -9,7 +9,7 @@ import { Auth } from './pages/Login'
 import Certificate from './pages/Institute/Certificate'
 import Letter from './pages/Institute/Letter'
 import { PaymentCallback } from './components/payments/PaymentCallback'
-import { PaymentStatus } from './components/payments/PaymentStatus'
+import { PaymentDetails } from './pages/Payments/PaymentDetails'
 import PaymentPageStudent from './pages/Payments/PaymentPageStudent'
 import InstituteDocumentUpload from './pages/Institute/InstituteDocumentUpload'
 import PaymentPageInstitute from './pages/Payments/PaymentPageInstitute'
@@ -53,8 +53,7 @@ function App() {
           <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
 
           {/* Success/Error pages */}
-          <Route path="/payment/success" element={<ProtectedRoute> <PaymentStatus status="success" /></ProtectedRoute>} />
-          <Route path="/payment/error" element={<ProtectedRoute> <PaymentStatus status="error" /></ProtectedRoute>} />
+          <Route path="/payment" element={<PaymentDetails />} />
         </Route>
         <Route path="/login" element={<Auth />} />
 
