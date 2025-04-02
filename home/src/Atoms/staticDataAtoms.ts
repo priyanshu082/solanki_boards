@@ -10,13 +10,19 @@ export enum CourseType {
   PHD = "PHD"
 }
 
+export enum SubjectType {
+  LANGUAGE = "LANGUAGE",
+  NON_LANGUAGE = "NON_LANGUAGE",
+  VOCATIONAL = "VOCATIONAL"
+}
+
 // Add interfaces for Course and Subject
 export interface Subject {
   id: string;
   name: string;
   code: string;
   fees?: number;
-  type: string;
+  type: SubjectType;
   courseId: string;
 }
 
