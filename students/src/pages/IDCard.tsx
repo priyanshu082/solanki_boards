@@ -7,12 +7,12 @@ import { studentDetailsUrl } from '../Config';
 import Swal from 'sweetalert2';
 
 interface Address {
-  address: string;
-  city: string;
-  district: string;
-  state: string;
-  country: string;
-  pincode: string;
+    address: string;
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pincode: string;
 }
 
 interface StudentData {
@@ -94,13 +94,13 @@ const StudentIDCard = () => {
                     <div
                         id="front-card"
                         className="relative w-[82.6mm] h-[140.98mm] rounded-lg shadow-lg overflow-hidden"
-                        style={{ backgroundImage: `url(${frontCardBg})`, backgroundSize: 'cover' }}>  
+                        style={{ backgroundImage: `url(${frontCardBg})`, backgroundSize: 'cover' }}>
 
                         <div className="absolute mt-[330px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                             {studentData.studentPhoto ? (
-                                <img 
-                                    src={studentData.studentPhoto} 
-                                    alt="Student" 
+                                <img
+                                    src={studentData.studentPhoto}
+                                    alt="Student"
                                     className='h-32 w-32 rounded-sm mx-auto'
                                     onError={(e) => {
                                         e.currentTarget.src = dummy;

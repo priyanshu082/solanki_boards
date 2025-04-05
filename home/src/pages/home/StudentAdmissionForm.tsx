@@ -181,16 +181,21 @@ const RegisterPage = () => {
         Swal.fire({
           icon: 'success',
           title: 'Success!',
-          text: 'Your application has been submitted successfully',
-          confirmButtonColor: '#3085d6'
+          text: 'Your application has been submitted successfully. Please check your email for further instructions.',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // window.location.href = '/';
+            navigate('/');
+          }
         });
 
         // Navigate after a fixed delay of 3 seconds
-        setTimeout(() => {
-          navigate('/payment');
-        }, 3000);
+        // setTimeout(() => {
+        //   navigate('/payment');
+        // }, 3000);
       }
-
     } catch (error: any) {
       console.error('Submission error:', error);
       if (error.response?.status === 401) {

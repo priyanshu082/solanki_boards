@@ -12,6 +12,7 @@ import dummyImage from '../../../assets/images/patners/patner_logo_4.png';
 import { Oval } from 'react-loader-spinner'
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Swal from 'sweetalert2';
 // Enums
 export enum Gender {
   MALE = "MALE",
@@ -169,7 +170,7 @@ const InstituteRegistrationForm = () => {
       centerCountry: Country.INDIA,
       centerPincode: '',
     },
-    mode: 'onBlur', 
+    mode: 'onBlur',
     resolver: zodResolver(formSchema),
   });
 
@@ -232,6 +233,18 @@ const InstituteRegistrationForm = () => {
       setIsLoading(false);
       if (response.data) {
         setRegistrationResponse(response.data);
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Your application has been submitted successfully. Please check your email for further instructions.',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/';
+            // navigate('/');
+          }
+        });
       }
     } catch (error) {
       console.error('Submission error:', error);
