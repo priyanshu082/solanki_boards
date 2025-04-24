@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import Swal from 'sweetalert2';
+import { adminLogin } from '@/Config';
+import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,15 +16,18 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Hardcoded credentials
-    if (email === 'admin@example.com' && password === 'admin123') {
-      // Set dummy data in localStorage
-      localStorage.setItem('id', '1');
+
+    const response = await axios.post(adminLogin, {
+      email: email,
+      password: password
+    });
+
+    if (response.status === 200) {
+      localStorage.setItem('id', response.data.admin.id);
       localStorage.setItem('role', 'admin');
-      localStorage.setItem('token', 'dummy-token');
+      localStorage.setItem('token', response.data.accessToken);
       localStorage.setItem('avatarUrl', '/path/to/avatar.jpg');
-      
+
       await Swal.fire({
         icon: 'success',
         title: 'Login Successful',
@@ -30,7 +35,7 @@ const Login = () => {
         timer: 1500,
         showConfirmButton: false
       });
-      
+
       navigate('/');
     } else {
       Swal.fire({

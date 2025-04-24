@@ -17,7 +17,7 @@ export enum Gender {
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS', 
+  SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
   DECLINED = 'DECLINED',
   PROCESSING = 'PROCESSING',
@@ -65,12 +65,12 @@ export enum SubjectType {
 }
 
 export enum ResultStatus {
-    PASS = 'PASS',
-    FAIL = 'FAIL',
-    PENDING = 'PENDING',
-    INCOMPLETE = 'INCOMPLETE',
-    WITHHELD = 'WITHHELD',
-    CANCELLED = 'CANCELLED'
+  PASS = 'PASS',
+  FAIL = 'FAIL',
+  PENDING = 'PENDING',
+  INCOMPLETE = 'INCOMPLETE',
+  WITHHELD = 'WITHHELD',
+  CANCELLED = 'CANCELLED'
 }
 
 export enum Grade {
@@ -192,18 +192,20 @@ export interface CoursePreview {
   courseType: string;
   subjects?: SubjectPreview[];
   fees?: number;
+  duration: number;
+  durationType: string;
 }
 
 export interface SubjectPreview {
-    id: string;
+  id: string;
+  name: string;
+  code: string;
+  type: string;
+  courseId: string;
+  course?: {
     name: string;
-    code: string;
-    type: string;
-    courseId: string;
-    course?: {
-      name: string;
-    };
-  }
+  };
+}
 
 export interface CourseDetails {
   id: string;
@@ -225,7 +227,7 @@ export interface StudentPreview {
   name: string;
   enrollmentNumber?: string;
   applicationNumber: string;
-  courseId:string
+  courseId: string
 }
 
 export interface InterfaceStudentDetails {

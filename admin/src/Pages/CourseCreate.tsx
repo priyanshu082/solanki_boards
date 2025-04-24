@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createcourse, getallcourse, deletecoursebyid, getallsubject } from '../Config';
-import { CoursePreview,SubjectPreview } from '../lib/Interfaces';
+import { CoursePreview, SubjectPreview } from '../lib/Interfaces';
 import Swal from 'sweetalert2';
 import { Trash2, Pencil, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +26,11 @@ enum CourseType {
   PHD = 'PHD'
 }
 
+enum DurationType {
+  MONTH = 'MONTH',
+  YEAR = 'YEAR',
+}
+
 // Define the form schema for course creation using zod
 const courseSchema = z.object({
   name: z.string().min(1, "Course name is required"),
@@ -34,7 +39,12 @@ const courseSchema = z.object({
   courseType: z.nativeEnum(CourseType, {
     required_error: "Course type is required",
     invalid_type_error: "Course type must be one of the valid types"
-  })
+  }),
+  durationType: z.nativeEnum(DurationType, {
+    required_error: "Duration type is required",
+    invalid_type_error: "Duration type must be one of the valid types"
+  }).optional(),
+  duration: z.number().optional(),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
@@ -70,7 +80,7 @@ const CourseCreate = () => {
 
   // Filter courses based on search term
   useEffect(() => {
-    const filtered = courses.filter(course => 
+    const filtered = courses.filter(course =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (course.code && course.code.toLowerCase().includes(searchTerm.toLowerCase()))
     );
@@ -91,7 +101,7 @@ const CourseCreate = () => {
       setIsLoading(true);
       const courseResponse = await axios.post(getallcourse);
       const subjectResponse = await axios.post(getallsubject);
-      
+
       // Group subjects by courseId
       const subjectsByCourse: Record<string, SubjectPreview[]> = {};
       subjectResponse.data.forEach((subject: SubjectPreview) => {
@@ -100,13 +110,13 @@ const CourseCreate = () => {
         }
         subjectsByCourse[subject.courseId].push(subject);
       });
-      
+
       // Add subjects to courses
       const coursesWithSubjects = courseResponse.data.map((course: CoursePreview) => ({
         ...course,
         subjects: subjectsByCourse[course.id] || []
       }));
-      
+
       setCourses(coursesWithSubjects);
     } catch (error) {
       console.error("Failed to fetch courses", error);
@@ -204,7 +214,7 @@ const CourseCreate = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="code"
@@ -218,7 +228,7 @@ const CourseCreate = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="fees"
@@ -226,9 +236,9 @@ const CourseCreate = () => {
                   <FormItem>
                     <FormLabel>Course Fees (Optional)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="Enter course fees" 
+                      <Input
+                        type="number"
+                        placeholder="Enter course fees"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -237,15 +247,15 @@ const CourseCreate = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="courseType"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Course Type</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
+                    <Select
+                      onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -265,7 +275,53 @@ const CourseCreate = () => {
                   </FormItem>
                 )}
               />
-              
+              <FormField
+                control={form.control}
+                name="durationType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select duration type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(DurationType).map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Enter duration of the course"
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 1)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <Button type="submit" className="md:col-span-4" disabled={isLoading}>
                 {isLoading ? "Creating..." : "Create Course"}
               </Button>
@@ -312,6 +368,7 @@ const CourseCreate = () => {
                     <TableHead>Type</TableHead>
                     <TableHead>Fees</TableHead>
                     <TableHead>Subjects</TableHead>
+                    <TableHead>Duration</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -324,8 +381,8 @@ const CourseCreate = () => {
                         <TableCell>{course.courseType}</TableCell>
                         <TableCell>{course.fees ? `₹${course.fees}` : "N/A"}</TableCell>
                         <TableCell>
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             className="flex items-center gap-1"
                             onClick={() => toggleCourseExpansion(course.id)}
@@ -339,6 +396,9 @@ const CourseCreate = () => {
                               "No subjects"
                             )}
                           </Button>
+                        </TableCell>
+                        <TableCell>
+                          {course.durationType && course.duration ? `${course.duration} ${course.durationType}` : 'N/A'}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
@@ -359,6 +419,7 @@ const CourseCreate = () => {
                             </Button>
                           </div>
                         </TableCell>
+
                       </TableRow>
                       {expandedCourses[course.id] && course.subjects && course.subjects.length > 0 && (
                         <TableRow className="bg-gray-50">
@@ -395,7 +456,7 @@ const CourseCreate = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 };
 
