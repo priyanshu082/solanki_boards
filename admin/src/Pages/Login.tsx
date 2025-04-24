@@ -17,16 +17,20 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log(email);
+    console.log(password);    
+
     const response = await axios.post(adminLogin, {
       email: email,
       password: password
     });
 
+    console.log(response);
+
     if (response.status === 200) {
       localStorage.setItem('id', response.data.admin.id);
       localStorage.setItem('role', 'admin');
       localStorage.setItem('token', response.data.accessToken);
-      localStorage.setItem('avatarUrl', '/path/to/avatar.jpg');
 
       await Swal.fire({
         icon: 'success',
