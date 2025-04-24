@@ -51,10 +51,8 @@ function App() {
 
           {/* PhonePe callback handler */}
           <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
-
-          {/* Success/Error pages */}
-          <Route path="/payment" element={<PaymentDetails />} />
         </Route>
+        <Route path="/payment" element={<PaymentDetails />} />
         <Route path="/login" element={<Auth />} />
 
 

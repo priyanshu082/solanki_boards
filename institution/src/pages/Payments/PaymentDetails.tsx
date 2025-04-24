@@ -26,6 +26,7 @@ interface PaymentDetails {
   bankTransactionId?: string;
   bankId?: string;
   utr?: string;
+  date: Date;
 }
 
 export const PaymentDetails: React.FC = () => {
@@ -50,6 +51,7 @@ export const PaymentDetails: React.FC = () => {
           throw new Error('Failed to fetch payment details');
         }
         const data = await response.data;
+
         setPaymentDetails(data);
 
         // Update status based on payment status from API
@@ -78,7 +80,36 @@ export const PaymentDetails: React.FC = () => {
     const element = document.getElementById('payment-receipt');
     if (!element) return;
 
-    html2canvas(element).then(canvas => {
+    // Create a clone of the element to avoid modifying the original
+    const clone = element.cloneNode(true) as HTMLElement;
+
+    // Add specific styles to ensure proper rendering
+    clone.style.backgroundColor = 'white';
+    clone.style.color = 'black';
+    clone.style.width = '210mm'; // A4 width
+    clone.style.padding = '20px';
+
+    // Temporarily append the clone to the document
+    document.body.appendChild(clone);
+
+    html2canvas(clone, {
+      scale: 2, // Higher scale for better quality
+      logging: false,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      onclone: (clonedDoc) => {
+        // Ensure all text is black for better PDF readability
+        const elements = clonedDoc.querySelectorAll('*');
+        elements.forEach((el) => {
+          const element = el as HTMLElement;
+          element.style.color = 'black';
+          element.style.borderColor = 'black';
+        });
+      }
+    }).then(canvas => {
+      // Remove the clone from the document
+      document.body.removeChild(clone);
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgWidth = 210;
@@ -104,32 +135,63 @@ export const PaymentDetails: React.FC = () => {
   const renderPaymentDetailsTable = () => {
     if (!paymentDetails) return null;
 
-    const entries = Object.entries(paymentDetails).filter(([_, value]) => value !== undefined && value !== null);
+    const entries = Object.entries(paymentDetails).filter(([, value]) => value !== undefined && value !== null);
 
     return (
       <div id="payment-receipt" className="mt-4">
-        <Table className="border rounded-md">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-1/2 font-semibold">Detail</TableHead>
-              <TableHead className="w-1/2 font-semibold">Value</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {entries.map(([key, value]) => (
-              <TableRow key={key}>
-                <TableCell className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</TableCell>
-                <TableCell>{typeof value === 'number' ? `₹${value.toLocaleString()}` : String(value)}</TableCell>
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold mb-2">SOLANKI BROTHERS COUNCIL FOR OPEN AND DISTANCE LEARNING</h1>
+          <p className="text-sm text-gray-500">Payment Receipt</p>
+          <div className="border-t border-b my-4 py-2">
+            <p className="text-sm text-gray-600">Receipt No: {paymentDetails.merchantTransactionId || 'N/A'}</p>
+            <p className="text-sm text-gray-600">Date: {paymentDetails.date.toString().split('T')[0]}</p>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-2">Student Information</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Name</p>
+              <p className="font-medium">{paymentDetails.name || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Application Number</p>
+              <p className="font-medium">{paymentDetails.applicationNumber || 'N/A'}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-2">Payment Details</h2>
+          <Table className="border rounded-md">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-1/2 font-semibold">Detail</TableHead>
+                <TableHead className="w-1/2 font-semibold">Value</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {entries.map(([key, value]) => (
+                <TableRow key={key}>
+                  <TableCell className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</TableCell>
+                  <TableCell>{typeof value === 'number' ? `₹${value.toLocaleString()}` : String(value)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="mt-6 pt-4 border-t text-center">
+          <p className="text-sm text-gray-600">This is a computer-generated receipt and does not require a signature.</p>
+          <p className="text-sm text-gray-600 mt-2">For any queries, please contact our support team.</p>
+        </div>
       </div>
     );
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-2xl mx-auto my-8">
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span>
@@ -144,10 +206,10 @@ export const PaymentDetails: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={downloadAsPdf}
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 cursor-pointer"
             >
               <Download size={16} />
-              <span>Download</span>
+              <span>Download Receipt</span>
             </Button>
           )}
         </CardTitle>

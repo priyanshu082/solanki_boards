@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
-import { ArrowLeft, CreditCard, RefreshCw } from 'lucide-react';
+import { ArrowLeft, CreditCard } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useSearchParams } from 'react-router-dom';
 
-import { initiatePaymentUrl, paymentStatusUrl } from '../../data/config';
+import { initiatePaymentUrl } from '../../data/config';
 
 const PaymentPage = () => {
   // const InstituteAmount = 1000;
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   //@ts-ignore
   const [paymentStatus, setPaymentStatus] = useState<string | null>("");
-  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
-  const [pollingCount, setPollingCount] = useState(0);
-  const maxPollingAttempts = 48;
+  // const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  // const [pollingCount, setPollingCount] = useState(0);
+  // const maxPollingAttempts = 48;
 
   const [searchParams] = useSearchParams();
   const instituteId = searchParams.get("instituteId");
@@ -38,68 +38,68 @@ const PaymentPage = () => {
     }
   }, []);
 
-  const checkPaymentStatus = async () => {
-    try {
-      setIsCheckingStatus(true);
-      const merchantTransactionId = localStorage.getItem("merchantTransactionId");
+  // const checkPaymentStatus = async () => {
+  //   try {
+  //     setIsCheckingStatus(true);
+  //     const merchantTransactionId = localStorage.getItem("merchantTransactionId");
 
-      if (!merchantTransactionId) {
-        Swal.fire({
-          icon: 'error',
-          title: 'No Payment Found',
-          text: 'No recent payment transaction was found',
-          confirmButtonColor: '#3085d6'
-        });
-        return;
-      }
+  //     if (!merchantTransactionId) {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'No Payment Found',
+  //         text: 'No recent payment transaction was found',
+  //         confirmButtonColor: '#3085d6'
+  //       });
+  //       return;
+  //     }
 
-      const pollStatus = async () => {
-        if (pollingCount >= maxPollingAttempts) {
-          throw new Error('Payment status check timed out');
-        }
+  //     const pollStatus = async () => {
+  //       if (pollingCount >= maxPollingAttempts) {
+  //         throw new Error('Payment status check timed out');
+  //       }
 
-        const response = await axios.get(`${paymentStatusUrl}/${merchantTransactionId}`);
+  //       const response = await axios.get(`${paymentStatusUrl}/${merchantTransactionId}`);
 
-        if (response.data.status === "SUCCESS") {
-          localStorage.setItem("paymentStatus", "COMPLETED");
-          Swal.fire({
-            icon: 'success',
-            title: 'Payment Successful!',
-            text: 'Your payment has been processed successfully',
-            confirmButtonColor: '#10B981'
-          }).then(() => {
-            window.location.href = '/';
-          });
-          return;
-        } else if (response.data.status === "FAILED") {
-          throw new Error('Payment failed');
-        }
+  //       if (response.data.status === "SUCCESS") {
+  //         localStorage.setItem("paymentStatus", "COMPLETED");
+  //         Swal.fire({
+  //           icon: 'success',
+  //           title: 'Payment Successful!',
+  //           text: 'Your payment has been processed successfully',
+  //           confirmButtonColor: '#10B981'
+  //         }).then(() => {
+  //           window.location.href = '/';
+  //         });
+  //         return;
+  //       } else if (response.data.status === "FAILED") {
+  //         throw new Error('Payment failed');
+  //       }
 
-        setPollingCount(prev => prev + 1);
-        const interval = pollingCount < 1 ? 20000 :
-          pollingCount < 11 ? 3000 :
-            pollingCount < 21 ? 6000 :
-              pollingCount < 27 ? 10000 :
-                pollingCount < 29 ? 30000 :
-                  60000;
+  //       setPollingCount(prev => prev + 1);
+  //       const interval = pollingCount < 1 ? 20000 :
+  //         pollingCount < 11 ? 3000 :
+  //           pollingCount < 21 ? 6000 :
+  //             pollingCount < 27 ? 10000 :
+  //               pollingCount < 29 ? 30000 :
+  //                 60000;
 
-        setTimeout(pollStatus, interval);
-      };
+  //       setTimeout(pollStatus, interval);
+  //     };
 
-      await pollStatus();
+  //     await pollStatus();
 
-    } catch (error: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Payment Failed',
-        text: error.message || 'Payment verification failed. Please try again.',
-        confirmButtonColor: '#EF4444'
-      });
-    } finally {
-      setIsCheckingStatus(false);
-      setPollingCount(0);
-    }
-  };
+  //   } catch (error: any) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Payment Failed',
+  //       text: error.message || 'Payment verification failed. Please try again.',
+  //       confirmButtonColor: '#EF4444'
+  //     });
+  //   } finally {
+  //     setIsCheckingStatus(false);
+  //     setPollingCount(0);
+  //   }
+  // };
 
   const handlePhonePePayment = async () => {
     try {
@@ -196,7 +196,7 @@ const PaymentPage = () => {
               Already made the payment? Check your payment status here
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-6">
+          {/* <CardContent className="p-6">
             <div className="flex justify-center">
               <button
                 onClick={checkPaymentStatus}
@@ -207,7 +207,7 @@ const PaymentPage = () => {
                 {isCheckingStatus ? 'Checking...' : 'Check Status'}
               </button>
             </div>
-          </CardContent>
+          </CardContent> */}
         </Card>
       </div>
     </div>

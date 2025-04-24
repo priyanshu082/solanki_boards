@@ -30,12 +30,12 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<StudentLogin />} />
+        <Route path="/payment" element={<PaymentDetails />} />
         <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Home />} />
           <Route path="/id-card" element={<StudentIDCard />} />
           <Route path="/result" element={<Result />} />
           <Route path="/payment-initiate" element={<PaymentPage />} />
-          <Route path="/payment" element={<PaymentDetails />} />
         </Route>
       </Routes>
     </BrowserRouter>
