@@ -17,35 +17,39 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log(email);
-    console.log(password);    
-
-    const response = await axios.post(adminLogin, {
-      email: email,
-      password: password
-    });
-
-    console.log(response);
-
-    if (response.status === 200) {
-      localStorage.setItem('id', response.data.admin.id);
-      localStorage.setItem('role', 'admin');
-      localStorage.setItem('token', response.data.accessToken);
-
-      await Swal.fire({
-        icon: 'success',
-        title: 'Login Successful',
-        text: 'Welcome back, Admin!',
-        timer: 1500,
-        showConfirmButton: false
+    try {
+      const response = await axios.post(adminLogin, {
+        email: email,
+        password: password
       });
 
-      navigate('/');
-    } else {
+      if (response.status === 200) {
+        localStorage.setItem('id', response.data.admin.id);
+        localStorage.setItem('role', 'admin');
+        localStorage.setItem('token', response.data.accessToken);
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: 'Welcome back, Admin!',
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+        navigate('/');
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'Invalid email or password',
+          confirmButtonColor: '#3085d6'
+        });
+      }
+    } catch (error: any) {
       Swal.fire({
         icon: 'error',
         title: 'Login Failed',
-        text: 'Invalid email or password',
+        text: error.message,
         confirmButtonColor: '#3085d6'
       });
     }
