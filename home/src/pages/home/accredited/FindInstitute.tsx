@@ -6,6 +6,7 @@ import { Search } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { Oval } from 'react-loader-spinner';
+import { instituteFetchUrl } from '../../../data/config';
 
 interface InstitutePreview {
     id: string;
@@ -44,7 +45,7 @@ const FindInstitute = () => {
             const skip = (currentPage - 1) * itemsPerPage;
             const limit = itemsPerPage;
 
-            const response = await axios.post('http://localhost:8080/api/public/institute/list', {
+            const response = await axios.post(instituteFetchUrl, {
                 searchTerm,
                 skip,
                 limit
