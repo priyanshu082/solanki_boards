@@ -91,7 +91,7 @@ export const aboutDropdownItems = [
   export const accreditedInstitutes = [
     {
       title: "Find Accredited",
-      href: "/institutes/partners",
+      href: "/institutes/find",
       description: "Our network of partner institutions.",
     },
     {
@@ -118,7 +118,7 @@ export const aboutDropdownItems = [
   
   export const admissionItems = [
     {
-      title: "Admission Process",
+      title: "Online Admission",
       href: "/student-admission-form",
       description: "Step-by-step guide to admission.",
     },

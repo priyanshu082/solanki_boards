@@ -43,6 +43,7 @@ import Recognition from "./pages/home/Recognition/Recognition";
 import Constitutional from "./pages/home/Recognition/Constitutional";
 import Autonomous from "./pages/home/Recognition/autonomous";
 import VisitorCounter from "./components/VisitorCounter";
+import FindInstitute from "./pages/home/accredited/FindInstitute";
 
 // Initialize Google Analytics with your tracking ID
 ReactGA.initialize("G-WDZG6SYQFM"); // Replace with your actual Google Analytics measurement ID
@@ -127,8 +128,8 @@ function App() {
           <Route path="/recognition" element={<Layout><Recognition /></Layout>} />
           <Route path="/constitutional-reliability" element={<Layout><Constitutional /></Layout>} />
           <Route path="/autonomous-institution" element={<Layout><Autonomous /></Layout>} />
+          <Route path="/institutes/find" element={<Layout><FindInstitute /></Layout>} />
         </Routes>
-        
       </BrowserRouter>
     </ThemeProvider>
   );
