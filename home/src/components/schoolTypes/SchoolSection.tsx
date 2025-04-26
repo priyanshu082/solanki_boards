@@ -4,22 +4,22 @@ import { Button } from '../ui/button'
 import { Link } from 'react-router-dom'
 
 // Image imports remain the same as in the original file
-import primaryYearsImage from '../../assets/images/img2.jpeg'
-import middleYearsImage from '../../assets/images/img4.jpeg'
+// import primaryYearsImage from '../../assets/images/img2.jpeg'
+// import middleYearsImage from '../../assets/images/img4.jpeg'
 import upperYearsImage from '../../assets/images/img16.jpeg'
 import diplomaProgrammeImage from '../../assets/images/img6.jpeg'
 import certificateProgrammeImage from '../../assets/images/img1.jpeg'
 import researchProgrammeImage from '../../assets/images/img11.jpeg'
 
 const SCHOOL_SECTIONS = [
-    {
-        title: 'Middle Years Programme',
-        image: primaryYearsImage
-    },
-    {
-        title: 'Upper Years Programme', 
-        image: middleYearsImage
-    },
+    // {
+    //     title: 'Middle Years Programme',
+    //     image: primaryYearsImage
+    // },
+    // {
+    //     title: 'Upper Years Programme', 
+    //     image: middleYearsImage
+    // },
     {
         title: 'Under Graduate Programme',
         image: upperYearsImage
