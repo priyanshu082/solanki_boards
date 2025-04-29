@@ -34,8 +34,7 @@ enum DurationType {
 // Define the form schema for course creation using zod
 const courseSchema = z.object({
   name: z.string().min(1, "Course name is required"),
-  code: z.string().optional(),
-  fees: z.number().optional(),
+  fees: z.number(),
   courseType: z.nativeEnum(CourseType, {
     required_error: "Course type is required",
     invalid_type_error: "Course type must be one of the valid types"
@@ -67,7 +66,6 @@ const CourseCreate = () => {
     resolver: zodResolver(courseSchema),
     defaultValues: {
       name: "",
-      code: "",
       fees: 0,
       courseType: undefined
     }
@@ -81,8 +79,7 @@ const CourseCreate = () => {
   // Filter courses based on search term
   useEffect(() => {
     const filtered = courses.filter(course =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (course.code && course.code.toLowerCase().includes(searchTerm.toLowerCase()))
+      course.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredCourses(filtered);
   }, [courses, searchTerm]);
@@ -215,7 +212,7 @@ const CourseCreate = () => {
                 )}
               />
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="code"
                 render={({ field }) => (
@@ -227,14 +224,14 @@ const CourseCreate = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
 
               <FormField
                 control={form.control}
                 name="fees"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Course Fees (Optional)</FormLabel>
+                    <FormLabel>Course Fees</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -364,7 +361,6 @@ const CourseCreate = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Course Name</TableHead>
-                    <TableHead>Code</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Fees</TableHead>
                     <TableHead>Subjects</TableHead>
@@ -377,7 +373,6 @@ const CourseCreate = () => {
                     <>
                       <TableRow key={course.id}>
                         <TableCell className="font-medium">{course.name}</TableCell>
-                        <TableCell>{course.code || "N/A"}</TableCell>
                         <TableCell>{course.courseType}</TableCell>
                         <TableCell>{course.fees ? `₹${course.fees}` : "N/A"}</TableCell>
                         <TableCell>
@@ -430,7 +425,6 @@ const CourseCreate = () => {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>Subject Name</TableHead>
-                                    <TableHead>Code</TableHead>
                                     <TableHead>Type</TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -438,7 +432,6 @@ const CourseCreate = () => {
                                   {course.subjects.map(subject => (
                                     <TableRow key={subject.id}>
                                       <TableCell>{subject.name}</TableCell>
-                                      <TableCell>{subject.code}</TableCell>
                                       <TableCell>{subject.type}</TableCell>
                                     </TableRow>
                                   ))}
