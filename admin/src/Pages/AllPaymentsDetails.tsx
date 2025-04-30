@@ -283,7 +283,7 @@ const AllPaymentsDetails = () => {
                                 <TableCell className="text-right">
                                     <Button
                                         variant="outline"
-                                        onClick={() => navigate(`/payment-details?id=${payment.merchantTransactionId}&type=${payment.paymentType}`)}
+                                        onClick={() => navigate(`/payment-details?id=${payment.paymentType === PaymentType.INSTITUTE ? payment.institute?.id : payment.student?.id}&type=${payment.paymentType}`)}
                                     >
                                         View Details
                                     </Button>

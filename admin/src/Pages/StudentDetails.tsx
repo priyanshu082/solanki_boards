@@ -443,7 +443,7 @@ const StudentDetails = () => {
                       <TableCell className="text-right">
                         <Button
                           variant="outline"
-                          onClick={() => navigate(`/payment-details?id=${payment.merchantTransactionId}&type=${payment.paymentType}`)}
+                          onClick={() => navigate(`/payment-details?id=${student.id}&type=${payment.paymentType}`)}
                         >
                           View Details
                         </Button>
