@@ -1,6 +1,6 @@
 
-export const BASE_URL = "https://sbiea.co.in/api/api";
-// export const BASE_URL = "http://localhost:8080/api";
+// export const BASE_URL = "https://sbiea.co.in/api/api";
+export const BASE_URL = "http://localhost:8080/api";
 export const ADMIN_URL = BASE_URL + "/admin";
 export const PUBLIC_URL = BASE_URL + "/public";
 export const updateenquiry = BASE_URL + "/enquiry";
@@ -39,7 +39,6 @@ export const getcoursebyid = PUBLIC_URL + "/course";
 
 export const uploadresult = ADMIN_URL + "/result";
 
+export const getAllPayments = ADMIN_URL + "/payment/list";
 
-
-
-
+export const getPaymentDetails = BASE_URL + "/payment/get-payment-details";

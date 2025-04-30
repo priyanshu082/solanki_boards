@@ -6,6 +6,8 @@ import { getstudentbyid } from '@/Config'
 import Swal from 'sweetalert2'
 import { Button } from '@/components/ui/button'
 import { InterfaceStudentDetails, ResultDetails, ResultStatus } from '@/lib/Interfaces'
+import { format } from 'date-fns'
+import { Table, TableHeader, TableBody, TableCell, TableRow, TableHead } from "@/components/ui/table"
 
 const StudentDetails = () => {
   const [student, setStudent] = useState<InterfaceStudentDetails | null>(null)
@@ -24,18 +26,18 @@ const StudentDetails = () => {
         }
 
         const response = await axios.get(`${getstudentbyid}/${id}`)
-        
+
         setStudent(response.data)
-        
+
         // Extract results if they exist in the response
         if (response.data.results && Array.isArray(response.data.results)) {
           setResults(response.data.results)
         }
-        
+
         setLoading(false)
         await Swal.fire({
           icon: 'success',
-          title: 'Success', 
+          title: 'Success',
           text: 'Student details loaded successfully',
           timer: 1500,
           showConfirmButton: false
@@ -91,7 +93,7 @@ const StudentDetails = () => {
         <h1 className="text-3xl font-bold">Student Details</h1>
         <Button onClick={handleBackClick}>Back to All Students</Button>
       </div>
-      
+
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="text-2xl">Personal Information</CardTitle>
@@ -198,18 +200,17 @@ const StudentDetails = () => {
                   </h3>
                   <div className="flex items-center">
                     <span className="mr-2">Status:</span>
-                    <span className={`px-2 py-1 rounded text-sm ${
-                      result.status === ResultStatus.PASS 
-                        ? 'bg-green-100 text-green-800' 
-                        : result.status === ResultStatus.FAIL 
-                          ? 'bg-red-100 text-red-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <span className={`px-2 py-1 rounded text-sm ${result.status === ResultStatus.PASS
+                      ? 'bg-green-100 text-green-800'
+                      : result.status === ResultStatus.FAIL
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                      }`}>
                       {result.status}
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <h3 className="font-semibold text-gray-700">Total Marks</h3>
@@ -228,7 +229,7 @@ const StudentDetails = () => {
                     <p>{formatDate(result.createdAt)}</p>
                   </div>
                 </div>
-                
+
                 {result.details && result.details.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
@@ -251,13 +252,12 @@ const StudentDetails = () => {
                             <td className="border p-2">{detail.obtainedMarks}</td>
                             <td className="border p-2">{detail.grade}</td>
                             <td className="border p-2">
-                              <span className={`px-2 py-1 rounded text-xs ${
-                                detail.status === ResultStatus.PASS 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : detail.status === ResultStatus.FAIL 
-                                    ? 'bg-red-100 text-red-800' 
-                                    : 'bg-yellow-100 text-yellow-800'
-                              }`}>
+                              <span className={`px-2 py-1 rounded text-xs ${detail.status === ResultStatus.PASS
+                                ? 'bg-green-100 text-green-800'
+                                : detail.status === ResultStatus.FAIL
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                                }`}>
                                 {detail.status}
                               </span>
                             </td>
@@ -381,8 +381,6 @@ const StudentDetails = () => {
         </Card>
       )}
 
-
-
       {student.documents && student.documents.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
@@ -394,9 +392,9 @@ const StudentDetails = () => {
                 <h3 className="font-semibold">{doc.documentType}</h3>
                 <p className="text-sm text-gray-600">{doc.fileName}</p>
                 <p className="text-xs text-gray-500">Uploaded: {formatDate(doc.createdAt)}</p>
-                <a 
-                  href={doc.fileUrl} 
-                  target="_blank" 
+                <a
+                  href={doc.fileUrl}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline mt-2 inline-block"
                 >
@@ -407,6 +405,59 @@ const StudentDetails = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Payments */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Payments</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {student.payments && student.payments.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Transaction ID</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {student.payments.map((payment) => (
+                    <TableRow key={payment.id}>
+                      <TableCell>₹{payment.amount}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs ${payment.paymentStatus === 'SUCCESS' ? 'bg-green-100 text-green-800' :
+                          payment.paymentStatus === 'FAILED' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {payment.paymentStatus}
+                        </span>
+                      </TableCell>
+                      <TableCell>{payment.paymentType}</TableCell>
+                      <TableCell>{payment.merchantTransactionId}</TableCell>
+                      <TableCell>{format(new Date(payment.createdAt), 'dd/MM/yyyy')}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate(`/payment-details?id=${payment.merchantTransactionId}&type=${payment.paymentType}`)}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-gray-500">No payments found</p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card className="mb-6">
         <CardHeader>

@@ -10,7 +10,7 @@ import axios from 'axios';
 import html2canvas from 'html2canvas';
 import { getPaymentDetailsUrl } from '@/Config';
 
-interface PaymentDetails {
+interface PaymentDetailsData {
   name?: string;
   applicationNumber?: string;
   paymentAmount?: number;
@@ -31,43 +31,59 @@ interface PaymentDetails {
 
 export const PaymentDetails: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetailsData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<'success' | 'error' | 'pending'>('success');
+  const [status, setStatus] = useState<'success' | 'error' | 'pending' | 'not_found'>('pending');
 
   useEffect(() => {
     const fetchPaymentDetails = async () => {
       const type = searchParams.get('type');
       const id = searchParams.get('id');
 
-      if (!type || !id) return;
+      if (!type || !id) {
+        setError('Missing required parameters');
+        setStatus('error');
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
         const response = await axios.get(`${getPaymentDetailsUrl}?type=${type}&id=${id}`);
-        // const response = await axios.get(`http://localhost:8080/api/payment/get-payment-details?type=${type}&id=${id}`);
+
         if (response.status !== 200) {
           throw new Error('Failed to fetch payment details');
         }
+
         const data = await response.data;
+
+        if (!data || Object.keys(data).length === 0) {
+          setStatus('not_found');
+          setPaymentDetails(null);
+          setLoading(false);
+          return;
+        }
 
         setPaymentDetails(data);
 
         // Update status based on payment status from API
         if (data.paymentStatus) {
           if (data.paymentStatus === 'SUCCESS') {
-            if (localStorage.getItem('paymentStatus') !== null)
-              localStorage.setItem('paymentStatus', 'success');
             setStatus('success');
           } else if (data.paymentStatus === 'PENDING') {
             setStatus('pending');
           } else if (data.paymentStatus === 'FAILED') {
             setStatus('error');
+          } else {
+            setStatus('error');
           }
+        } else {
+          setStatus('error');
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
+        setStatus('error');
       } finally {
         setLoading(false);
       }
@@ -199,9 +215,11 @@ export const PaymentDetails: React.FC = () => {
               ? 'Payment Successful'
               : status === 'pending'
                 ? 'Payment Pending'
-                : 'Payment Failed'}
+                : status === 'not_found'
+                  ? 'Payment Not Found'
+                  : 'Payment Failed'}
           </span>
-          {paymentDetails && (
+          {paymentDetails && status !== 'not_found' && (
             <Button
               variant="outline"
               size="sm"
@@ -220,22 +238,30 @@ export const PaymentDetails: React.FC = () => {
             ? 'default'
             : status === 'pending'
               ? 'default'
-              : 'destructive'
+              : status === 'not_found'
+                ? 'default'
+                : 'destructive'
         }>
           <AlertDescription>
-            {(
-              status === 'success'
-                ? 'Your payment has been processed successfully.'
-                : status === 'pending'
-                  ? 'Your payment is being processed. Please check back later.'
-                  : 'There was an error processing your payment.'
-            )}
+            {status === 'success'
+              ? 'Your payment has been processed successfully.'
+              : status === 'pending'
+                ? 'Your payment is being processed. Please check back later.'
+                : status === 'not_found'
+                  ? 'No payment details found for the provided transaction ID.'
+                  : 'There was an error processing your payment.'}
           </AlertDescription>
         </Alert>
 
         {loading && <p className="text-center mt-4">Loading payment details...</p>}
         {error && <Alert variant="destructive" className="mt-4"><AlertDescription>{error}</AlertDescription></Alert>}
-        {renderPaymentDetailsTable()}
+        {status === 'not_found' && (
+          <div className="text-center mt-4">
+            <p className="text-gray-600">The payment details you are looking for could not be found.</p>
+            <p className="text-sm text-gray-500 mt-2">Please verify the transaction ID and try again.</p>
+          </div>
+        )}
+        {paymentDetails && status !== 'not_found' && renderPaymentDetailsTable()}
       </CardContent>
     </Card>
   );

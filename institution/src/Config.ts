@@ -24,9 +24,6 @@ export const verifyPaymentUrl = PAYMENT_BASE_URL + '/verify-payment';
 export const courseFetchUrl = PUBLIC_BASE_URL + '/course/list';
 export const instituteFetchUrl = PUBLIC_BASE_URL + '/institute/list';
 
-
-
-
 export const instituteLogoutUrl = INSTITUTE_BASE_URL + '/logout';
 export const instituteProfileUrl = INSTITUTE_BASE_URL + '/profile';
 export const instituteDashboardUrl = INSTITUTE_BASE_URL + '/dashboard';

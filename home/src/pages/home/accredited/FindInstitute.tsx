@@ -7,6 +7,15 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { Oval } from 'react-loader-spinner';
 import { instituteFetchUrl } from '../../../data/config';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "../../../components/ui/table";
+import { useNavigate } from 'react-router-dom';
 
 interface InstitutePreview {
     id: string;
@@ -19,6 +28,7 @@ interface InstitutePreview {
 }
 
 const FindInstitute = () => {
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [institutes, setInstitutes] = useState<InstitutePreview[]>([]);
     const [loading, setLoading] = useState(false);
@@ -78,6 +88,10 @@ const FindInstitute = () => {
         handleSearch();
     };
 
+    const handleViewDetails = (instituteId: string) => {
+        navigate(`/institute-details/${instituteId}`);
+    };
+
     return (
         <div className="mx-auto p-4 bg-white relative">
             {/* Add Loader Overlay */}
@@ -120,43 +134,38 @@ const FindInstitute = () => {
 
                     {institutes.length > 0 ? (
                         <>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Center Code</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Center Name</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Head Name</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Center Code</TableHead>
+                                            <TableHead>Center Name</TableHead>
+                                            <TableHead>Head Name</TableHead>
+                                            <TableHead>City</TableHead>
+                                            <TableHead>State</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
                                         {institutes.map((institute) => (
-                                            <tr key={institute.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">{institute.centercode}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">{institute.centerName}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{institute.headName}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{institute.headMobileNumber}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{institute.centerCity}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{institute.centerState.replace('_', ' ')}</div>
-                                                </td>
-                                            </tr>
+                                            <TableRow key={institute.id}>
+                                                <TableCell className="font-medium">{institute.centercode}</TableCell>
+                                                <TableCell>{institute.centerName}</TableCell>
+                                                <TableCell>{institute.headName}</TableCell>
+                                                <TableCell>{institute.centerCity}</TableCell>
+                                                <TableCell>{institute.centerState.replace('_', ' ')}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={() => handleViewDetails(institute.id)}
+                                                    >
+                                                        View Details
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
                                         ))}
-                                    </tbody>
-                                </table>
+                                    </TableBody>
+                                </Table>
                             </div>
 
                             {/* Pagination Controls */}

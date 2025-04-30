@@ -8,7 +8,7 @@ import { Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
-import { getPaymentDetailsUrl } from '@/Config';
+import { getPaymentDetails } from '@/Config';
 
 interface PaymentDetailsData {
     name?: string;
@@ -50,7 +50,7 @@ export const PaymentDetails: React.FC = () => {
 
             try {
                 setLoading(true);
-                const response = await axios.get(`${getPaymentDetailsUrl}?type=${type}&id=${id}`);
+                const response = await axios.get(`${getPaymentDetails}?type=${type}&id=${id}`);
 
                 if (response.status !== 200) {
                     throw new Error('Failed to fetch payment details');

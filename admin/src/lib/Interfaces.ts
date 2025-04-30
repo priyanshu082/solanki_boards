@@ -37,9 +37,9 @@ export enum EnquiryStatus {
 }
 
 export enum AdmissionType {
-  REGULAR = 'REGULAR',
-  DISTANCE = 'DISTANCE',
-  ONLINE = 'ONLINE'
+  FRESH = 'FRESH',
+  TOC = 'TOC',
+  PART_ADMISSION = 'PART_ADMISSION'
 }
 
 export enum BatchType {
@@ -160,29 +160,128 @@ export enum DocumentType {
   OTHER = 'OTHER'
 }
 
+export enum UnionTerritory {
+  ANDAMAN_AND_NICOBAR = 'ANDAMAN_AND_NICOBAR',
+  CHANDIGARH = 'CHANDIGARH',
+  DADRA_AND_NAGAR_HAVELI = 'DADRA_AND_NAGAR_HAVELI',
+  DAMAN_AND_DIU = 'DAMAN_AND_DIU',
+  DELHI = 'DELHI',
+  JAMMU_AND_KASHMIR = 'JAMMU_AND_KASHMIR',
+  LADAKH = 'LADAKH',
+  LAKSHADWEEP = 'LAKSHADWEEP',
+  PUDUCHERRY = 'PUDUCHERRY'
+}
+
+export enum InstituteDocumentType {
+  REGISTRATION_CERTIFICATE = 'REGISTRATION_CERTIFICATE',
+  AFFILIATION_CERTIFICATE = 'AFFILIATION_CERTIFICATE',
+  RECOGNITION_CERTIFICATE = 'RECOGNITION_CERTIFICATE',
+  NO_OBJECTION_CERTIFICATE = 'NO_OBJECTION_CERTIFICATE',
+  BUILDING_OWNERSHIP = 'BUILDING_OWNERSHIP',
+  FIRE_SAFETY = 'FIRE_SAFETY',
+  SANITATION = 'SANITATION',
+  OTHER = 'OTHER'
+}
+
+export enum PaymentType {
+  REGISTRATION = 'REGISTRATION',
+  RENEWAL = 'RENEWAL',
+  EXAM = 'EXAM',
+  OTHER = 'OTHER'
+}
+
+export enum PaymentInstrumentType {
+  UPI = 'UPI',
+  NET_BANKING = 'NET_BANKING',
+  CARD = 'CARD',
+  WALLET = 'WALLET',
+  OTHER = 'OTHER'
+}
+
+export enum CourseStatus {
+  COMPLETED = 'COMPLETED',
+  ONGOING = 'ONGOING'
+}
+
 export interface InstitutePreview {
   id: string;
   centerName: string;
-  centerAddress: string;
   centerCity: string;
   centerState: string;
-  centercode: string;
+  centerCode: string;
+  headName: string;
+  paymentStatus: PaymentStatus;
 }
 
 export interface InstituteDetails {
   id: string;
+  applicationNumber?: string;
+  registrationNumber?: string;
+  headDob: string;
   headName: string;
-  headEmailId: string;
+  headFatherName: string;
+  headAadharNumber: string;
+  headPanCardNumber: string;
   headMobileNumber: string;
+  headEmailId: string;
+  headProfileImage?: string;
+  headGender: Gender;
+  headAddress: string;
+  headCity: string;
+  headState?: IndianState;
+  headUnionTerritory?: UnionTerritory;
+  headCountry: Country;
+  headPincode: string;
+  headBankName: string;
+  headAccountNumber: string;
+  headIfscCode: string;
+  centerCode?: string;
   centerName: string;
   centerEmailId: string;
+  centerWebsiteUrl?: string;
   centerPhoneNumber: string;
   centerAddress: string;
   centerCity: string;
-  centerState: string;
+  centerState?: IndianState;
+  centerUnionTerritory?: UnionTerritory;
+  centerCountry: Country;
   centerPincode: string;
-  centerWebsiteUrl?: string;
-  unionTerritory?: string;
+  paymentStatus: PaymentStatus;
+  createdAt: Date;
+  updatedAt: Date;
+  documents: InstituteDocument[];
+  payments: Payment[];
+}
+
+export interface InstituteDocument {
+  id: string;
+  documentType: InstituteDocumentType;
+  fileName: string;
+  fileUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Payment {
+  id: string;
+  merchantTransactionId: string;
+  phonePeTransactionId?: string;
+  merchantId: string;
+  merchantUserId: string;
+  amount: number;
+  paymentType: PaymentType;
+  paymentStatus: PaymentStatus;
+  paymentInstrumentType?: PaymentInstrumentType;
+  utr?: string;
+  cardType?: string;
+  pgTransactionId?: string;
+  bankTransactionId?: string;
+  pgAuthorizationCode?: string;
+  arn?: string;
+  bankId?: string;
+  brn?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CoursePreview {
@@ -227,7 +326,10 @@ export interface StudentPreview {
   name: string;
   enrollmentNumber?: string;
   applicationNumber: string;
-  courseId: string
+  courseId: string;
+  paymentStatus: PaymentStatus;
+  admissionType: AdmissionType;
+  courseStatus: CourseStatus;
 }
 
 export interface InterfaceStudentDetails {
@@ -258,6 +360,7 @@ export interface InterfaceStudentDetails {
   educationalQualifications?: EducationalQualification[];
   lastPassedExam?: LastPassedExam[];
   documents?: StudentDocument[];
+  payments?: Payment[];
 }
 
 export interface CorrespondenceAddress {

@@ -3,9 +3,24 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { getallstudents } from '@/Config'
 import Swal from 'sweetalert2'
-import { StudentPreview } from '@/lib/Interfaces'
+import { StudentPreview, PaymentStatus, AdmissionType, CourseStatus } from '@/lib/Interfaces'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+interface FilterParams {
+  name?: string;
+  paymentStatus?: PaymentStatus | null;
+  admissionType?: AdmissionType | null;
+  courseStatus?: CourseStatus | null;
+}
 
 const AllStudentDetails = () => {
   const [students, setStudents] = useState<StudentPreview[]>([])
@@ -13,56 +28,70 @@ const AllStudentDetails = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalItems, setTotalItems] = useState(0)
+  const [filters, setFilters] = useState<FilterParams>({
+    name: '',
+    paymentStatus: null,
+    admissionType: null,
+    courseStatus: null
+  })
   const itemsPerPage = 9
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const token = localStorage.getItem('token') || 'hjj'
-        if (!token) {
-          navigate('/login')
-          return
-        }
-
-        const skip = (currentPage - 1) * itemsPerPage
-        const limit = itemsPerPage
-
-        const response = await axios.post(getallstudents, {
-          skip,
-          limit
-        })
-        
-        if (response.data.students) {
-          setStudents(response.data.students)
-          setTotalItems(response.data.total || response.data.students.length)
-          setTotalPages(Math.ceil((response.data.total || response.data.students.length) / itemsPerPage))
-        } else {
-          setStudents(response.data)
-          setTotalItems(response.data.length)
-          setTotalPages(Math.ceil(response.data.length / itemsPerPage))
-        }
-        
-        setLoading(false)
-        
-      } catch (error: any) {
-        console.error('Error fetching students:', error)
-        if (error.response?.status === 401) {
-          navigate('/login')
-          return
-        }
-        await Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to fetch student details',
-          confirmButtonColor: '#3085d6'
-        })
-        setLoading(false)
+  const fetchStudents = async (page: number = currentPage, filterParams: FilterParams = filters) => {
+    try {
+      const token = localStorage.getItem('token') || 'hjj'
+      if (!token) {
+        navigate('/login')
+        return
       }
-    }
 
+      const skip = (page - 1) * itemsPerPage
+      const limit = itemsPerPage
+
+      // Remove null/undefined values from filter params
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filterParams).filter(([, value]) => value !== null && value !== undefined && value !== '')
+      )
+
+      const response = await axios.post(getallstudents, {
+        skip,
+        limit,
+        ...cleanFilters
+      })
+
+      if (response.data.students) {
+        setStudents(response.data.students)
+        setTotalItems(response.data.total || response.data.students.length)
+        setTotalPages(Math.ceil((response.data.total || response.data.students.length) / itemsPerPage))
+      } else {
+        setStudents(response.data)
+        setTotalItems(response.data.length)
+        setTotalPages(Math.ceil(response.data.length / itemsPerPage))
+      }
+
+      setLoading(false)
+
+    } catch (error: unknown) {
+      console.error('Error fetching students:', error)
+      if (error instanceof Error && typeof error === 'object' && 'response' in error &&
+        error.response && typeof error.response === 'object' && 'status' in error.response &&
+        error.response.status === 401) {
+        navigate('/login')
+        return
+      }
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to fetch student details',
+        confirmButtonColor: '#3085d6'
+      })
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchStudents()
-  }, [navigate, currentPage])
+  }, [navigate])
 
   const handleStudentClick = async (id: string) => {
     const token = localStorage.getItem('token') || 'hjj'
@@ -89,6 +118,29 @@ const AllStudentDetails = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
+    fetchStudents(page)
+  }
+
+  const handleFilterChange = (key: keyof FilterParams, value: string | null) => {
+    const newFilters = {
+      ...filters,
+      [key]: value
+    }
+    setFilters(newFilters)
+    setCurrentPage(1) // Reset to first page when filter changes
+    fetchStudents(1, newFilters)
+  }
+
+  const clearFilters = () => {
+    const emptyFilters: FilterParams = {
+      name: '',
+      paymentStatus: null,
+      admissionType: null,
+      courseStatus: null
+    }
+    setFilters(emptyFilters)
+    setCurrentPage(1) // Reset to first page when clearing filters
+    fetchStudents(1, emptyFilters)
   }
 
   if (loading) {
@@ -98,14 +150,79 @@ const AllStudentDetails = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">All Students</h1>
-      
+
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Input
+          type="text"
+          placeholder="Search by name"
+          value={filters.name}
+          onChange={(e) => handleFilterChange('name', e.target.value)}
+        />
+
+        <Select
+          value={filters.paymentStatus || 'all'}
+          onValueChange={(value: string) => handleFilterChange('paymentStatus', value === 'all' ? null : value as PaymentStatus)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Payment Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Payment Status</SelectItem>
+            <SelectItem value={PaymentStatus.SUCCESS}>SUCCESS</SelectItem>
+            <SelectItem value={PaymentStatus.FAILED}>FAILED</SelectItem>
+            <SelectItem value={PaymentStatus.PENDING}>PENDING</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filters.admissionType || 'all'}
+          onValueChange={(value: string) => handleFilterChange('admissionType', value === 'all' ? null : value as AdmissionType)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Admission Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Admission Types</SelectItem>
+            <SelectItem value={AdmissionType.FRESH}>FRESH</SelectItem>
+            <SelectItem value={AdmissionType.TOC}>TOC</SelectItem>
+            <SelectItem value={AdmissionType.PART_ADMISSION}>PART ADMISSION</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filters.courseStatus || 'all'}
+          onValueChange={(value: string) => handleFilterChange('courseStatus', value === 'all' ? null : value as CourseStatus)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Course Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Course Status</SelectItem>
+            <SelectItem value={CourseStatus.COMPLETED}>COMPLETED</SelectItem>
+            <SelectItem value={CourseStatus.ONGOING}>ONGOING</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="outline"
+          onClick={clearFilters}
+        >
+          Clear Filters
+        </Button>
+      </div>
+
       <div className="rounded-md border mb-6">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Enrollment Number</TableHead>
               <TableHead>Application Number</TableHead>
+              <TableHead>Payment Status</TableHead>
+              <TableHead>Admission Type</TableHead>
+              <TableHead>Course Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -113,18 +230,27 @@ const AllStudentDetails = () => {
             {students.map((student) => (
               <TableRow key={student.id}>
                 <TableCell className="font-medium">{student.name}</TableCell>
-                <TableCell>{student.enrollmentNumber || 'Not assigned'}</TableCell>
                 <TableCell>{student.applicationNumber}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs ${student.paymentStatus === PaymentStatus.SUCCESS ? 'bg-green-100 text-green-800' :
+                    student.paymentStatus === PaymentStatus.FAILED ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                    {student.paymentStatus}
+                  </span>
+                </TableCell>
+                <TableCell>{student.admissionType}</TableCell>
+                <TableCell>{student.courseStatus}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => handleStudentClick(student.id)}
                     >
                       View Details
                     </Button>
-                    <Button 
-                      variant="default" 
+                    <Button
+                      variant="default"
                       onClick={() => handleResultUpload(student.id, student.courseId)}
                     >
                       Upload Result
@@ -136,17 +262,17 @@ const AllStudentDetails = () => {
           </TableBody>
         </Table>
       </div>
-      
+
       {/* Pagination Controls */}
       <div className="flex justify-center mt-8 gap-2">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           Previous
         </Button>
-        
+
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
           <Button
             key={page}
@@ -156,9 +282,9 @@ const AllStudentDetails = () => {
             {page}
           </Button>
         ))}
-        
-        <Button 
-          variant="outline" 
+
+        <Button
+          variant="outline"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >

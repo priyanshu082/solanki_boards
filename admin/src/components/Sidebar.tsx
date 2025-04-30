@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  ChevronDown, 
+import {
+  ChevronDown,
   ChevronRight,
   Building2,
   Users,
   BookOpen,
   GraduationCap,
   Settings,
+  IndianRupee,
   Menu,
-  X 
+  X
 } from 'lucide-react';
 import logo from "../assets/logo.png"
 import {
@@ -48,17 +49,18 @@ const Sidebar = () => {
       ]
     },
     {
-      title: "Students", 
+      title: "Students",
       path: "/students",
       icon: <Users className="h-5 w-5" />,
       items: [
         { name: "All Students", path: "/all-students" },
         // { name: "Student Details", path: "/student-details" },
+        // { name: "Result Upload", path: "/all-students" },
       ]
     },
     {
       title: "Courses",
-      path: "/courses", 
+      path: "/courses",
       icon: <BookOpen className="h-5 w-5" />,
       items: [
         { name: "Create Course", path: "/create-course" },
@@ -75,13 +77,21 @@ const Sidebar = () => {
       ]
     },
     {
+      title: "Payments",
+      path: "/payments",
+      icon: < IndianRupee className="h-5 w-5" />,
+      items: [
+        { name: "All Payments", path: "/all-payments" },
+      ]
+    },
+    {
       title: "Others",
       path: "/others",
       icon: <Settings className="h-5 w-5" />,
       items: [
         { name: "Enquiry", path: "/enquiry" },
         { name: "Notice Update", path: "/notice-update" },
-        { name: "Result Upload", path: "/all-students" },
+
       ]
     }
   ];
@@ -96,8 +106,8 @@ const Sidebar = () => {
     <button
       className={`w-full px-4 py-2 text-left text-sm transition-all duration-200 ease-in-out
         hover:bg-blue-50 hover:text-blue-600 rounded-lg
-        ${isActive(item.path) 
-          ? 'bg-blue-50 text-blue-600 font-medium' 
+        ${isActive(item.path)
+          ? 'bg-blue-50 text-blue-600 font-medium'
           : 'text-gray-600 hover:translate-x-1'
         }`}
       onClick={() => {
@@ -119,7 +129,7 @@ const Sidebar = () => {
         open={isOpen}
         className="mb-2"
       >
-        <CollapsibleTrigger 
+        <CollapsibleTrigger
           className={`flex items-center w-full p-3 hover:bg-blue-50 rounded-lg transition-all duration-200
             ${isMenuActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
           onClick={() => toggleMenu(section.title)}
@@ -148,7 +158,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Hamburger Button */}
-      <button 
+      <button
         className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg shadow-md "
         onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
       >
@@ -157,14 +167,14 @@ const Sidebar = () => {
 
       {/* Overlay for Mobile */}
       {isMobileSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={() => setIsMobileSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar - Desktop and Mobile */}
-      <div 
+      <div
         className={`
           fixed top-0 left-0 h-full bg-white border-r border-gray-200 
           transform transition-transform duration-300 z-50
@@ -174,14 +184,14 @@ const Sidebar = () => {
       >
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src={logo} 
-              alt="Logo" 
+            <img
+              src={logo}
+              alt="Logo"
               className="h-8 object-contain"
             />
             <span className="font-semibold text-xl text-gray-800">Dashboard</span>
           </Link>
-          <button 
+          <button
             className="md:hidden"
             onClick={() => setIsMobileSidebarOpen(false)}
           >

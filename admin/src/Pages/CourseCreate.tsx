@@ -262,8 +262,8 @@ const CourseCreate = () => {
                       </FormControl>
                       <SelectContent>
                         {Object.values(CourseType).map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
+                          <SelectItem key={type} value={type.replace("_", " ")}>
+                            {type.replace("_", " ")}
                           </SelectItem>
                         ))}
                       </SelectContent>
