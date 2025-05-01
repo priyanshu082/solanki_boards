@@ -52,6 +52,8 @@ interface Payment {
     paymentStatus: PaymentStatus;
     paymentInstrumentType?: PaymentInstrumentType;
     updatedAt: string;
+    instituteId?: string;
+    studentId?: string;
     institute?: Institute;
     student?: Student;
 }
@@ -113,15 +115,9 @@ const AllPaymentsDetails = () => {
                 ...cleanFilters
             })
 
-            if (response.data.payments) {
-                setPayments(response.data.payments)
-                setTotalItems(response.data.total || response.data.payments.length)
-                setTotalPages(Math.ceil((response.data.total || response.data.payments.length) / itemsPerPage))
-            } else {
-                setPayments(response.data)
-                setTotalItems(response.data.length)
-                setTotalPages(Math.ceil(response.data.length / itemsPerPage))
-            }
+            setPayments(response.data);            
+            setTotalItems(response.data.length)
+            setTotalPages(Math.ceil(response.data.length / itemsPerPage))
 
             setLoading(false)
 
@@ -283,7 +279,7 @@ const AllPaymentsDetails = () => {
                                 <TableCell className="text-right">
                                     <Button
                                         variant="outline"
-                                        onClick={() => navigate(`/payment-details?id=${payment.paymentType === PaymentType.INSTITUTE ? payment.institute?.id : payment.student?.id}&type=${payment.paymentType}`)}
+                                        onClick={() => navigate(`/payment-details?id=${payment.paymentType === PaymentType.INSTITUTE ? payment.instituteId : payment.studentId}&type=${payment.paymentType}`)}
                                     >
                                         View Details
                                     </Button>

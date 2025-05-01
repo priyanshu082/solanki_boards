@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import logo from "../assets/logo.png"
@@ -14,8 +14,6 @@ import logo from "../assets/logo.png"
 // User type definition
 interface User {
   name: string;
-  email: string;
-  avatarUrl?: string;
 }
 
 const Navbar: React.FC = () => {
@@ -24,42 +22,20 @@ const Navbar: React.FC = () => {
 
   // Fetch user data from localStorage or use dummy data
   useEffect(() => {
-    const storedUser = localStorage.getItem('avatarUrl');
-    if (storedUser) {
-      setUser(
-        {
-          name: 'John Doe',
-          email: 'john@example.com',
-          avatarUrl: storedUser,
-        }
-      );
-    } else {
-      // Dummy data if no user is found in localStorage
-      setUser({
-        name: 'John Doe',
-        email: 'john@example.com',
-        avatarUrl: '/path/to/avatar.jpg',
-      });
-    }
+    const name = localStorage.getItem('name');
+    setUser({ name: name || 'Admin' });
   }, []);
 
   const handleLogout = () => {
     // Clear user data from localStorage
 
     localStorage.removeItem('id');
-    localStorage.removeItem('paymentStatus');
     localStorage.removeItem('role');
     localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('avatarUrl');
-    localStorage.removeItem('merchantTransactionId');
+    localStorage.removeItem('name');
     setUser(null);
     navigate('/login');
   };
-
-  // const handleProfileClick = () => {
-  //   navigate('/profile');
-  // };
 
   // Return nothing if no user is available
   if (!user) return null;
@@ -78,9 +54,10 @@ const Navbar: React.FC = () => {
       </Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className="cursor-pointer">
-            <AvatarImage src={user.avatarUrl} alt={user.name} />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+          <Avatar className="cursor-pointer rounded-full h-9 w-9">
+            <AvatarFallback className="bg-gray-100 text-black font-medium">
+              {user.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">

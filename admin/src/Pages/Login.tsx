@@ -27,6 +27,7 @@ const Login = () => {
         localStorage.setItem('id', response.data.admin.id);
         localStorage.setItem('role', 'admin');
         localStorage.setItem('token', response.data.accessToken);
+        localStorage.setItem('name', response.data.admin.name);
 
         await Swal.fire({
           icon: 'success',

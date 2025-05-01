@@ -279,96 +279,12 @@ const InstituteDetails = () => {
           </CardContent>
         </Card>
 
-        {/* Documents */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Documents</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {institute.documents.length > 0 ? (
-              <div className="space-y-2">
-                {institute.documents.map((doc) => (
-                  <div key={doc.id} className="flex items-center justify-between p-2 border rounded">
-                    <div>
-                      <p className="font-medium">{doc.fileName}</p>
-                      <p className="text-sm text-gray-500">{doc.documentType}</p>
-                    </div>
-                    <a
-                      href={doc.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      View
-                    </a>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500">No documents uploaded</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Payments */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Payments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {institute.payments.length > 0 ? (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Transaction ID</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {institute.payments.map((payment) => (
-                      <TableRow key={payment.id}>
-                        <TableCell>₹{payment.amount}</TableCell>
-                        <TableCell>
-                          <span className={`px-2 py-1 rounded-full text-xs ${payment.paymentStatus === 'SUCCESS' ? 'bg-green-100 text-green-800' :
-                            payment.paymentStatus === 'FAILED' ? 'bg-red-100 text-red-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }`}>
-                            {payment.paymentStatus}
-                          </span>
-                        </TableCell>
-                        <TableCell>{payment.paymentType}</TableCell>
-                        <TableCell>{payment.merchantTransactionId}</TableCell>
-                        <TableCell>{format(new Date(payment.createdAt), 'dd/MM/yyyy')}</TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            onClick={() => navigate(`/payment-details?id=${institute.id}&type=${payment.paymentType}`)}
-                          >
-                            View Details
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <p className="text-gray-500">No payments found</p>
-            )}
-          </CardContent>
-        </Card>
         {/* Registeration Information */}
         <Card>
           <CardHeader>
             <CardTitle>Registeration Information</CardTitle>
           </CardHeader>
           <CardContent>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Created At</p>
@@ -378,11 +294,94 @@ const InstituteDetails = () => {
                 <p className="text-sm text-gray-500">Updated At</p>
                 <p className="font-medium">{institute.updatedAt.toString().split('T')[0]}</p>
               </div>
-
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Documents */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Documents</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {institute.documents.length > 0 ? (
+            <div className="space-y-2">
+              {institute.documents.map((doc) => (
+                <div key={doc.id} className="flex items-center justify-between p-2 border rounded">
+                  <div>
+                    <p className="font-medium">{doc.fileName}</p>
+                    <p className="text-sm text-gray-500">{doc.documentType}</p>
+                  </div>
+                  <a
+                    href={doc.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    View
+                  </a>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No documents uploaded</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Payments */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Payments</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {institute.payments.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Transaction ID</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {institute.payments.map((payment) => (
+                    <TableRow key={payment.id}>
+                      <TableCell>₹{payment.amount}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs ${payment.paymentStatus === 'SUCCESS' ? 'bg-green-100 text-green-800' :
+                          payment.paymentStatus === 'FAILED' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {payment.paymentStatus}
+                        </span>
+                      </TableCell>
+                      <TableCell>{payment.paymentType}</TableCell>
+                      <TableCell>{payment.merchantTransactionId}</TableCell>
+                      <TableCell>{format(new Date(payment.createdAt), 'dd/MM/yyyy')}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate(`/payment-details?id=${institute.id}&type=${payment.paymentType}`)}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-gray-500">No payments found</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

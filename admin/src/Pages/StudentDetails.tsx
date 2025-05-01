@@ -94,6 +94,28 @@ const StudentDetails = () => {
         <Button onClick={handleBackClick}>Back to All Students</Button>
       </div>
 
+      {/* Photo Section */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-2xl">Student Photo</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center">
+            {student.studentPhoto ? (
+              <img
+                src={student.studentPhoto}
+                alt={`${student.name}'s photo`}
+                className="w-48 h-48 object-cover rounded-lg"
+              />
+            ) : (
+              <div className="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                <span className="text-gray-500">No photo available</span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="text-2xl">Personal Information</CardTitle>
@@ -409,7 +431,7 @@ const StudentDetails = () => {
       {/* Payments */}
       <Card>
         <CardHeader>
-          <CardTitle>Payments</CardTitle>
+          <CardTitle className='text-2xl'>Payments</CardTitle>
         </CardHeader>
         <CardContent>
           {student.payments && student.payments.length > 0 ? (
