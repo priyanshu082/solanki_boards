@@ -411,7 +411,7 @@ const StudentDetails = () => {
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {student.documents.map((doc, index) => (
               <div key={index} className="border p-4 rounded-md">
-                <h3 className="font-semibold">{doc.documentType}</h3>
+                <h3 className="font-semibold">{String(doc.documentType).replace("_", " ")}</h3>
                 <p className="text-sm text-gray-600">{doc.fileName}</p>
                 <p className="text-xs text-gray-500">Uploaded: {formatDate(doc.createdAt)}</p>
                 <a

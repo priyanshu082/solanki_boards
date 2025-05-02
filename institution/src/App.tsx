@@ -13,6 +13,8 @@ import { PaymentDetails } from './pages/Payments/PaymentDetails'
 import PaymentPageStudent from './pages/Payments/PaymentPageStudent'
 import InstituteDocumentUpload from './pages/Institute/InstituteDocumentUpload'
 import PaymentPageInstitute from './pages/Payments/PaymentPageInstitute'
+import StudentDetails from './pages/Students/StudentDetails'
+import ShowPayments from './pages/Payments/ShowPayments'
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }: any) => {
@@ -41,6 +43,7 @@ function App() {
           <Route path="register-student" element={<ProtectedRoute><RegisterStudent /></ProtectedRoute>} />
           <Route path="upload-document" element={<ProtectedRoute><UploadDocuments /></ProtectedRoute>} />
           <Route path="show-students" element={<ProtectedRoute><ShowStudents /></ProtectedRoute>} />
+          <Route path="/student-details/:id" element={<ProtectedRoute><StudentDetails /></ProtectedRoute>} />
           <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="accredited-certificate" element={<ProtectedRoute><Certificate /></ProtectedRoute>} />
           <Route path="sanctioned-letter" element={<ProtectedRoute><Letter /></ProtectedRoute>} />
@@ -48,6 +51,7 @@ function App() {
 
           <Route path="/payment-student" element={<ProtectedRoute><PaymentPageStudent /></ProtectedRoute>} />
           <Route path="/payment-institute" element={<ProtectedRoute><PaymentPageInstitute /></ProtectedRoute>} />
+          <Route path="/show-payments" element={<ProtectedRoute>< ShowPayments/></ProtectedRoute>} />
 
           {/* PhonePe callback handler */}
           <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />

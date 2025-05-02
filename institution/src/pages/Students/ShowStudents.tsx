@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import {
   Table,
@@ -14,35 +14,43 @@ import {
 import { AdmissionType, BatchType, PaymentStatus } from '@/lib/Interfaces';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import {  allStudentsSearchUrl } from '@/Config';
+import { allStudentsSearchUrl } from '@/Config';
+import { useNavigate } from 'react-router-dom';
 
 interface Student {
   id: string;
   applicationNumber: string;
   name: string;
-  fatherName: string;
   admissionType: AdmissionType;
   batch: string;
-  courseId: string;
   paymentStatus: string;
-  documents: string[];
+}
+
+interface FilterParams {
+  name?: string;
+  applicationNumber?: string;
+  admissionType?: string;
+  batch?: string;
+  paymentStatus?: string;
 }
 
 const ShowStudents = () => {
-  const [allStudents, setAllStudents] = useState<Student[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 10;
+  const navigate = useNavigate();
 
   // Filter states
-  const [selectedAdmissionType, setSelectedAdmissionType] = useState('all');
-  const [selectedBatch, setSelectedBatch] = useState('all');
-
-  //@ts-ignore
-  const [selectedCourse, setSelectedCourse] = useState('all');
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('any');
-  const [selectedDocumentStatus, setSelectedDocumentStatus] = useState('');
+  const [filters, setFilters] = useState<FilterParams>({
+    name: '',
+    applicationNumber: '',
+    admissionType: 'all',
+    batch: 'all',
+    paymentStatus: 'any'
+  });
 
   const admissionTypes = Object.entries(AdmissionType).map(([key, value]) => ({
     id: value.toString(),
@@ -59,7 +67,7 @@ const ShowStudents = () => {
     name: key.replace(/_/g, ' ')
   }));
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (page: number = currentPage) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -73,20 +81,43 @@ const ShowStudents = () => {
         return;
       }
 
-      const response = await axios.post(allStudentsSearchUrl,{}, {
+      const skip = (page - 1) * itemsPerPage;
+      const limit = itemsPerPage;
+
+      // Remove empty or 'all'/'any' values from filters
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([, value]) =>
+          value !== '' && value !== 'all' && value !== 'any'
+        )
+      );
+
+      const response = await axios.post(allStudentsSearchUrl, {
+        instituteId: localStorage.getItem('id'),
+        skip,
+        limit,
+        ...cleanFilters
+      }, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      setAllStudents(response.data);
+      if (response.data.students) {
+        setStudents(response.data.students);
+        setTotalItems(response.data.total || response.data.students.length);
+        setTotalPages(Math.ceil((response.data.total || response.data.students.length) / itemsPerPage));
+      } else {
+        setStudents(response.data);
+        setTotalItems(response.data.length);
+        setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+      }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching students:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: error.response?.data?.message || 'Failed to fetch students',
+        text: error instanceof Error ? error.message : 'Failed to fetch students',
         confirmButtonColor: '#3085d6'
       });
     } finally {
@@ -96,173 +127,188 @@ const ShowStudents = () => {
 
   useEffect(() => {
     fetchStudents();
-  }, []);
+  }, [filters]);
 
-  // Filter students whenever filter criteria changes
-  useEffect(() => {
-    let result = [...allStudents];
+  const handleStudentClick = (id: string) => {
+    navigate(`/student-details/${id}`);
+  };
 
-    if (selectedAdmissionType !== 'all') {
-      result = result.filter(student => student.admissionType === selectedAdmissionType);
-    }
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchStudents(page);
+  };
 
-    if (selectedBatch !== 'all') {
-      result = result.filter(student => student.batch === selectedBatch);
-    }
-
-    if (selectedCourse !== 'all') {
-      result = result.filter(student => student.courseId === selectedCourse);
-    }
-
-    if (selectedPaymentStatus !== 'any') {
-      result = result.filter(student => student.paymentStatus === selectedPaymentStatus);
-    }
-
-    if (selectedDocumentStatus !== '') {
-      result = result.filter(student => 
-        selectedDocumentStatus === 'YES' ? student.documents.length > 0 : student.documents.length === 0
-      );
-    }
-
-    setFilteredStudents(result);
+  const handleFilterChange = (key: keyof FilterParams, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
     setCurrentPage(1);
-  }, [selectedAdmissionType, selectedBatch, selectedCourse, selectedPaymentStatus, selectedDocumentStatus, allStudents]);
+  };
 
-  // Get current page students
-  const paginatedStudents = filteredStudents.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const clearFilters = () => {
+    setFilters({
+      name: '',
+      applicationNumber: '',
+      admissionType: 'all',
+      batch: 'all',
+      paymentStatus: 'any'
+    });
+    setCurrentPage(1);
+  };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Admission Type</label>
-              <Select onValueChange={setSelectedAdmissionType} value={selectedAdmissionType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Admission Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  {admissionTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Batch</label>
-              <Select onValueChange={setSelectedBatch} value={selectedBatch}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Batch" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  {batches.map((batch) => (
-                    <SelectItem key={batch.id} value={batch.id}>{batch.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Payment Status</label>
-              <Select onValueChange={setSelectedPaymentStatus} value={selectedPaymentStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Payment Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  {paymentStatuses.map((status) => (
-                    <SelectItem key={status.id} value={status.id}>{status.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Documents Uploaded</label>
-              <Select onValueChange={setSelectedDocumentStatus} value={selectedDocumentStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Document Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="YES">Yes</SelectItem>
-                  <SelectItem value="NO">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">All Students</h1>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            Student List {loading && <Loader2 className="inline ml-2 animate-spin" />}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex justify-between mb-4">
-            <Button onClick={fetchStudents} disabled={loading}>
-              Refresh
-            </Button>
-          </div>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16">No.</TableHead>
-                  <TableHead>Application No.</TableHead>
-                  <TableHead>Student Name</TableHead>
-                  <TableHead>Father Name</TableHead>
-                  <TableHead>Admission Type</TableHead>
-                  <TableHead>Batch</TableHead>
-                  <TableHead>Course</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Documents Uploaded</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedStudents.map((student, index) => (
-                  <TableRow key={student.id}>
-                    <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                    <TableCell>{student.applicationNumber}</TableCell>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.fatherName}</TableCell>
-                    <TableCell>{student.admissionType}</TableCell>
-                    <TableCell>{student.batch}</TableCell>
-                    <TableCell>{student.courseId}</TableCell>
-                    <TableCell>{student.paymentStatus}</TableCell>
-                    <TableCell>{student.documents.length > 0 ? "Yes" : "No"}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Input
+          type="text"
+          placeholder="Search by name"
+          value={filters.name}
+          onChange={(e) => handleFilterChange('name', e.target.value)}
+        />
 
-          <div className="flex justify-between items-center mt-4">
-            <Button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1 || loading}
-            >
-              Previous
-            </Button>
-            <span>Page {currentPage} of {Math.ceil(filteredStudents.length / itemsPerPage)}</span>
-            <Button
-              onClick={() => setCurrentPage(prev => prev + 1)}
-              disabled={currentPage >= Math.ceil(filteredStudents.length / itemsPerPage) || loading}
-            >
-              Next
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        <Input
+          type="text"
+          placeholder="Search by application number"
+          value={filters.applicationNumber}
+          onChange={(e) => handleFilterChange('applicationNumber', e.target.value)}
+        />
+
+        <Select
+          value={filters.admissionType}
+          onValueChange={(value) => handleFilterChange('admissionType', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Admission Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Admission Types</SelectItem>
+            {admissionTypes.map((type) => (
+              <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filters.batch}
+          onValueChange={(value) => handleFilterChange('batch', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Batch" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Batches</SelectItem>
+            {batches.map((batch) => (
+              <SelectItem key={batch.id} value={batch.id}>{batch.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filters.paymentStatus}
+          onValueChange={(value) => handleFilterChange('paymentStatus', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Payment Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="any">All Payment Status</SelectItem>
+            {paymentStatuses.map((status) => (
+              <SelectItem key={status.id} value={status.id}>{status.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Button onClick={() => fetchStudents(1)} disabled={loading}>
+          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          Refresh
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={clearFilters}
+          disabled={loading}
+        >
+          Clear Filters
+        </Button>
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Application No.</TableHead>
+              <TableHead>Student Name</TableHead>
+              <TableHead>Admission Type</TableHead>
+              <TableHead>Batch</TableHead>
+              <TableHead>Payment Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {students.map((student) => (
+              <TableRow key={student.id}>
+                <TableCell>{student.applicationNumber}</TableCell>
+                <TableCell>{student.name}</TableCell>
+                <TableCell>{student.admissionType}</TableCell>
+                <TableCell>{student.batch}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs ${student.paymentStatus === PaymentStatus.SUCCESS ? 'bg-green-100 text-green-800' :
+                    student.paymentStatus === PaymentStatus.FAILED ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                    {student.paymentStatus}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleStudentClick(student.id)}
+                  >
+                    View Details
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center mt-8 gap-2">
+        <Button
+          variant="outline"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1 || loading}
+        >
+          Previous
+        </Button>
+
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <Button
+            key={page}
+            variant={currentPage === page ? "default" : "outline"}
+            onClick={() => handlePageChange(page)}
+            disabled={loading}
+          >
+            {page}
+          </Button>
+        ))}
+
+        <Button
+          variant="outline"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages || loading}
+        >
+          Next
+        </Button>
+      </div>
+      <div className="text-center mt-2 text-sm text-gray-500">
+        Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} students
+      </div>
     </div>
   );
 };

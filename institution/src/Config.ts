@@ -1,4 +1,5 @@
-export const BASE_URL = "https://sbiea.co.in/api/api";
+// export const BASE_URL = "https://sbiea.co.in/api/api";
+export const BASE_URL = "http://localhost:8080/api";
 
 export const ADMIN_BASE_URL = BASE_URL + '/admin';
 export const INSTITUTE_BASE_URL = BASE_URL + '/institute';
@@ -28,15 +29,17 @@ export const instituteLogoutUrl = INSTITUTE_BASE_URL + '/logout';
 export const instituteProfileUrl = INSTITUTE_BASE_URL + '/profile';
 export const instituteDashboardUrl = INSTITUTE_BASE_URL + '/dashboard';
 
+export const getStudentDetailsUrl = INSTITUTE_BASE_URL + '/student';
+
+export const getAllStudentsPayments = INSTITUTE_BASE_URL + '/payment/list';
 
 
 
-
-export enum alertTypeEnum{
-    success="success",
-    error="error",
-    info="error",
-    warning="warning"
+export enum alertTypeEnum {
+    success = "success",
+    error = "error",
+    info = "error",
+    warning = "warning"
 }
 
 
