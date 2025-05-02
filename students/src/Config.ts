@@ -1,4 +1,5 @@
 export const BASE_URL = "https://sbiea.co.in/api/api";
+// export const BASE_URL = "https://sbiea.co.in/api/api";
 
 export const ADMIN_BASE_URL = BASE_URL + '/admin';
 export const INSTITUTE_BASE_URL = BASE_URL + '/institute';

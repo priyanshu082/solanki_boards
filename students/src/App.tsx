@@ -13,12 +13,18 @@ const ProtectedRoute = ({ children }: any) => {
   const id = localStorage.getItem('id')
   const paymentStatus = localStorage.getItem('paymentStatus')
 
+  console.log('ProtectedRoute', { id, paymentStatus, path: window.location.pathname });
+
   if (!id) {
     return <Navigate to="/login" replace />
   }
 
   //Redirect to payment page if payment is pending
-  if (paymentStatus !== 'SUCCESS' && window.location.pathname !== '/payment') {
+  if (
+    paymentStatus !== 'SUCCESS' &&
+    window.location.pathname !== '/payment' &&
+    window.location.pathname !== '/payment-initiate'
+  ) {
     return <Navigate to="/payment-initiate" replace />
   }
 
