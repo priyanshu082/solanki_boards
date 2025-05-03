@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Grid, BookOpen, Users, School, Upload, MessageSquare, Info } from 'lucide-react';
+import { Grid, BookOpen, Users, School, MessageSquare, Info } from 'lucide-react';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -13,7 +13,6 @@ const Home = () => {
     { title: 'Create Subject', description: 'Add new subjects to courses', icon: Grid, path: '/create-subject' },
     { title: 'Enquiries', description: 'Manage student enquiries', icon: MessageSquare, path: '/enquiry' },
     { title: 'Notice Updates', description: 'Post and manage notices', icon: Info, path: '/notice-update' },
-    { title: 'Result Upload', description: 'Upload student results', icon: Upload, path: '/result-upload' },
     // { title: 'Student Details', description: 'View detailed student information', icon: FileText, path: '/student-details/1' },
   ];
 
