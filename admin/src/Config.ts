@@ -42,3 +42,5 @@ export const uploadresult = ADMIN_URL + "/result";
 export const getAllPayments = ADMIN_URL + "/payment/list";
 
 export const getPaymentDetails = BASE_URL + "/payment/get-payment-details";
+
+export const changePassword = ADMIN_URL + "/auth/changePassword";

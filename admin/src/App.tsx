@@ -14,6 +14,7 @@ import ResultUpload from './Pages/ResultUpload'
 import StudentDetails from './Pages/StudentDetails'
 import AllPaymentsDetails from './Pages/AllPaymentsDetails'
 import { PaymentDetails } from './Pages/PaymentsDetails'
+import ChangePassword from './Pages/ChangePassword'
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }: any) => {
@@ -45,6 +46,7 @@ function App() {
           <Route path="/result-upload/:id/:courseId" element={<ResultUpload />} />
           <Route path="/student-details/:id" element={<StudentDetails />} />
           <Route path="/payment-details" element={<PaymentDetails />} />
+          <Route path="/change-password" element={<ChangePassword />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
