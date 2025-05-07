@@ -50,7 +50,11 @@ export const PaymentDetails: React.FC = () => {
 
             try {
                 setLoading(true);
-                const response = await axios.get(`${getPaymentDetails}?type=${type}&id=${id}`);
+                const response = await axios.get(`${getPaymentDetails}?type=${type}&id=${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
 
                 if (response.status !== 200) {
                     throw new Error('Failed to fetch payment details');

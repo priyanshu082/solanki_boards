@@ -37,6 +37,8 @@ export const getsubjectbyid = ADMIN_URL + "/subject";
 export const getcoursebyid = PUBLIC_URL + "/course";
 
 
+export const updateResultById = ADMIN_URL + "/result";
+
 export const uploadresult = ADMIN_URL + "/result";
 
 export const getAllPayments = ADMIN_URL + "/payment/list";

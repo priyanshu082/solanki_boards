@@ -19,7 +19,11 @@ const InstituteDetails = () => {
   useEffect(() => {
     const fetchInstituteDetails = async () => {
       try {
-        const response = await axios.get(`${getinstitutebyid}/${id}`)
+        const response = await axios.get(`${getinstitutebyid}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
         setInstitute(response.data)
         setLoading(false)
       } catch (error) {

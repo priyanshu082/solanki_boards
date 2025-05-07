@@ -126,7 +126,11 @@ const Enquiry = () => {
   const fetchEnquiries = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(getallenquiry);
+      const response = await axios.post(getallenquiry, {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       if (response.data && response.data.length > 0) {
         setEnquiries(response.data);
       } else {
@@ -160,7 +164,11 @@ const Enquiry = () => {
       setLoading(true);
       // Try to fetch from API first
       try {
-        const response = await axios.get(`${getallenquiry}/${id}`);
+        const response = await axios.get(`${getallenquiry}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         if (response.data) {
           setSelectedEnquiry(response.data);
           setUpdatedStatus(response.data.status);
@@ -208,6 +216,10 @@ const Enquiry = () => {
       const response = await axios.put(updateenquiry, {
         id: selectedEnquiry.id,
         status: updatedStatus
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       });
       
       if (response.data) {

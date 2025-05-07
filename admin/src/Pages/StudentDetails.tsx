@@ -25,7 +25,11 @@ const StudentDetails = () => {
           return
         }
 
-        const response = await axios.get(`${getstudentbyid}/${id}`)
+        const response = await axios.get(`${getstudentbyid}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
 
         setStudent(response.data)
 

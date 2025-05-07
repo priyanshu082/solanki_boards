@@ -113,9 +113,13 @@ const AllPaymentsDetails = () => {
                 skip,
                 limit,
                 ...cleanFilters
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             })
 
-            setPayments(response.data);            
+            setPayments(response.data);
             setTotalItems(response.data.length)
             setTotalPages(Math.ceil(response.data.length / itemsPerPage))
 

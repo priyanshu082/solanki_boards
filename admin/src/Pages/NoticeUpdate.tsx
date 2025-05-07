@@ -14,7 +14,7 @@ import { NoticePreview, NoticeDetails } from '../lib/Interfaces';
 import Swal from 'sweetalert2';
 import { Trash2, Search, Eye } from 'lucide-react';
 import { format } from 'date-fns';
-import { getallnotice,createnotice, deletenoticebyid, getnoticebyid } from '../Config';
+import { getallnotice, createnotice, deletenoticebyid, getnoticebyid } from '../Config';
 // Define the form schema for notice creation using zod
 const noticeSchema = z.object({
   title: z.string().min(1, "Notice title is required"),
@@ -48,7 +48,7 @@ const NoticeUpdate = () => {
 
   // Filter notices based on search term
   useEffect(() => {
-    const filtered = notices.filter(notice => 
+    const filtered = notices.filter(notice =>
       notice.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredNotices(filtered);
@@ -59,7 +59,11 @@ const NoticeUpdate = () => {
     try {
       setIsLoading(true);
       // Replace with your actual API endpoint
-      const response = await axios.post(getallnotice);
+      const response = await axios.post(getallnotice, {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       setNotices(response.data);
     } catch (error) {
       console.error("Failed to fetch notices", error);
@@ -79,7 +83,11 @@ const NoticeUpdate = () => {
     try {
       setIsLoading(true);
       // Replace with your actual API endpoint
-      await axios.post(createnotice, data);
+      await axios.post(createnotice, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       form.reset();
       fetchNotices();
       Swal.fire({
@@ -115,7 +123,11 @@ const NoticeUpdate = () => {
       if (result.isConfirmed) {
         try {
           // Replace with your actual API endpoint
-          await axios.delete(`${deletenoticebyid}/${id}`);
+          await axios.delete(`${deletenoticebyid}/${id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
           fetchNotices();
           Swal.fire(
             'Deleted!',
@@ -140,7 +152,11 @@ const NoticeUpdate = () => {
     try {
       setIsLoading(true);
       // Replace with your actual API endpoint
-      const response = await axios.get(`${getnoticebyid}/${id}`);
+      const response = await axios.get(`${getnoticebyid}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       setSelectedNotice(response.data);
     } catch (error) {
       console.error("Failed to fetch notice details", error);
@@ -155,7 +171,7 @@ const NoticeUpdate = () => {
     }
   };
 
- 
+
   return (
     <div className="container mx-auto p-6 space-y-8 max-w-full">
       {/* Notice Creation Form */}
@@ -180,7 +196,7 @@ const NoticeUpdate = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="description"
@@ -188,17 +204,17 @@ const NoticeUpdate = () => {
                   <FormItem>
                     <FormLabel>Notice Description</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Enter notice description" 
+                      <Textarea
+                        placeholder="Enter notice description"
                         className="min-h-[150px]"
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="forInstitute"
@@ -219,10 +235,10 @@ const NoticeUpdate = () => {
                   </FormItem>
                 )}
               />
-              
+
               <div className="flex justify-between">
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   variant="outline"
                   onClick={() => {
                     form.reset({
@@ -298,7 +314,7 @@ const NoticeUpdate = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          
+
                           <Button
                             variant="destructive"
                             size="icon"
@@ -335,8 +351,8 @@ const NoticeUpdate = () => {
               </div>
             </CardContent>
             <div className="p-6 pt-0 flex justify-end">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setSelectedNotice(null)}
               >
                 Close

@@ -57,6 +57,10 @@ const AllStudentDetails = () => {
         skip,
         limit,
         ...cleanFilters
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
 
       if (response.data.students) {

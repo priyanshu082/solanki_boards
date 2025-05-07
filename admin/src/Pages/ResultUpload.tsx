@@ -42,7 +42,7 @@ const ResultUpload = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!id || !courseId) return
-      
+
       try {
         setLoading(true)
         const token = localStorage.getItem('token') || 'hjj'
@@ -52,21 +52,29 @@ const ResultUpload = () => {
         }
 
         // Fetch student data
-        const studentResponse = await axios.post(getallstudents, { 
+        const studentResponse = await axios.post(getallstudents, {
           id,
           skip: 0,
           limit: 4
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         })
-        
+
         if (studentResponse.data && studentResponse.data[0]) {
           setStudentData(studentResponse.data[0])
         }
-        
+
         // Fetch course data directly using courseId from params
         try {
-          const courseResponse = await axios.get(`${getcoursebyid}/${courseId}`)
+          const courseResponse = await axios.get(`${getcoursebyid}/${courseId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
           setCourseData(courseResponse.data)
-          
+
           // Initialize subject results from course subjects
           if (courseResponse.data.subjects && courseResponse.data.subjects.length > 0) {
             const initialSubjectResults = courseResponse.data.subjects.map((subject: SubjectPreview) => ({
@@ -77,7 +85,7 @@ const ResultUpload = () => {
               grade: Grade.A,
               status: ResultStatus.PASS
             }));
-            
+
             setSubjectResults(initialSubjectResults);
             calculateTotalMarks(initialSubjectResults);
           }
@@ -90,7 +98,7 @@ const ResultUpload = () => {
             confirmButtonColor: '#3085d6'
           })
         }
-        
+
         setLoading(false)
       } catch (error) {
         console.error('Error fetching student data:', error)
@@ -120,15 +128,15 @@ const ResultUpload = () => {
   const calculateTotalMarks = (subjects: SubjectResult[]) => {
     let total = 0;
     let obtained = 0;
-    
+
     subjects.forEach(subject => {
       total += subject.totalMarks;
       obtained += subject.obtainedMarks;
     });
-    
+
     setTotalMarks(total);
     setObtainedMarks(obtained);
-    
+
     // Determine overall status
     if (subjects.length > 0) {
       const failedSubjects = subjects.filter(s => s.status === ResultStatus.FAIL);
@@ -153,11 +161,11 @@ const ResultUpload = () => {
 
     try {
       setLoading(true)
-      
+
       const resultData = {
         studentId: id,
         month,
-        year: 'Y'+year,
+        year: 'Y' + year,
         totalMarks,
         obtainedMarks,
         status,
@@ -170,17 +178,21 @@ const ResultUpload = () => {
           status: subject.status
         }))
       }
-      
+
       // Send result data to backend
-      await axios.post(uploadresult, resultData)
-      
+      await axios.post(uploadresult, resultData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+
       Swal.fire({
         icon: 'success',
         title: 'Success',
         text: 'Result uploaded successfully',
         confirmButtonColor: '#3085d6'
       })
-      
+
       navigate(`/student-details/${id}`)
     } catch (error) {
       console.error('Error uploading result:', error)
@@ -202,7 +214,7 @@ const ResultUpload = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Upload Result</h1>
-      
+
       {studentData && (
         <Card className="mb-6">
           <CardHeader>
@@ -222,7 +234,7 @@ const ResultUpload = () => {
           </CardContent>
         </Card>
       )}
-      
+
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Result Information</CardTitle>
@@ -231,8 +243,8 @@ const ResultUpload = () => {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <Label htmlFor="month">Month</Label>
-              <Select 
-                value={month} 
+              <Select
+                value={month}
                 onValueChange={(value) => setMonth(value as Month)}
               >
                 <SelectTrigger id="month">
@@ -249,8 +261,8 @@ const ResultUpload = () => {
             </div>
             <div>
               <Label htmlFor="year">Year</Label>
-              <Select 
-                value={year} 
+              <Select
+                value={year}
                 onValueChange={(value) => setYear(value as Year)}
               >
                 <SelectTrigger id="year">
@@ -266,30 +278,30 @@ const ResultUpload = () => {
               </Select>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div>
               <Label htmlFor="totalMarks">Total Marks</Label>
-              <Input 
-                id="totalMarks" 
-                type="number" 
-                value={totalMarks} 
-                readOnly 
+              <Input
+                id="totalMarks"
+                type="number"
+                value={totalMarks}
+                readOnly
               />
             </div>
             <div>
               <Label htmlFor="obtainedMarks">Obtained Marks</Label>
-              <Input 
-                id="obtainedMarks" 
-                type="number" 
-                value={obtainedMarks} 
-                readOnly 
+              <Input
+                id="obtainedMarks"
+                type="number"
+                value={obtainedMarks}
+                readOnly
               />
             </div>
             <div>
               <Label htmlFor="status">Overall Status</Label>
-              <Select 
-                value={status} 
+              <Select
+                value={status}
                 onValueChange={(value) => setStatus(value as ResultStatus)}
               >
                 <SelectTrigger id="status">
@@ -307,7 +319,7 @@ const ResultUpload = () => {
           </div>
         </CardContent>
       </Card>
-      
+
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Subject Results</CardTitle>
@@ -331,22 +343,22 @@ const ResultUpload = () => {
                     <TableCell>{subject.code}</TableCell>
                     <TableCell>{subject.name}</TableCell>
                     <TableCell>
-                      <Input 
-                        type="number" 
-                        value={subject.totalMarks} 
-                        onChange={(e) => handleUpdateSubject(index, 'totalMarks', parseInt(e.target.value) || 0)} 
+                      <Input
+                        type="number"
+                        value={subject.totalMarks}
+                        onChange={(e) => handleUpdateSubject(index, 'totalMarks', parseInt(e.target.value) || 0)}
                       />
                     </TableCell>
                     <TableCell>
-                      <Input 
-                        type="number" 
-                        value={subject.obtainedMarks} 
-                        onChange={(e) => handleUpdateSubject(index, 'obtainedMarks', parseInt(e.target.value) || 0)} 
+                      <Input
+                        type="number"
+                        value={subject.obtainedMarks}
+                        onChange={(e) => handleUpdateSubject(index, 'obtainedMarks', parseInt(e.target.value) || 0)}
                       />
                     </TableCell>
                     <TableCell>
-                      <Select 
-                        value={subject.grade} 
+                      <Select
+                        value={subject.grade}
                         onValueChange={(value) => handleUpdateSubject(index, 'grade', value as Grade)}
                       >
                         <SelectTrigger>
@@ -362,8 +374,8 @@ const ResultUpload = () => {
                       </Select>
                     </TableCell>
                     <TableCell>
-                      <Select 
-                        value={subject.status} 
+                      <Select
+                        value={subject.status}
                         onValueChange={(value) => handleUpdateSubject(index, 'status', value as ResultStatus)}
                       >
                         <SelectTrigger>
@@ -387,7 +399,7 @@ const ResultUpload = () => {
           )}
         </CardContent>
       </Card>
-      
+
       <div className="flex justify-end gap-4">
         <Button variant="outline" onClick={() => navigate(`/student-details/${id}`)}>
           Cancel

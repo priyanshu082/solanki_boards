@@ -96,8 +96,16 @@ const CourseCreate = () => {
   const fetchCourses = async () => {
     try {
       setIsLoading(true);
-      const courseResponse = await axios.post(getallcourse);
-      const subjectResponse = await axios.post(getallsubject);
+      const courseResponse = await axios.post(getallcourse, {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const subjectResponse = await axios.post(getallsubject, {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
 
       // Group subjects by courseId
       const subjectsByCourse: Record<string, SubjectPreview[]> = {};
@@ -132,7 +140,11 @@ const CourseCreate = () => {
   const onSubmit = async (data: CourseFormValues) => {
     try {
       setIsLoading(true);
-      await axios.post(createcourse, data);
+      await axios.post(createcourse, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       form.reset();
       fetchCourses();
       Swal.fire({
@@ -167,7 +179,11 @@ const CourseCreate = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`${deletecoursebyid}/${id}`);
+          await axios.delete(`${deletecoursebyid}/${id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
           fetchCourses();
           Swal.fire(
             'Deleted!',

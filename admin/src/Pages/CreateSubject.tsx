@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createsubject, getallsubject, deletesubjectbyid, getallcourse } from '../Config';
-import { CoursePreview,SubjectPreview} from '../lib/Interfaces';
+import { CoursePreview, SubjectPreview } from '../lib/Interfaces';
 import Swal from 'sweetalert2';
 import { Trash2, Search } from 'lucide-react';
 
@@ -65,7 +65,7 @@ const CreateSubject = () => {
 
   // Filter subjects based on search term
   useEffect(() => {
-    const filtered = subjects.filter(subject => 
+    const filtered = subjects.filter(subject =>
       subject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       subject.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (subject.course?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
@@ -77,7 +77,11 @@ const CreateSubject = () => {
   const fetchSubjects = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.post(getallsubject);
+      const response = await axios.post(getallsubject, {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       setSubjects(response.data);
     } catch (error) {
       console.error("Failed to fetch subjects", error);
@@ -95,9 +99,13 @@ const CreateSubject = () => {
   // Function to fetch courses for dropdown
   const fetchCourses = async () => {
     try {
-    
+
       setIsLoading(true);
-      const response = await axios.post(getallcourse);
+      const response = await axios.post(getallcourse, {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       setCourses(response.data);
     } catch (error) {
       console.error("Failed to fetch courses", error);
@@ -114,7 +122,11 @@ const CreateSubject = () => {
   const onSubmit = async (data: SubjectFormValues) => {
     try {
       setIsLoading(true);
-      await axios.post(createsubject, data);
+      await axios.post(createsubject, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       form.reset();
       fetchSubjects();
       Swal.fire({
@@ -199,7 +211,7 @@ const CreateSubject = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="code"
@@ -213,7 +225,7 @@ const CreateSubject = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="fees"
@@ -221,9 +233,9 @@ const CreateSubject = () => {
                   <FormItem>
                     <FormLabel>Subject Fees (Optional)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="Enter subject fees" 
+                      <Input
+                        type="number"
+                        placeholder="Enter subject fees"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -232,15 +244,15 @@ const CreateSubject = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="courseId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Course</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
+                    <Select
+                      onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -260,15 +272,15 @@ const CreateSubject = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Subject Type</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
+                    <Select
+                      onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -288,7 +300,7 @@ const CreateSubject = () => {
                   </FormItem>
                 )}
               />
-              
+
               <Button type="submit" className="md:col-span-1" disabled={isLoading}>
                 {isLoading ? "Creating..." : "Create Subject"}
               </Button>
@@ -345,16 +357,16 @@ const CreateSubject = () => {
                       <TableCell>{subject.type.replace('_', ' ')}</TableCell>
                       <TableCell>{subject.course?.name || getCourseName(subject.courseId)}</TableCell>
                       <TableCell className="text-right">
-                        
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            className='text-white'
-                            onClick={() => handleDeleteSubject(subject.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                   
+
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className='text-white'
+                          onClick={() => handleDeleteSubject(subject.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+
                       </TableCell>
                     </TableRow>
                   ))}

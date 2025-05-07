@@ -56,6 +56,10 @@ const AllInstituteDetails = () => {
           skip,
           limit,
           ...(filters.paymentStatus && { paymentStatus: filters.paymentStatus })
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         })
 
         if (response.data.institutes) {
