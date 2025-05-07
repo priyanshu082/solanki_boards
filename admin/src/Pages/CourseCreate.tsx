@@ -9,11 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createcourse, getallcourse, deletecoursebyid, getallsubject } from '../Config';
+import { createcourse, getallcourse, deleteCourse, getallsubject, updateCourse } from '../Config';
 import { CoursePreview, SubjectPreview } from '../lib/Interfaces';
 import Swal from 'sweetalert2';
 import { Trash2, Pencil, Search, ChevronDown, ChevronUp } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 
 // Define CourseType enum since it's missing in Interfaces.ts
@@ -54,12 +53,12 @@ interface CourseWithSubjects extends CoursePreview {
 }
 
 const CourseCreate = () => {
-  const navigate = useNavigate();
   const [courses, setCourses] = useState<CourseWithSubjects[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCourses, setFilteredCourses] = useState<CourseWithSubjects[]>([]);
   const [expandedCourses, setExpandedCourses] = useState<Record<string, boolean>>({});
+  const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
 
   // Initialize the form
   const form = useForm<CourseFormValues>({
@@ -136,28 +135,53 @@ const CourseCreate = () => {
     }
   };
 
-  // Function to create a new course
+  // Function to create or update a course
   const onSubmit = async (data: CourseFormValues) => {
     try {
       setIsLoading(true);
-      await axios.post(createcourse, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      if (editingCourseId) {
+        // Update course
+        const updateData = {
+          id: editingCourseId,
+          name: data.name,
+          fees: data.fees,
+          duration: data.duration,
+          durationType: data.durationType,
+          courseType: data.courseType,
+        };
+        await axios.put(updateCourse, updateData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        Swal.fire({
+          title: 'Success!',
+          text: 'Course updated successfully!',
+          icon: 'success',
+          confirmButtonText: 'Great!'
+        });
+        setEditingCourseId(null);
+      } else {
+        // Create course
+        await axios.post(createcourse, data, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        Swal.fire({
+          title: 'Success!',
+          text: 'Course created successfully!',
+          icon: 'success',
+          confirmButtonText: 'Great!'
+        });
+      }
       form.reset();
       fetchCourses();
-      Swal.fire({
-        title: 'Success!',
-        text: 'Course created successfully!',
-        icon: 'success',
-        confirmButtonText: 'Great!'
-      });
     } catch (error) {
       console.error("Failed to create course", error);
       Swal.fire({
         title: 'Error!',
-        text: 'Failed to create course. Please try again.',
+        text: editingCourseId ? 'Failed to update course. Please try again.' : 'Failed to create course. Please try again.',
         icon: 'error',
         confirmButtonText: 'OK'
       });
@@ -179,7 +203,7 @@ const CourseCreate = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`${deletecoursebyid}/${id}`, {
+          await axios.delete(`${deleteCourse}/${id}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`
             }
@@ -201,6 +225,22 @@ const CourseCreate = () => {
         }
       }
     });
+  };
+
+  // Function to handle edit click
+  const handleEditCourse = (course: CourseWithSubjects) => {
+    setEditingCourseId(course.id);
+    form.setValue('name', course.name);
+    form.setValue('fees', course.fees || 0);
+    form.setValue('courseType', course.courseType as CourseType);
+    form.setValue('durationType', course.durationType as DurationType);
+    form.setValue('duration', course.duration || 1);
+  };
+
+  // Function to handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingCourseId(null);
+    form.reset();
   };
 
   return (
@@ -227,20 +267,6 @@ const CourseCreate = () => {
                   </FormItem>
                 )}
               />
-
-              {/* <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Course Code (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter course code" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
 
               <FormField
                 control={form.control}
@@ -336,8 +362,13 @@ const CourseCreate = () => {
               />
 
               <Button type="submit" className="md:col-span-4" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Course"}
+                {isLoading ? (editingCourseId ? "Updating..." : "Creating...") : (editingCourseId ? "Update Course" : "Create Course")}
               </Button>
+              {editingCourseId && (
+                <Button type="button" variant="secondary" className="md:col-span-4" onClick={handleCancelEdit}>
+                  Cancel Edit
+                </Button>
+              )}
             </form>
           </Form>
         </CardContent>
@@ -387,7 +418,10 @@ const CourseCreate = () => {
                 <TableBody>
                   {filteredCourses.map((course) => (
                     <>
-                      <TableRow key={course.id}>
+                      <TableRow
+                        key={course.id}
+                        className={editingCourseId === course.id ? 'bg-gray-100 scale-[1.01] transition-all duration-300' : ''}
+                      >
                         <TableCell className="font-medium">{course.name}</TableCell>
                         <TableCell>{course.courseType}</TableCell>
                         <TableCell>{course.fees ? `₹${course.fees}` : "N/A"}</TableCell>
@@ -416,7 +450,7 @@ const CourseCreate = () => {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => navigate(`/course-details/${course.id}`)}
+                              onClick={() => handleEditCourse(course)}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
@@ -430,7 +464,6 @@ const CourseCreate = () => {
                             </Button>
                           </div>
                         </TableCell>
-
                       </TableRow>
                       {expandedCourses[course.id] && course.subjects && course.subjects.length > 0 && (
                         <TableRow className="bg-gray-50">

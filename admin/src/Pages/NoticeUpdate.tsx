@@ -12,9 +12,9 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Switch } from "@/components/ui/switch";
 import { NoticePreview, NoticeDetails } from '../lib/Interfaces';
 import Swal from 'sweetalert2';
-import { Trash2, Search, Eye } from 'lucide-react';
+import { Trash2, Search, Eye, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
-import { getallnotice, createnotice, deletenoticebyid, getnoticebyid } from '../Config';
+import { getallnotice, createnotice, deleteNotice, getnoticebyid, updateNotice } from '../Config';
 // Define the form schema for notice creation using zod
 const noticeSchema = z.object({
   title: z.string().min(1, "Notice title is required"),
@@ -30,6 +30,7 @@ const NoticeUpdate = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredNotices, setFilteredNotices] = useState<NoticePreview[]>([]);
   const [selectedNotice, setSelectedNotice] = useState<NoticeDetails | null>(null);
+  const [editingNoticeId, setEditingNoticeId] = useState<string | null>(null);
 
   // Initialize the form
   const form = useForm<NoticeFormValues>({
@@ -82,25 +83,45 @@ const NoticeUpdate = () => {
   const onSubmit = async (data: NoticeFormValues) => {
     try {
       setIsLoading(true);
-      // Replace with your actual API endpoint
-      await axios.post(createnotice, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      if (editingNoticeId) {
+        // Update notice
+        await axios.put(updateNotice, {
+          id: editingNoticeId,
+          ...data
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        Swal.fire({
+          title: 'Success!',
+          text: 'Notice updated successfully!',
+          icon: 'success',
+          confirmButtonText: 'Great!'
+        });
+        setEditingNoticeId(null);
+        setSelectedNotice(null);
+      } else {
+        // Create notice
+        await axios.post(createnotice, data, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        Swal.fire({
+          title: 'Success!',
+          text: 'Notice created successfully!',
+          icon: 'success',
+          confirmButtonText: 'Great!'
+        });
+      }
       form.reset();
       fetchNotices();
-      Swal.fire({
-        title: 'Success!',
-        text: 'Notice created successfully!',
-        icon: 'success',
-        confirmButtonText: 'Great!'
-      });
     } catch (error) {
-      console.error("Failed to create notice", error);
+      console.error("Failed to create/update notice", error);
       Swal.fire({
         title: 'Error!',
-        text: 'Failed to create notice. Please try again.',
+        text: editingNoticeId ? 'Failed to update notice. Please try again.' : 'Failed to create notice. Please try again.',
         icon: 'error',
         confirmButtonText: 'OK'
       });
@@ -122,8 +143,7 @@ const NoticeUpdate = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Replace with your actual API endpoint
-          await axios.delete(`${deletenoticebyid}/${id}`, {
+          await axios.delete(`${deleteNotice}/${id}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`
             }
@@ -171,6 +191,22 @@ const NoticeUpdate = () => {
     }
   };
 
+  // Function to handle edit click
+  const handleEditNotice = (notice: NoticePreview) => {
+    setEditingNoticeId(notice.id);
+    form.setValue('title', notice.title);
+    // Try to get description if available (from NoticeDetails), otherwise fallback to empty string
+    const description = (notice as NoticeDetails).description || '';
+    form.setValue('description', description);
+    form.setValue('forInstitute', notice.forInstitute || false);
+    setSelectedNotice(null);
+  };
+
+  // Function to handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingNoticeId(null);
+    form.reset();
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-8 max-w-full">
@@ -237,22 +273,28 @@ const NoticeUpdate = () => {
               />
 
               <div className="flex justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    form.reset({
-                      title: "",
-                      description: "",
-                      forInstitute: false
-                    });
-                    setSelectedNotice(null);
-                  }}
-                >
-                  Cancel
-                </Button>
+                {editingNoticeId ? (
+                  <Button type="button" variant="secondary" onClick={handleCancelEdit}>
+                    Cancel Edit
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      form.reset({
+                        title: "",
+                        description: "",
+                        forInstitute: false
+                      });
+                      setSelectedNotice(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                )}
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Saving..." : (selectedNotice ? "Update Notice" : "Create Notice")}
+                  {isLoading ? (editingNoticeId ? "Updating..." : "Saving...") : (editingNoticeId ? "Update Notice" : (selectedNotice ? "Update Notice" : "Create Notice"))}
                 </Button>
               </div>
             </form>
@@ -301,7 +343,10 @@ const NoticeUpdate = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredNotices.map((notice) => (
-                    <TableRow key={notice.id}>
+                    <TableRow
+                      key={notice.id}
+                      className={editingNoticeId === notice.id ? 'bg-gray-100 scale-[1.01] transition-all duration-300' : ''}
+                    >
                       <TableCell className="font-medium">{notice.title}</TableCell>
                       <TableCell>{format(new Date(notice.createdAt), 'PPP')}</TableCell>
                       <TableCell>{notice.forInstitute ? "Yes" : "No"}</TableCell>
@@ -314,7 +359,13 @@ const NoticeUpdate = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleEditNotice(notice)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant="destructive"
                             size="icon"

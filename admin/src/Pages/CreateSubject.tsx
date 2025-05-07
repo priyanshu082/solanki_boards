@@ -9,10 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createsubject, getallsubject, deletesubjectbyid, getallcourse } from '../Config';
+import { createsubject, getallsubject, deleteSubject, getallcourse, updateSubject } from '../Config';
 import { CoursePreview, SubjectPreview } from '../lib/Interfaces';
 import Swal from 'sweetalert2';
-import { Trash2, Search } from 'lucide-react';
+import { Trash2, Search, Pencil } from 'lucide-react';
 
 // Define SubjectType enum with correct values
 enum SubjectType {
@@ -28,7 +28,6 @@ enum SubjectType {
 const subjectSchema = z.object({
   name: z.string().min(1, "Subject name is required"),
   code: z.string().min(1, "Subject code is required"),
-  fees: z.number().optional(),
   courseId: z.string().min(1, "Course is required"),
   type: z.nativeEnum(SubjectType, {
     required_error: "Subject type is required",
@@ -44,6 +43,7 @@ const CreateSubject = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSubjects, setFilteredSubjects] = useState<SubjectPreview[]>([]);
+  const [editingSubjectId, setEditingSubjectId] = useState<string | null>(null);
 
   // Initialize the form
   const form = useForm<SubjectFormValues>({
@@ -51,7 +51,6 @@ const CreateSubject = () => {
     defaultValues: {
       name: "",
       code: "",
-      fees: 0,
       courseId: "",
       type: undefined
     }
@@ -118,34 +117,73 @@ const CreateSubject = () => {
     }
   };
 
-  // Function to create a new subject
+  // Function to create or update a subject
   const onSubmit = async (data: SubjectFormValues) => {
     try {
       setIsLoading(true);
-      await axios.post(createsubject, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      if (editingSubjectId) {
+        // Update subject
+        const updateData = {
+          id: editingSubjectId,
+          name: data.name,
+          code: data.code,
+          courseId: data.courseId,
+          type: data.type,
+        };
+        await axios.put(updateSubject, updateData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        Swal.fire({
+          title: 'Success!',
+          text: 'Subject updated successfully!',
+          icon: 'success',
+          confirmButtonText: 'Great!'
+        });
+        setEditingSubjectId(null);
+      } else {
+        // Create subject
+        await axios.post(createsubject, data, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        Swal.fire({
+          title: 'Success!',
+          text: 'Subject created successfully!',
+          icon: 'success',
+          confirmButtonText: 'Great!'
+        });
+      }
       form.reset();
       fetchSubjects();
-      Swal.fire({
-        title: 'Success!',
-        text: 'Subject created successfully!',
-        icon: 'success',
-        confirmButtonText: 'Great!'
-      });
     } catch (error) {
-      console.error("Failed to create subject", error);
+      console.error("Failed to create/update subject", error);
       Swal.fire({
         title: 'Error!',
-        text: 'Failed to create subject. Please try again.',
+        text: editingSubjectId ? 'Failed to update subject. Please try again.' : 'Failed to create subject. Please try again.',
         icon: 'error',
         confirmButtonText: 'OK'
       });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Function to handle edit click
+  const handleEditSubject = (subject: SubjectPreview) => {
+    setEditingSubjectId(subject.id);
+    form.setValue('name', subject.name);
+    form.setValue('code', subject.code);
+    form.setValue('courseId', subject.courseId);
+    form.setValue('type', subject.type as SubjectType);
+  };
+
+  // Function to handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingSubjectId(null);
+    form.reset();
   };
 
   // Function to delete a subject
@@ -161,7 +199,11 @@ const CreateSubject = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`${deletesubjectbyid}/${id}`);
+          await axios.delete(`${deleteSubject}/${id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
           fetchSubjects();
           Swal.fire(
             'Deleted!',
@@ -228,25 +270,6 @@ const CreateSubject = () => {
 
               <FormField
                 control={form.control}
-                name="fees"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subject Fees (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Enter subject fees"
-                        {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="courseId"
                 render={({ field }) => (
                   <FormItem>
@@ -302,8 +325,13 @@ const CreateSubject = () => {
               />
 
               <Button type="submit" className="md:col-span-1" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Subject"}
+                {isLoading ? (editingSubjectId ? "Updating..." : "Creating...") : (editingSubjectId ? "Update Subject" : "Create Subject")}
               </Button>
+              {editingSubjectId && (
+                <Button type="button" variant="secondary" className="md:col-span-1" onClick={handleCancelEdit}>
+                  Cancel Edit
+                </Button>
+              )}
             </form>
           </Form>
         </CardContent>
@@ -351,22 +379,32 @@ const CreateSubject = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredSubjects.map((subject) => (
-                    <TableRow key={subject.id}>
+                    <TableRow
+                      key={subject.id}
+                      className={editingSubjectId === subject.id ? 'bg-gray-100 scale-[1.01] transition-all duration-300' : ''}
+                    >
                       <TableCell className="font-medium">{subject.name}</TableCell>
                       <TableCell>{subject.code}</TableCell>
                       <TableCell>{subject.type.replace('_', ' ')}</TableCell>
                       <TableCell>{subject.course?.name || getCourseName(subject.courseId)}</TableCell>
                       <TableCell className="text-right">
-
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className='text-white'
-                          onClick={() => handleDeleteSubject(subject.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleEditSubject(subject)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className='text-white'
+                            onClick={() => handleDeleteSubject(subject.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

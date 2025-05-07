@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { EnquiryPreview, EnquiryDetails, EnquiryStatus } from '@/lib/Interfaces'
-import { Loader2, Search, Filter, RefreshCw, Eye } from 'lucide-react'
+import { Loader2, Search, Filter, RefreshCw, Eye, Trash2 } from 'lucide-react'
 import Swal from 'sweetalert2'
-import { getallenquiry, updateenquiry } from '@/Config'
+import { getallenquiry, updateenquiry, deleteEnquiry } from '@/Config'
 
 const Enquiry = () => {
   const [enquiries, setEnquiries] = useState<EnquiryPreview[]>([]);
@@ -152,8 +152,8 @@ const Enquiry = () => {
 
   // Filter enquiries based on search term and status
   const filteredEnquiries = enquiries.filter(enquiry => {
-    const matchesSearch = enquiry.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          enquiry.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = enquiry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      enquiry.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter && statusFilter !== "all" ? enquiry.status === statusFilter : true;
     return matchesSearch && matchesStatus;
   });
@@ -178,7 +178,7 @@ const Enquiry = () => {
       } catch (apiError) {
         console.error("API error, falling back to dummy data:", apiError);
       }
-      
+
       // Fallback to dummy data if API fails or returns no data
       const enquiryDetail = dummyEnquiryDetails[id] || {
         id,
@@ -209,7 +209,7 @@ const Enquiry = () => {
   // Function to update enquiry status
   const handleUpdateEnquiry = async () => {
     if (!selectedEnquiry || !updatedStatus) return;
-    
+
     setLoading(true);
     try {
       // Make the actual API call
@@ -221,7 +221,7 @@ const Enquiry = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
+
       if (response.data) {
         // Update the selected enquiry with the response data
         const updatedEnquiry = {
@@ -230,18 +230,18 @@ const Enquiry = () => {
           updatedAt: new Date()
         };
         setSelectedEnquiry(updatedEnquiry);
-        
+
         // Update the enquiry in the list
-        setEnquiries(prevEnquiries => 
-          prevEnquiries.map(enquiry => 
-            enquiry.id === selectedEnquiry.id 
-              ? { ...enquiry, status: updatedStatus as EnquiryStatus } 
+        setEnquiries(prevEnquiries =>
+          prevEnquiries.map(enquiry =>
+            enquiry.id === selectedEnquiry.id
+              ? { ...enquiry, status: updatedStatus as EnquiryStatus }
               : enquiry
           )
         );
-        
+
         setLoading(false);
-        
+
         Swal.fire({
           title: 'Success!',
           text: 'Enquiry status has been updated successfully.',
@@ -260,6 +260,43 @@ const Enquiry = () => {
       setLoading(false);
     }
   };
+
+  // Function to delete enquiry
+  const handleDeleteEnquiry = async (enquiryId: string) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      })
+      if (result.isConfirmed) {
+        await axios.delete(`${deleteEnquiry}/${enquiryId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        await Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Enquiry has been deleted.',
+          timer: 1500,
+          showConfirmButton: false
+        })
+        fetchEnquiries()
+      }
+    } catch {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to delete enquiry',
+        confirmButtonColor: '#3085d6'
+      })
+    }
+  }
 
   // Status badge component
   const StatusBadge = ({ status }: { status: EnquiryStatus }) => {
@@ -349,7 +386,7 @@ const Enquiry = () => {
                   Back to List
                 </Button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-1">Contact Information</h3>
@@ -367,19 +404,19 @@ const Enquiry = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-500 mb-2">Description</h3>
                 <div className="p-4 bg-gray-50 rounded-md">
                   <p className="whitespace-pre-wrap">{selectedEnquiry.description}</p>
                 </div>
               </div>
-              
+
               <div className="border-t pt-4">
                 <h3 className="text-sm font-medium text-gray-500 mb-2">Actions</h3>
                 <div className="flex gap-2">
-                  <Select 
-                    value={updatedStatus} 
+                  <Select
+                    value={updatedStatus}
                     onValueChange={(value) => setUpdatedStatus(value as EnquiryStatus)}
                   >
                     <SelectTrigger className="w-[200px]">
@@ -393,7 +430,7 @@ const Enquiry = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Button 
+                  <Button
                     onClick={handleUpdateEnquiry}
                     disabled={loading || updatedStatus === selectedEnquiry.status}
                   >
@@ -431,14 +468,24 @@ const Enquiry = () => {
                         <StatusBadge status={enquiry.status} />
                       </TableCell>
                       <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleViewEnquiry(enquiry.id)}
-                          className="flex items-center gap-1"
-                        >
-                          <Eye className="h-4 w-4" /> View Details
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewEnquiry(enquiry.id)}
+                            className="flex items-center gap-1"
+                          >
+                            <Eye className="h-4 w-4" /> View Details
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className='text-white'
+                            onClick={() => handleDeleteEnquiry(enquiry.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

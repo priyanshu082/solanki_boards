@@ -1,20 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { getinstitutebyid } from '@/Config'
+import { getinstitutebyid, updateInstitute, deleteInstitute } from '@/Config'
 import { InstituteDetails as InstituteDetailsType } from '@/lib/Interfaces'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Trash2 } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { format } from 'date-fns'
 import { Table, TableHeader, TableBody, TableCell, TableRow, TableHead } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+
+// Define Gender enum locally for select
+enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  OTHER = 'OTHER',
+}
 
 const InstituteDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [institute, setInstitute] = useState<InstituteDetailsType | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editData, setEditData] = useState<Partial<InstituteDetailsType> | null>(null)
 
   useEffect(() => {
     const fetchInstituteDetails = async () => {
@@ -25,6 +34,7 @@ const InstituteDetails = () => {
           }
         })
         setInstitute(response.data)
+        setEditData(response.data)
         setLoading(false)
       } catch (error) {
         console.error('Error fetching institute details:', error)
@@ -43,39 +53,41 @@ const InstituteDetails = () => {
     }
   }, [id])
 
-  // const handleDelete = async () => {
-  //   try {
-  //     const result = await Swal.fire({
-  //       title: 'Are you sure?',
-  //       text: "You won't be able to revert this!",
-  //       icon: 'warning',
-  //       showCancelButton: true,
-  //       confirmButtonColor: '#d33',
-  //       cancelButtonColor: '#3085d6',
-  //       confirmButtonText: 'Yes, delete it!'
-  //     })
-
-  //     if (result.isConfirmed) {
-  //       await axios.delete(`${deleteinstitutebyid}/${id}`)
-  //       await Swal.fire({
-  //         icon: 'success',
-  //         title: 'Deleted!',
-  //         text: 'Institute has been deleted.',
-  //         timer: 1500,
-  //         showConfirmButton: false
-  //       })
-  //       navigate('/all-institutes')
-  //     }
-  //   } catch (error) {
-  //     console.error('Error deleting institute:', error)
-  //     await Swal.fire({
-  //       icon: 'error',
-  //       title: 'Error',
-  //       text: 'Failed to delete institute',
-  //       confirmButtonColor: '#3085d6'
-  //     })
-  //   }
-  // }
+  const handleDelete = async () => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      })
+      if (result.isConfirmed) {
+        await axios.delete(`${deleteInstitute}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        await Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Institute has been deleted.',
+          timer: 1500,
+          showConfirmButton: false
+        })
+        navigate('/all-institutes')
+      }
+    } catch {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to delete institute',
+        confirmButtonColor: '#3085d6'
+      })
+    }
+  }
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>
@@ -85,18 +97,83 @@ const InstituteDetails = () => {
     return <div className="flex justify-center items-center min-h-screen">Institute not found</div>
   }
 
+  const handleEditClick = () => {
+    setIsEditing(true)
+    setEditData(institute)
+  }
+
+  const handleEditChange = (field: string, value: string) => {
+    setEditData({ ...editData, [field]: value })
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    setEditData(institute)
+  }
+
+  const handleEditSubmit = async () => {
+    try {
+      const token = localStorage.getItem('token') || ''
+      const data = new FormData()
+      // Add all fields as per schema
+      const fields = [
+        'applicationNumber',
+        'headDob', 'headName', 'headFatherName', 'headAadharNumber', 'headPanCardNumber', 'headMobileNumber', 'headEmailId', 'headGender',
+        'headAddress', 'headCity', 'headState', 'headUnionTerritory', 'headCountry', 'headPincode',
+        'headBankName', 'headAccountNumber', 'headIfscCode',
+        'centerCode', 'centerName', 'centerEmailId', 'centerWebsiteUrl', 'centerPhoneNumber',
+        'centerAddress', 'centerCity', 'centerState', 'centerUnionTerritory', 'centerCountry', 'centerPincode',
+        'documentId', 'documentType',
+      ]
+      fields.forEach(field => {
+        if (editData && typeof editData[field as keyof typeof editData] !== 'undefined' && editData[field as keyof typeof editData] !== null) {
+          data.append(field, String(editData[field as keyof typeof editData] ?? ''))
+        }
+      })
+      await axios.put(updateInstitute, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setIsEditing(false)
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Institute details updated successfully',
+        timer: 1500,
+        showConfirmButton: false
+      })
+      // Refresh data
+      const response = await axios.get(`${getinstitutebyid}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      setInstitute(response.data)
+      setEditData(response.data)
+    } catch {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to update institute details',
+        confirmButtonColor: '#3085d6'
+      })
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{institute.centerName}</h1>
-        {/* <Button
-          variant="destructive"
-          onClick={handleDelete}
-          className="flex items-center gap-2"
-        >
-          <Trash2 size={16} />
-          Delete Institute
-        </Button> */}
+        <div className="flex gap-2">
+          {!isEditing && <Button variant="outline" onClick={handleEditClick}>Edit</Button>}
+          <Button variant="destructive" onClick={handleDelete} size="icon" title="Delete Institute">
+            <Trash2 className="h-5 w-5" />
+          </Button>
+          {isEditing && <Button variant="default" onClick={handleEditSubmit}>Submit</Button>}
+          {isEditing && <Button variant="secondary" onClick={handleCancelEdit}>Cancel</Button>}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -109,35 +186,54 @@ const InstituteDetails = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Name</p>
-                <p className="font-medium">{institute.headName}</p>
+                {isEditing ? (
+                  <input className="font-medium w-full border rounded px-2 py-1" value={editData && editData.headName ? editData.headName : ''} onChange={e => handleEditChange('headName', e.target.value)} />
+                ) : <p className="font-medium">{institute.headName}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Father's Name</p>
-                <p className="font-medium">{institute.headFatherName}</p>
+                {isEditing ? (
+                  <input className="font-medium w-full border rounded px-2 py-1" value={editData && editData.headFatherName ? editData.headFatherName : ''} onChange={e => handleEditChange('headFatherName', e.target.value)} />
+                ) : <p className="font-medium">{institute.headFatherName}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Date of Birth</p>
-                <p className="font-medium">{institute.headDob}</p>
+                {isEditing ? (
+                  <input type="date" className="font-medium w-full border rounded px-2 py-1" value={editData && editData.headDob ? editData.headDob.split('T')[0] : ''} onChange={e => handleEditChange('headDob', e.target.value)} />
+                ) : <p className="font-medium">{institute.headDob}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Gender</p>
-                <p className="font-medium">{institute.headGender}</p>
+                {isEditing ? (
+                  <select className="font-medium w-full border rounded px-2 py-1" value={editData && editData.headGender ? editData.headGender : ''} onChange={e => handleEditChange('headGender', e.target.value)}>
+                    <option value="">Select Gender</option>
+                    {Object.values(Gender).map(g => <option key={g} value={g}>{g}</option>)}
+                  </select>
+                ) : <p className="font-medium">{institute.headGender}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Aadhar Number</p>
-                <p className="font-medium">{institute.headAadharNumber}</p>
+                {isEditing ? (
+                  <input className="font-medium w-full border rounded px-2 py-1" value={editData && editData.headAadharNumber ? editData.headAadharNumber : ''} onChange={e => handleEditChange('headAadharNumber', e.target.value)} />
+                ) : <p className="font-medium">{institute.headAadharNumber}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">PAN Card Number</p>
-                <p className="font-medium">{institute.headPanCardNumber}</p>
+                {isEditing ? (
+                  <input className="font-medium w-full border rounded px-2 py-1" value={editData && editData.headPanCardNumber ? editData.headPanCardNumber : ''} onChange={e => handleEditChange('headPanCardNumber', e.target.value)} />
+                ) : <p className="font-medium">{institute.headPanCardNumber}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Mobile Number</p>
-                <p className="font-medium">{institute.headMobileNumber}</p>
+                {isEditing ? (
+                  <input className="font-medium w-full border rounded px-2 py-1" value={editData && editData.headMobileNumber ? editData.headMobileNumber : ''} onChange={e => handleEditChange('headMobileNumber', e.target.value)} />
+                ) : <p className="font-medium">{institute.headMobileNumber}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{institute.headEmailId}</p>
+                {isEditing ? (
+                  <input type="email" className="font-medium w-full border rounded px-2 py-1" value={editData && editData.headEmailId ? editData.headEmailId : ''} onChange={e => handleEditChange('headEmailId', e.target.value)} />
+                ) : <p className="font-medium">{institute.headEmailId}</p>}
               </div>
             </div>
           </CardContent>

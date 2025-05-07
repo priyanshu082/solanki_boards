@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Month, Year, ResultStatus, Grade, InterfaceStudentDetails, SubjectPreview } from '@/lib/Interfaces'
+import { Month, Year, ResultStatus, Grade, InterfaceStudentDetails, SubjectPreview, ResultDetails } from '@/lib/Interfaces'
 import Swal from 'sweetalert2'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { getallstudents, getcoursebyid, uploadresult } from '@/Config'
+import { getallstudents, getcoursebyid, uploadresult, updateResult, deleteResult } from '@/Config'
+import { Pencil1Icon } from '@radix-ui/react-icons'
+import { Trash2 } from 'lucide-react'
 
 interface SubjectResult {
   code: string
@@ -38,6 +40,8 @@ const ResultUpload = () => {
   const [obtainedMarks, setObtainedMarks] = useState<number>(0)
   const [status, setStatus] = useState<ResultStatus>(ResultStatus.PASS)
   const [subjectResults, setSubjectResults] = useState<SubjectResult[]>([])
+  const [results, setResults] = useState<ResultDetails[]>([])
+  const [editingResultId, setEditingResultId] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,6 +68,10 @@ const ResultUpload = () => {
 
         if (studentResponse.data && studentResponse.data[0]) {
           setStudentData(studentResponse.data[0])
+          // Extract results if they exist in the response
+          if (studentResponse.data[0].results && Array.isArray(studentResponse.data[0].results)) {
+            setResults(studentResponse.data[0].results)
+          }
         }
 
         // Fetch course data directly using courseId from params
@@ -148,6 +156,61 @@ const ResultUpload = () => {
     }
   }
 
+  const handleEditResult = (result: ResultDetails) => {
+    setEditingResultId(result.id)
+    setMonth(result.month as Month)
+    setYear(result.year as Year)
+    setTotalMarks(result.totalMarks)
+    setObtainedMarks(result.obtainedMarks)
+    setStatus(result.status as ResultStatus)
+    setSubjectResults(result.details.map((detail) => ({
+      code: detail.code,
+      name: detail.name,
+      totalMarks: detail.totalMarks,
+      obtainedMarks: detail.obtainedMarks,
+      grade: detail.grade as Grade,
+      status: detail.status as ResultStatus
+    })))
+  }
+
+  const resetForm = () => {
+    setEditingResultId(null)
+    setMonth(Month.JANUARY)
+    setYear(Year.Y2023)
+    setTotalMarks(0)
+    setObtainedMarks(0)
+    setStatus(ResultStatus.PASS)
+    setSubjectResults(courseData?.subjects?.map((subject: SubjectPreview) => ({
+      code: subject.code,
+      name: subject.name,
+      totalMarks: 100,
+      obtainedMarks: 0,
+      grade: Grade.A,
+      status: ResultStatus.PASS
+    })) || [])
+  }
+
+  const fetchStudentResults = async () => {
+    if (!id) return
+    try {
+      const token = localStorage.getItem('token') || 'hjj'
+      const studentResponse = await axios.post(getallstudents, {
+        id,
+        skip: 0,
+        limit: 4
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      if (studentResponse.data && studentResponse.data[0] && studentResponse.data[0].results) {
+        setResults(studentResponse.data[0].results)
+      }
+    } catch {
+      // Optionally handle error
+    }
+  }
+
   const handleSubmit = async () => {
     if (subjectResults.length === 0) {
       Swal.fire({
@@ -179,31 +242,86 @@ const ResultUpload = () => {
         }))
       }
 
-      // Send result data to backend
-      await axios.post(uploadresult, resultData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      })
+      if (editingResultId) {
+        // Update result
+        await axios.put(updateResult, {
+          id: editingResultId,
+          ...resultData
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Result updated successfully',
+          confirmButtonColor: '#3085d6'
+        })
+      } else {
+        // Upload new result
+        await axios.post(uploadresult, resultData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Result uploaded successfully',
+          confirmButtonColor: '#3085d6'
+        })
+      }
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Result uploaded successfully',
-        confirmButtonColor: '#3085d6'
-      })
-
-      navigate(`/student-details/${id}`)
+      // Refresh results and reset form
+      await fetchStudentResults()
+      resetForm()
     } catch (error) {
-      console.error('Error uploading result:', error)
+      console.error('Error uploading/updating result:', error)
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Failed to upload result',
+        text: editingResultId ? 'Failed to update result' : 'Failed to upload result',
         confirmButtonColor: '#3085d6'
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDeleteResult = async (resultId: string) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      })
+      if (result.isConfirmed) {
+        await axios.delete(`${deleteResult}/${resultId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        await Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Result has been deleted.',
+          timer: 1500,
+          showConfirmButton: false
+        })
+        await fetchStudentResults()
+      }
+    } catch {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to delete result',
+        confirmButtonColor: '#3085d6'
+      })
     }
   }
 
@@ -401,13 +519,120 @@ const ResultUpload = () => {
       </Card>
 
       <div className="flex justify-end gap-4">
-        <Button variant="outline" onClick={() => navigate(`/student-details/${id}`)}>
-          Cancel
-        </Button>
+        {editingResultId ? (
+          <Button variant="secondary" onClick={resetForm}>
+            Cancel Edit
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={resetForm}>
+            Cancel
+          </Button>
+        )}
         <Button onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Uploading...' : 'Upload Result'}
+          {loading ? (editingResultId ? 'Updating...' : 'Uploading...') : (editingResultId ? 'Update Result' : 'Upload Result')}
         </Button>
       </div>
+
+      {/* Uploaded Results Section */}
+      {results && results.length > 0 && (
+        <Card className="mb-6 mt-8">
+          <CardHeader>
+            <CardTitle className="text-2xl">Examination Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {results.map((result) => (
+              <div
+                key={result.id}
+                className={`mb-6 pb-6 last:border-b-0 last:pb-0 transition-all duration-300 rounded-lg
+                  ${editingResultId === result.id
+                    ? 'bg-gray-100 shadow-lg scale-[1.01]'
+                    : 'bg-white'}
+                `}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-semibold">
+                    {result.month} {result.year.replace('Y', '')} Examination
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <span className="mr-2">Status:</span>
+                    <span className={`px-2 py-1 rounded text-sm ${result.status === ResultStatus.PASS
+                      ? 'bg-green-100 text-green-800'
+                      : result.status === ResultStatus.FAIL
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                      {result.status}
+                    </span>
+                    <Button size="sm" variant="default" className="flex items-center gap-1" onClick={() => handleEditResult(result)} title="Edit Result">
+                      <Pencil1Icon className="w-4 h-4" /> Edit
+                    </Button>
+                    <Button size="sm" variant="destructive" className="flex items-center gap-1" onClick={() => handleDeleteResult(result.id)} title="Delete Result">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <h3 className="font-semibold text-gray-700">Total Marks</h3>
+                    <p>{result.totalMarks}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-700">Obtained Marks</h3>
+                    <p>{result.obtainedMarks}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-700">Percentage</h3>
+                    <p>{((result.obtainedMarks / result.totalMarks) * 100).toFixed(2)}%</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-700">Date</h3>
+                    <p>{result.createdAt ? new Date(result.createdAt).toLocaleDateString() : ''}</p>
+                  </div>
+                </div>
+
+                {result.details && result.details.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border p-2 text-left">Subject Code</th>
+                          <th className="border p-2 text-left">Subject Name</th>
+                          <th className="border p-2 text-left">Total Marks</th>
+                          <th className="border p-2 text-left">Obtained Marks</th>
+                          <th className="border p-2 text-left">Grade</th>
+                          <th className="border p-2 text-left">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {result.details.map((detail) => (
+                          <tr key={detail.id}>
+                            <td className="border p-2">{detail.code}</td>
+                            <td className="border p-2">{detail.name}</td>
+                            <td className="border p-2">{detail.totalMarks}</td>
+                            <td className="border p-2">{detail.obtainedMarks}</td>
+                            <td className="border p-2">{detail.grade}</td>
+                            <td className="border p-2">
+                              <span className={`px-2 py-1 rounded text-xs ${detail.status === ResultStatus.PASS
+                                ? 'bg-green-100 text-green-800'
+                                : detail.status === ResultStatus.FAIL
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                {detail.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

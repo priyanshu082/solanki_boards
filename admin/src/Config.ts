@@ -37,11 +37,25 @@ export const getsubjectbyid = ADMIN_URL + "/subject";
 export const getcoursebyid = PUBLIC_URL + "/course";
 
 
-export const updateResultById = ADMIN_URL + "/result";
+export const updateAdmission = ADMIN_URL + "/admission";
+export const updateInstitute = ADMIN_URL + "/institute";
+export const updateResult = ADMIN_URL + "/result";
+export const updateCourse = ADMIN_URL + "/course";
+export const updateSubject = ADMIN_URL + "/subject";
+export const updateNotice = ADMIN_URL + "/notice";
+
+export const deleteAdmission = ADMIN_URL + "/admission";
+export const deleteResult = ADMIN_URL + "/result";
+export const deleteInstitute = ADMIN_URL + "/institute";
+export const deleteCourse = ADMIN_URL + "/course";
+export const deleteSubject = ADMIN_URL + "/subject";
+export const deleteNotice = ADMIN_URL + "/notice";
+export const deleteEnquiry = ADMIN_URL + "/enquiry";
 
 export const uploadresult = ADMIN_URL + "/result";
 
 export const getAllPayments = ADMIN_URL + "/payment/list";
+export const getResult = ADMIN_URL + "/result/list";
 
 export const getPaymentDetails = BASE_URL + "/payment/get-payment-details";
 
