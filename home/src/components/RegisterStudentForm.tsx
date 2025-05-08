@@ -235,7 +235,7 @@ const RegisterStudentForm: React.FC = () => {
   return (
     <Card className="w-full mx-auto bg-white rounded-lg shadow-md text-primary">
       <CardHeader>
-        <CardTitle>School Registration Form</CardTitle>
+        <CardTitle>Student Admission Form</CardTitle>
       </CardHeader>
       <CardContent>
         <div className='flex flex-col '>

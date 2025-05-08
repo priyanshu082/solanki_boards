@@ -7,8 +7,10 @@ const Home = () => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { title: 'All Institutes', description: 'View and manage all institutes', icon: School, path: '/all-institutes' },
+    { title: 'Student Admission', description: 'New Student Admission', icon: Users, path: '/admission' },
     { title: 'All Students', description: 'View and manage all student records', icon: Users, path: '/all-students' },
+    { title: 'Institute Registration', description: 'New Institute Registration', icon: School, path: '/institute-registration' },
+    { title: 'All Institutes', description: 'View and manage all institutes', icon: School, path: '/all-institutes' },
     { title: 'Create Course', description: 'Create new courses for institutes', icon: BookOpen, path: '/create-course' },
     { title: 'Create Subject', description: 'Add new subjects to courses', icon: Grid, path: '/create-subject' },
     { title: 'Enquiries', description: 'Manage student enquiries', icon: MessageSquare, path: '/enquiry' },
@@ -20,7 +22,7 @@ const Home = () => {
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-gray-500">Welcome to the education management system</p>
+        <p className="text-gray-500">Welcome to the SBCODL Admin Dashboard</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
@@ -34,8 +36,8 @@ const Home = () => {
               <CardDescription>{item.description}</CardDescription>
             </CardHeader>
             <CardFooter>
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 onClick={() => navigate(item.path)}
               >
                 Navigate

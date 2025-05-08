@@ -15,6 +15,7 @@ export const getallnotice = ADMIN_URL + "/notice/list";
 export const getallresult = ADMIN_URL + "/result/list";
 export const getallsubject = ADMIN_URL + "/subject/list";
 
+export const createadmission = ADMIN_URL + "/admission";
 export const createcourse = ADMIN_URL + "/course";
 export const createsubject = ADMIN_URL + "/subject";
 export const createinstitute = ADMIN_URL + "/institute";
@@ -35,7 +36,7 @@ export const getnoticebyid = ADMIN_URL + "/notice";
 export const getresultbyid = ADMIN_URL + "/result";
 export const getsubjectbyid = ADMIN_URL + "/subject";
 export const getcoursebyid = PUBLIC_URL + "/course";
-
+export const getenquirybyid = ADMIN_URL + "/enquiry";
 
 export const updateAdmission = ADMIN_URL + "/admission";
 export const updateInstitute = ADMIN_URL + "/institute";

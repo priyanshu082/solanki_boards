@@ -167,12 +167,21 @@ const InstituteDetails = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{institute.centerName}</h1>
         <div className="flex gap-2">
-          {!isEditing && <Button variant="outline" onClick={handleEditClick}>Edit</Button>}
-          <Button variant="destructive" onClick={handleDelete} size="icon" title="Delete Institute">
-            <Trash2 className="h-5 w-5" />
-          </Button>
-          {isEditing && <Button variant="default" onClick={handleEditSubmit}>Submit</Button>}
-          {isEditing && <Button variant="secondary" onClick={handleCancelEdit}>Cancel</Button>}
+          <Button variant="outline" className='cursor-pointer' onClick={() => navigate('/all-institutes')}>Back to All Institutes</Button>
+          {!isEditing && (
+            <>
+              <Button variant="outline" className='cursor-pointer' onClick={handleEditClick}>Edit</Button>
+              <Button variant="destructive" className='cursor-pointer' onClick={handleDelete} size="icon" title="Delete Institute">
+                <Trash2 className="h-5 w-5 text-white" />
+              </Button>
+            </>
+          )}
+          {isEditing && (
+            <>
+              <Button variant="default" className='cursor-pointer' onClick={handleEditSubmit}>Submit</Button>
+              <Button variant="outline" className='cursor-pointer' onClick={handleCancelEdit}>Cancel</Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -184,6 +193,17 @@ const InstituteDetails = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Application Number</p>
+                {isEditing ? (
+                  <input
+                    className="font-medium w-full border rounded px-2 py-1 bg-gray-100 cursor-not-allowed"
+                    value={editData && editData.applicationNumber ? editData.applicationNumber : ''}
+                    onChange={e => handleEditChange('applicationNumber', e.target.value)}
+                    disabled={true}
+                  />
+                ) : <p className="font-medium">{institute.applicationNumber}</p>}
+              </div>
               <div>
                 <p className="text-sm text-gray-500">Name</p>
                 {isEditing ? (
@@ -248,23 +268,56 @@ const InstituteDetails = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Center Code</p>
-                <p className="font-medium">{institute.centerCode || '-'}</p>
+                {isEditing ? (
+                  <input
+                    className="font-medium w-full border rounded px-2 py-1 bg-gray-100 cursor-not-allowed"
+                    value={editData && editData.centerCode ? editData.centerCode : ''}
+                    onChange={e => handleEditChange('centerCode', e.target.value)}
+                    disabled={true}
+                  />
+                ) : <p className="font-medium">{institute.centerCode || '-'}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Center Name</p>
-                <p className="font-medium">{institute.centerName}</p>
+                {isEditing ? (
+                  <input
+                    className="font-medium w-full border rounded px-2 py-1"
+                    value={editData && editData.centerName ? editData.centerName : ''}
+                    onChange={e => handleEditChange('centerName', e.target.value)}
+                  />
+                ) : <p className="font-medium">{institute.centerName}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{institute.centerEmailId}</p>
+                {isEditing ? (
+                  <input
+                    type="email"
+                    className="font-medium w-full border rounded px-2 py-1"
+                    value={editData && editData.centerEmailId ? editData.centerEmailId : ''}
+                    onChange={e => handleEditChange('centerEmailId', e.target.value)}
+                  />
+                ) : <p className="font-medium">{institute.centerEmailId}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Phone</p>
-                <p className="font-medium">{institute.centerPhoneNumber}</p>
+                {isEditing ? (
+                  <input
+                    className="font-medium w-full border rounded px-2 py-1"
+                    value={editData && editData.centerPhoneNumber ? editData.centerPhoneNumber : ''}
+                    onChange={e => handleEditChange('centerPhoneNumber', e.target.value)}
+                  />
+                ) : <p className="font-medium">{institute.centerPhoneNumber}</p>}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Website</p>
-                {institute.centerWebsiteUrl ? (
+                {isEditing ? (
+                  <input
+                    type="url"
+                    className="font-medium w-full border rounded px-2 py-1"
+                    value={editData && editData.centerWebsiteUrl ? editData.centerWebsiteUrl : ''}
+                    onChange={e => handleEditChange('centerWebsiteUrl', e.target.value)}
+                  />
+                ) : institute.centerWebsiteUrl ? (
                   <a
                     href={institute.centerWebsiteUrl}
                     target="_blank"

@@ -567,7 +567,7 @@ const ResultUpload = () => {
                       <Pencil1Icon className="w-4 h-4" /> Edit
                     </Button>
                     <Button size="sm" variant="destructive" className="flex items-center gap-1" onClick={() => handleDeleteResult(result.id)} title="Delete Result">
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 text-white" />
                     </Button>
                   </div>
                 </div>

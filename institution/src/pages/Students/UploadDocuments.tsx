@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -139,7 +139,7 @@ const UploadDocuments = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      
+
       if (response.data) {
         setUploadError('');
         Swal.fire({
@@ -195,7 +195,7 @@ const UploadDocuments = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      
+
       if (response.data) {
         Swal.fire({
           icon: 'success',
@@ -220,7 +220,7 @@ const UploadDocuments = () => {
   // Get list of document types that haven't been uploaded yet
   const getAvailableDocumentTypes = () => {
     if (!studentData) return Object.entries(DocumentType);
-    
+
     const uploadedTypes = new Set(studentData.documents.map(doc => doc.documentType as keyof typeof DocumentType));
     return Object.entries(DocumentType).filter(([_, value]) => !uploadedTypes.has(value as keyof typeof DocumentType));
   };
@@ -241,8 +241,8 @@ const UploadDocuments = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
-            <Button 
+
+            <Button
               onClick={handleSearch}
               disabled={isLoading}
               className="w-full md:w-auto"
@@ -301,7 +301,7 @@ const UploadDocuments = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg">
                 <div>
-                  <Select 
+                  <Select
                     value={selectedDocType}
                     onValueChange={(value: keyof typeof DocumentType) => setSelectedDocType(value)}
                   >
@@ -384,11 +384,11 @@ const UploadDocuments = () => {
                     <p className="font-semibold">{doc.documentType.replace(/_/g, ' ')}</p>
                     <p className="text-sm text-gray-600">{doc.fileName}</p>
                   </div>
-                  
+
                   <div>
-                    <a 
-                      href={doc.fileUrl} 
-                      target="_blank" 
+                    <a
+                      href={doc.fileUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
                     >

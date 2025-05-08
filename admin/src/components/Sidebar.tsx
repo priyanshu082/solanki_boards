@@ -40,22 +40,28 @@ const Sidebar = () => {
 
   const menuItems: MenuSection[] = [
     {
-      title: "Institute",
-      path: "/institute",
-      icon: <Building2 className="h-5 w-5" />,
-      items: [
-        { name: "All Institutes", path: "/all-institutes" },
-        // { name: "Institute Details", path: "/institute-details" },
-      ]
-    },
-    {
       title: "Students",
       path: "/students",
       icon: <Users className="h-5 w-5" />,
       items: [
+        { name: "Student Admission", path: "/admission" },
+        { name: "Upload Documents", path: "/upload-documents" },
+        { name: "Fee Payment", path: "/fee-payment" },
         { name: "All Students", path: "/all-students" },
         // { name: "Student Details", path: "/student-details" },
         // { name: "Result Upload", path: "/all-students" },
+      ]
+    },
+    {
+      title: "Institutes",
+      path: "/institutes",
+      icon: <Building2 className="h-5 w-5" />,
+      items: [
+        { name: "Institute Registration", path: "/institute-registration" },
+        { name: "Upload Documents", path: "/institute-upload-documents" },
+        { name: "Fee Payment", path: "/institute-fee-payment" },
+        { name: "All Institutes", path: "/all-institutes" },
+        // { name: "Institute Details", path: "/institute-details" },
       ]
     },
     {

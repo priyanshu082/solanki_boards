@@ -64,6 +64,10 @@ export enum Country {
   INDIA = "INDIA"
 }
 
+export enum UnionTerritory {
+  DELHI = "DELHI",
+}
+
 export enum ExaminationType {
   X = "X",
   XII = "XII",

@@ -2,7 +2,7 @@ import { useEffect, useState, ChangeEvent } from 'react'
 import axios from 'axios'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getstudentbyid, updateAdmission, deleteAdmission } from '@/Config'
+import { getstudentbyid, updateAdmission, deleteAdmission, getcoursebyid } from '@/Config'
 import Swal from 'sweetalert2'
 import { Button } from '@/components/ui/button'
 import { InterfaceStudentDetails, ResultDetails, ResultStatus, IndianState, Country, ExaminationType, SubjectType, StudentCategory, Gender, BatchType, AdmissionType } from '@/lib/Interfaces'
@@ -16,6 +16,7 @@ const StudentDetails = () => {
   const [student, setStudent] = useState<InterfaceStudentDetails | null>(null)
   const [results, setResults] = useState<ResultDetails[]>([])
   const [loading, setLoading] = useState(true)
+  const [courseName, setCourseName] = useState<string>('')
   const { id } = useParams()
   const navigate = useNavigate()
   const [isEditing, setIsEditing] = useState(false)
@@ -44,6 +45,21 @@ const StudentDetails = () => {
         // Extract results if they exist in the response
         if (response.data.results && Array.isArray(response.data.results)) {
           setResults(response.data.results)
+        }
+
+        // Fetch course name if courseId exists
+        if (response.data.courseId) {
+          try {
+            const courseResponse = await axios.get(`${getcoursebyid}/${response.data.courseId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            })
+            setCourseName(courseResponse.data.name)
+          } catch (error) {
+            console.error('Error fetching course details:', error)
+            setCourseName('Course not found')
+          }
         }
 
         setLoading(false)
@@ -83,6 +99,13 @@ const StudentDetails = () => {
   const handleEditClick = () => {
     setIsEditing(true)
     setEditData(student)
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    setEditData(null)
+    setEditPhoto(null)
+    setPhotoPreview(null)
   }
 
   const handleEditChange = <K extends keyof InterfaceStudentDetails>(field: K, value: InterfaceStudentDetails[K]) => {
@@ -290,12 +313,21 @@ const StudentDetails = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Student Details</h1>
         <div className="flex gap-2">
-          <Button onClick={handleBackClick}>Back to All Students</Button>
-          <Button variant="outline" onClick={handleEditClick}>Edit</Button>
-          <Button variant="destructive" onClick={handleDelete} size="icon" title="Delete Student">
-            <Trash2 className="h-5 w-5" />
-          </Button>
-          {isEditing && <Button variant="default" onClick={handleEditSubmit}>Submit</Button>}
+          <Button variant="outline" className='cursor-pointer' onClick={handleBackClick}>Back to All Students</Button>
+          {!isEditing && (
+            <>
+              <Button variant="outline" className='cursor-pointer' onClick={handleEditClick}>Edit</Button>
+              <Button variant="destructive" className='cursor-pointer' onClick={handleDelete} size="icon" title="Delete Student">
+                <Trash2 className="h-5 w-5 text-white" />
+              </Button>
+            </>
+          )}
+          {isEditing && (
+            <>
+              <Button variant="default" className='cursor-pointer' onClick={handleEditSubmit}>Submit</Button>
+              <Button variant="outline" className='cursor-pointer' onClick={handleCancelEdit}>Cancel</Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -456,15 +488,29 @@ const StudentDetails = () => {
             <>
               <div>
                 <label className="font-semibold text-gray-700">Enrollment Number</label>
-                <Input value={editData?.enrollmentNumber || ''} onChange={e => handleEditChange('enrollmentNumber', e.target.value)} />
+                <Input
+                  value={editData?.enrollmentNumber || ''}
+                  onChange={e => handleEditChange('enrollmentNumber', e.target.value)}
+                  disabled={true}
+                  className="bg-gray-100 cursor-not-allowed"
+                />
               </div>
               <div>
                 <label className="font-semibold text-gray-700">Application Number</label>
-                <Input value={editData?.applicationNumber || ''} onChange={e => handleEditChange('applicationNumber', e.target.value)} />
+                <Input
+                  value={editData?.applicationNumber || ''}
+                  onChange={e => handleEditChange('applicationNumber', e.target.value)}
+                  disabled={true}
+                  className="bg-gray-100 cursor-not-allowed"
+                />
               </div>
               <div>
-                <label className="font-semibold text-gray-700">Course ID</label>
-                <Input value={editData?.courseId || ''} onChange={e => handleEditChange('courseId', e.target.value)} />
+                <label className="font-semibold text-gray-700">Course</label>
+                <p>{isEditing ? (
+                  <Input value={editData?.courseId || ''} onChange={e => handleEditChange('courseId', e.target.value)} />
+                ) : (
+                  courseName || student.courseId || 'Not assigned'
+                )}</p>
               </div>
               <div>
                 <label className="font-semibold text-gray-700">Institute ID</label>
@@ -504,8 +550,8 @@ const StudentDetails = () => {
                 <p>{student.applicationNumber}</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-700">Course ID</h3>
-                <p>{student.courseId}</p>
+                <h3 className="font-semibold text-gray-700">Course</h3>
+                <p>{courseName || student.courseId || 'Not assigned'}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700">Institute ID</h3>

@@ -13,56 +13,12 @@ import { Oval } from 'react-loader-spinner'
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Swal from 'sweetalert2';
-// Enums
-export enum Gender {
-  MALE = "MALE",
-  FEMALE = "FEMALE",
-  OTHER = "OTHER"
-}
-
-export enum IndianState {
-  ANDHRA_PRADESH = "ANDHRA_PRADESH",
-  ARUNACHAL_PRADESH = "ARUNACHAL_PRADESH",
-  ASSAM = "ASSAM",
-  BIHAR = "BIHAR",
-  CHHATTISGARH = "CHHATTISGARH",
-  GOA = "GOA",
-  GUJARAT = "GUJARAT",
-  HARYANA = "HARYANA",
-  HIMACHAL_PRADESH = "HIMACHAL_PRADESH",
-  JHARKHAND = "JHARKHAND",
-  KARNATAKA = "KARNATAKA",
-  KERALA = "KERALA",
-  MADHYA_PRADESH = "MADHYA_PRADESH",
-  MAHARASHTRA = "MAHARASHTRA",
-  MANIPUR = "MANIPUR",
-  MEGHALAYA = "MEGHALAYA",
-  MIZORAM = "MIZORAM",
-  NAGALAND = "NAGALAND",
-  ODISHA = "ODISHA",
-  PUNJAB = "PUNJAB",
-  RAJASTHAN = "RAJASTHAN",
-  SIKKIM = "SIKKIM",
-  TAMIL_NADU = "TAMIL_NADU",
-  TELANGANA = "TELANGANA",
-  TRIPURA = "TRIPURA",
-  UTTAR_PRADESH = "UTTAR_PRADESH",
-  UTTARAKHAND = "UTTARAKHAND",
-  WEST_BENGAL = "WEST_BENGAL"
-}
+import { Country, Gender, IndianState, UnionTerritory } from '../../../Atoms/FormDataAtoms';
 
 // Helper function to format state display
 const formatStateDisplay = (state: string) => {
   return state.replace(/_/g, ' ');
 };
-
-export enum UnionTerritory {
-  DELHI = "DELHI",
-}
-
-export enum Country {
-  INDIA = "INDIA",
-}
 
 // // Update the FormData type to match your form fields
 // type FormData = {
