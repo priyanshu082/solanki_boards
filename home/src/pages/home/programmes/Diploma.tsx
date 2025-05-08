@@ -6,6 +6,9 @@ import { Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../../../components/ui/table";
 import { ScrollArea } from "../../../components/ui/scroll-area";
+import { useNavigate } from 'react-router-dom';
+
+
 
 
 const diplomaCourses = [
@@ -87,6 +90,7 @@ const diplomaCourses = [
 const Diploma = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [durationFilter, setDurationFilter] = React.useState("all");
+  const navigate = useNavigate();
 
   const filteredCourses = diplomaCourses.filter(course => {
     const matchesSearch = course.programName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -114,8 +118,8 @@ const Diploma = () => {
             </div>
 
           <div className="flex justify-end ">
-            <button className="mt-6 h-fit  text-white text-xl py-2 px-6 rounded bg-primary">
-              Registration
+            <button className="mt-6 h-fit  text-white text-xl py-2 px-6 rounded bg-primary" onClick={() => navigate('/student-admission-form')}>
+              Apply Now
             </button>
           </div>
         </CardHeader>

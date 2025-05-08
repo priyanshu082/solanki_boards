@@ -2,10 +2,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui
 import { Alert, AlertTitle, AlertDescription } from "../../../components/ui/alert";
 import { Badge } from "../../../components/ui/badge";
 import { Separator } from "../../../components/ui/separator";
-import { 
-  GraduationCap, 
-  Calendar, 
-  UserCheck, 
+import {
+  GraduationCap,
+  Calendar,
+  UserCheck,
   ScrollText,
   Wrench,
   Cpu,
@@ -13,6 +13,7 @@ import {
   Zap,
   PenTool
 } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 const certificatePrograms = [
   {
@@ -59,10 +60,11 @@ const certificatePrograms = [
   }
 ];
 
-const CertificatePrograms = ({ 
+const CertificatePrograms = ({
   programTitle = "Certificate Programs",
   program = "Certificate"
 }) => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -77,11 +79,11 @@ const CertificatePrograms = ({
               {programTitle}
             </h1>
             <p className="text-xl text-blue-100 max-w-3xl">
-              Comprehensive {program} programs designed to provide practical knowledge and 
+              Comprehensive {program} programs designed to provide practical knowledge and
               skill-based learning that enhances career prospects.
             </p>
           </div>
-          <button className="bg-gray-100 text-primary py-2 px-4 rounded">
+          <button className="bg-gray-100 text-primary py-2 px-4 rounded" onClick={() => navigate('/student-admission-form')}>
             Apply Now
           </button>
         </div>
@@ -101,13 +103,13 @@ const CertificatePrograms = ({
               <div className="space-y-4">
                 <h2 className="text-2xl font-semibold text-blue-800">Introduction</h2>
                 <p className="text-gray-600 leading-relaxed">
-                  SBCODL offers a diverse range of certificate programs across multiple 
+                  SBCODL offers a diverse range of certificate programs across multiple
                   disciplines, each designed to provide practical skills and industry-relevant knowledge.
                 </p>
                 <Alert className="bg-blue-50 border-blue-200">
                   <AlertTitle className="text-blue-800">Key Features</AlertTitle>
                   <AlertDescription className="text-blue-700">
-                    All programs are one-year duration with 10th pass eligibility, 
+                    All programs are one-year duration with 10th pass eligibility,
                     focusing on practical training and skill development.
                   </AlertDescription>
                 </Alert>
@@ -181,8 +183,8 @@ const CertificatePrograms = ({
         <div className="text-center space-y-4">
           <h2 className="text-2xl font-semibold text-blue-800">Start Your Career Journey</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Join SBCODL's certificate programs and gain the practical skills needed for 
-            a successful career. Visit www.sbiea.co.in or contact our administration for 
+            Join SBCODL's certificate programs and gain the practical skills needed for
+            a successful career. Visit www.sbiea.co.in or contact our administration for
             more details.
           </p>
         </div>

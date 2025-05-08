@@ -3,8 +3,10 @@ import { Alert, AlertTitle, AlertDescription } from "../../../components/ui/aler
 import { Badge } from "../../../components/ui/badge";
 import { Separator } from "../../../components/ui/separator";
 import { GraduationCap, BookOpen, Users, Globe, School, Cross } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 const Research = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -22,7 +24,7 @@ const Research = () => {
               Pursue the highest academic qualification through rigorous study and original research
             </p>
           </div>
-          <button className="bg-gray-100 text-primary py-2 px-4 rounded">
+          <button className="bg-gray-100 text-primary py-2 px-4 rounded" onClick={() => navigate('/student-admission-form')}>
             Apply Now
           </button>
         </div>

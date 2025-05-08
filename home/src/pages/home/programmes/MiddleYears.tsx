@@ -4,12 +4,13 @@ import { Alert, AlertTitle, AlertDescription } from "../../../components/ui/aler
 import { Badge } from "../../../components/ui/badge";
 import { Separator } from "../../../components/ui/separator";
 import { Book, Code, Brain, Globe, Microscope } from "lucide-react";
-
+import { useNavigate } from 'react-router-dom';
 const MiddleYears = ({ 
   programTitle = "Middle School Curriculum",
   grades = "Grades 6-8",
   program = "Middle School"
 }) => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -28,7 +29,7 @@ const MiddleYears = ({
               and interactive learning environment, bridging elementary education and high school.
             </p>
           </div>
-          <button className=" bg-gray-100 text-primary py-2 px-4 rounded ">
+          <button className=" bg-gray-100 text-primary py-2 px-4 rounded" onClick={() => navigate('/student-admission-form')}>
             Registration
           </button>
         </div>
