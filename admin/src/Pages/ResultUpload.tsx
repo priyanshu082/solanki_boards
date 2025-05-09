@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Month, Year, ResultStatus, Grade, InterfaceStudentDetails, SubjectPreview, ResultDetails } from '@/lib/Interfaces'
 import Swal from 'sweetalert2'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { getallstudents, getcoursebyid, uploadresult, updateResult, deleteResult } from '@/Config'
+import { getallstudents, uploadresult, updateResult, deleteResult, getallsubject } from '@/Config'
 import { Pencil1Icon } from '@radix-ui/react-icons'
 import { Trash2 } from 'lucide-react'
 
@@ -22,18 +22,17 @@ interface SubjectResult {
   status: ResultStatus
 }
 
-interface Course {
-  id: string
-  name: string
-  subjects: SubjectPreview[]
-}
+// interface Course {
+//   id: string
+//   name: string
+//   subjects: SubjectPreview[]
+// }
 
 const ResultUpload = () => {
   const { id, courseId } = useParams<{ id: string, courseId: string }>()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [studentData, setStudentData] = useState<InterfaceStudentDetails | null>(null)
-  const [courseData, setCourseData] = useState<Course | null>(null)
   const [month, setMonth] = useState<Month>(Month.JANUARY)
   const [year, setYear] = useState<Year>(Year.Y2023)
   const [totalMarks, setTotalMarks] = useState<number>(0)
@@ -42,6 +41,7 @@ const ResultUpload = () => {
   const [subjectResults, setSubjectResults] = useState<SubjectResult[]>([])
   const [results, setResults] = useState<ResultDetails[]>([])
   const [editingResultId, setEditingResultId] = useState<string | null>(null)
+  const [selectedSubjects, setSelectedSubjects] = useState<SubjectPreview[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,18 +74,19 @@ const ResultUpload = () => {
           }
         }
 
-        // Fetch course data directly using courseId from params
         try {
-          const courseResponse = await axios.get(`${getcoursebyid}/${courseId}`, {
+          const subjectResponse = await axios.post(`${getallsubject}`, {
+            subjectIds: studentData?.subjectIds
+          }, {
             headers: {
               Authorization: `Bearer ${token}`
             }
           })
-          setCourseData(courseResponse.data)
 
-          // Initialize subject results from course subjects
-          if (courseResponse.data.subjects && courseResponse.data.subjects.length > 0) {
-            const initialSubjectResults = courseResponse.data.subjects.map((subject: SubjectPreview) => ({
+          // Store selected subjects for later use in resetForm
+          if (subjectResponse.data && subjectResponse.data.length > 0) {
+            setSelectedSubjects(subjectResponse.data as SubjectPreview[]);
+            const initialSubjectResults = (subjectResponse.data as SubjectPreview[]).map((subject: SubjectPreview) => ({
               code: subject.code,
               name: subject.name,
               totalMarks: 100,
@@ -123,7 +124,7 @@ const ResultUpload = () => {
     fetchData()
   }, [id, courseId, navigate])
 
-  const handleUpdateSubject = (index: number, field: keyof SubjectResult, value: any) => {
+  const handleUpdateSubject = (index: number, field: keyof SubjectResult, value: string | number | Grade | ResultStatus) => {
     const updatedSubjects = [...subjectResults];
     updatedSubjects[index] = {
       ...updatedSubjects[index],
@@ -180,7 +181,7 @@ const ResultUpload = () => {
     setTotalMarks(0)
     setObtainedMarks(0)
     setStatus(ResultStatus.PASS)
-    setSubjectResults(courseData?.subjects?.map((subject: SubjectPreview) => ({
+    setSubjectResults(selectedSubjects.map((subject: SubjectPreview) => ({
       code: subject.code,
       name: subject.name,
       totalMarks: 100,
@@ -346,7 +347,7 @@ const ResultUpload = () => {
               </div>
               <div>
                 <p><strong>Application Number:</strong> {studentData.applicationNumber}</p>
-                <p><strong>Course:</strong> {courseData?.name || courseId}</p>
+                <p><strong>Course:</strong> {courseId}</p>
               </div>
             </div>
           </CardContent>
