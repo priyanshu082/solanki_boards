@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Month, Year, ResultStatus, Grade, InterfaceStudentDetails, SubjectPreview, ResultDetails } from '@/lib/Interfaces'
 import Swal from 'sweetalert2'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { getallstudents, uploadresult, updateResult, deleteResult, getallsubject } from '@/Config'
+import { getallstudents, uploadresult, updateResult, deleteResult, getallsubject, getcoursebyid } from '@/Config'
 import { Pencil1Icon } from '@radix-ui/react-icons'
 import { Trash2 } from 'lucide-react'
 
@@ -33,6 +33,7 @@ const ResultUpload = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [studentData, setStudentData] = useState<InterfaceStudentDetails | null>(null)
+  const [courseName, setCourseName] = useState<string>('')
   const [month, setMonth] = useState<Month>(Month.JANUARY)
   const [year, setYear] = useState<Year>(Year.Y2023)
   const [totalMarks, setTotalMarks] = useState<number>(0)
@@ -67,45 +68,63 @@ const ResultUpload = () => {
         })
 
         if (studentResponse.data && studentResponse.data[0]) {
-          setStudentData(studentResponse.data[0])
+          const student = studentResponse.data[0]
+          setStudentData(student)
           // Extract results if they exist in the response
-          if (studentResponse.data[0].results && Array.isArray(studentResponse.data[0].results)) {
-            setResults(studentResponse.data[0].results)
+          if (student.results && Array.isArray(student.results)) {
+            setResults(student.results)
           }
-        }
 
-        try {
-          const subjectResponse = await axios.post(`${getallsubject}`, {
-            subjectIds: studentData?.subjectIds
-          }, {
-            headers: {
-              Authorization: `Bearer ${token}`
+          // Fetch course name
+          try {
+            const courseResponse = await axios.get(`${getcoursebyid}/${courseId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            })
+            if (courseResponse.data && courseResponse.data.name) {
+              setCourseName(courseResponse.data.name)
             }
-          })
-
-          // Store selected subjects for later use in resetForm
-          if (subjectResponse.data && subjectResponse.data.length > 0) {
-            setSelectedSubjects(subjectResponse.data as SubjectPreview[]);
-            const initialSubjectResults = (subjectResponse.data as SubjectPreview[]).map((subject: SubjectPreview) => ({
-              code: subject.code,
-              name: subject.name,
-              totalMarks: 100,
-              obtainedMarks: 0,
-              grade: Grade.A,
-              status: ResultStatus.PASS
-            }));
-
-            setSubjectResults(initialSubjectResults);
-            calculateTotalMarks(initialSubjectResults);
+          } catch (error) {
+            console.error('Error fetching course details:', error)
+            setCourseName('Course not found')
           }
-        } catch (error) {
-          console.error('Error fetching course data:', error)
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to fetch course data',
-            confirmButtonColor: '#3085d6'
-          })
+
+          // Fetch subjects only after student data is loaded
+          if (student.subjectIds && student.subjectIds.length > 0) {
+            try {
+              const subjectResponse = await axios.post(`${getallsubject}`, {
+                subjectIds: student.subjectIds
+              }, {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              })
+
+              if (subjectResponse.data && subjectResponse.data.length > 0) {
+                setSelectedSubjects(subjectResponse.data as SubjectPreview[]);
+                const initialSubjectResults = (subjectResponse.data as SubjectPreview[]).map((subject: SubjectPreview) => ({
+                  code: subject.code,
+                  name: subject.name,
+                  totalMarks: 100,
+                  obtainedMarks: 0,
+                  grade: Grade.A,
+                  status: ResultStatus.PASS
+                }));
+
+                setSubjectResults(initialSubjectResults);
+                calculateTotalMarks(initialSubjectResults);
+              }
+            } catch (error) {
+              console.error('Error fetching course data:', error)
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to fetch course data',
+                confirmButtonColor: '#3085d6'
+              })
+            }
+          }
         }
 
         setLoading(false)
@@ -122,7 +141,7 @@ const ResultUpload = () => {
     }
 
     fetchData()
-  }, [id, courseId, navigate])
+  }, [id, navigate])
 
   const handleUpdateSubject = (index: number, field: keyof SubjectResult, value: string | number | Grade | ResultStatus) => {
     const updatedSubjects = [...subjectResults];
@@ -347,7 +366,7 @@ const ResultUpload = () => {
               </div>
               <div>
                 <p><strong>Application Number:</strong> {studentData.applicationNumber}</p>
-                <p><strong>Course:</strong> {courseId}</p>
+                <p><strong>Course:</strong> {courseName}</p>
               </div>
             </div>
           </CardContent>
