@@ -66,7 +66,9 @@ const CourseCreate = () => {
     defaultValues: {
       name: "",
       fees: 0,
-      courseType: undefined
+      courseType: CourseType.ACADEMIC,
+      duration: 2,
+      durationType: DurationType.YEAR
     }
   });
 

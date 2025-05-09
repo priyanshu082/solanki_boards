@@ -12,6 +12,7 @@ import { Search, Loader2, CreditCard, CheckCircle2 } from "lucide-react";
 import axios from 'axios';
 import { getallstudents } from '@/Config';
 import Swal from 'sweetalert2';
+import { PaymentStatus } from '@/lib/Interfaces';
 
 interface StudentDetails {
     id: string;
@@ -23,7 +24,7 @@ interface StudentDetails {
     applicationNumber: string;
     paymentAmount: string;
     phoneNumber: string;
-    paymentStatus: boolean;
+    paymentStatus: PaymentStatus;
 }
 
 const FeePayment = () => {
@@ -204,7 +205,7 @@ const FeePayment = () => {
             )}
 
             {/* Payment Section */}
-            {studentData && !studentData.paymentStatus && (
+            {studentData && (studentData.paymentStatus === PaymentStatus.PENDING || studentData.paymentStatus === PaymentStatus.FAILED) && (
                 <Card>
                     <CardHeader>
                         <CardTitle>Fee Payment</CardTitle>
@@ -232,7 +233,7 @@ const FeePayment = () => {
             )}
 
             {/* Payment Completed Message */}
-            {studentData && studentData.paymentStatus && (
+            {studentData && studentData.paymentStatus === PaymentStatus.SUCCESS && (
                 <Card className="bg-green-50 border-green-200">
                     <CardHeader>
                         <CardTitle className="text-green-700">Payment Completed</CardTitle>

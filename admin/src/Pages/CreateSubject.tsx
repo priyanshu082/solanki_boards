@@ -51,8 +51,8 @@ const CreateSubject = () => {
     defaultValues: {
       name: "",
       code: "",
-      courseId: "",
-      type: undefined
+      courseId: courses[0]?.id || "",
+      type: SubjectType.LANGUAGE
     }
   });
 
@@ -156,7 +156,12 @@ const CreateSubject = () => {
           confirmButtonText: 'Great!'
         });
       }
-      form.reset();
+      form.reset({
+        name: "",
+        code: "",
+        courseId: courses[0]?.id || "",
+        type: SubjectType.LANGUAGE
+      });
       fetchSubjects();
     } catch (error) {
       console.error("Failed to create/update subject", error);
