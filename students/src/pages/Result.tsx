@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { motion } from "framer-motion";
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 
@@ -148,87 +148,6 @@ const Result = () => {
     return ((obtained / total) * 100).toFixed(1);
   };
 
-  // const handleDownloadPDF = () => {
-  //   if (!result) return;
-
-  //   try {
-  //     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-
-  //     // Header
-  //     doc.setFontSize(24);
-  //     doc.setTextColor(0, 48, 87);
-  //     doc.text("STUDENT RESULT CARD", 105, 15, { align: "center" });
-
-  //     // Institution details
-  //     doc.setFontSize(12);
-  //     doc.setTextColor(100);
-  //     doc.text(`Academic Year: ${result.year}`, 20, 25);
-  //     doc.text(`Examination: ${formatMonth(result.month)} ${result.year}`, 20, 32);
-
-  //     // Student details
-  //     doc.setDrawColor(0, 48, 87);
-  //     doc.rect(15, 38, 180, 30);
-  //     doc.setFontSize(11);
-  //     doc.setTextColor(0);
-  //     doc.text([
-  //       `Student Name: ${student?.name || 'N/A'}`,
-  //       `Total Marks: ${result.totalMarks}`,
-  //       `Marks Obtained: ${result.obtainedMarks}`,
-  //       `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
-  //       `Final Result: ${result.status}`
-  //     ], 20, 45);
-
-  //     // Subject-wise results table
-  //     const headers = [["Code", "Subject", "Total", "Obtained", "Grade", "Status"]];
-  //     const data = result.details.map(sub => [
-  //       sub.code,
-  //       sub.name,
-  //       sub.totalMarks.toString(),
-  //       sub.obtainedMarks.toString(),
-  //       formatGrade(sub.grade),
-  //       sub.status
-  //     ]);
-
-  //     // @ts-ignore - Using autoTable from the imported jspdf-autotable
-  //     doc.autoTable({
-  //       startY: 72,
-  //       head: headers,
-  //       body: data,
-  //       theme: 'striped',
-  //       headStyles: { fillColor: [0, 48, 87], textColor: 255, fontSize: 10 },
-  //       styles: { fontSize: 9, cellPadding: 2 },
-  //       columnStyles: { 1: { cellWidth: 60 } },
-  //       margin: { left: 15, right: 15 }
-  //     });
-
-  //     // Get the final Y position from autoTable
-  //     // @ts-ignore
-  //     let finalY = doc.lastAutoTable.finalY + 5;
-
-  //     // Summary section after the table
-  //     doc.setFontSize(11);
-  //     doc.setDrawColor(0, 48, 87);
-  //     doc.rect(15, finalY, 180, 25);
-  //     doc.text([
-  //       "Final Summary",
-  //       `Total Marks: ${result.totalMarks}`,
-  //       `Marks Obtained: ${result.obtainedMarks}`,
-  //       `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
-  //       `Overall Grade: ${result.status}`
-  //     ], 20, finalY + 7);
-
-  //     // Footer
-  //     doc.setFontSize(8);
-  //     doc.text("This is a computer-generated document", 105, 290, { align: "center" });
-
-  //     // Save PDF
-  //     doc.save(`Result_${result.month}${result.year}.pdf`);
-  //   } catch (error) {
-  //     console.error("Error generating PDF:", error);
-  //     alert("Failed to generate PDF. Please try again later.");
-  //   }
-  // };
-
   if (loading) {
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-6xl">
@@ -309,7 +228,7 @@ const Result = () => {
             <span className="font-bold">Name :</span> <span className="ml-2">{student?.name}</span>
           </div>
           <div className="flex-1">
-            <span className="font-bold">Registration No :</span> <span className="ml-2">{student?.enrollmentNumber || student?.applicationNumber}</span>
+            <span className="font-bold">Enrollment No :</span> <span className="ml-2">{student?.enrollmentNumber || student?.applicationNumber}</span>
           </div>
         </div>
 
@@ -328,7 +247,7 @@ const Result = () => {
             </thead>
             <tbody>
               <tr className="bg-gray-50">
-                <td className="border px-4 py-2">{formatMonth(result.month)} {result.year}</td>
+                <td className="border px-4 py-2">{formatMonth(result.month)} {(result.year).split('Y')[1]}</td>
                 <td className="border px-4 py-2">{result.totalMarks}</td>
                 <td className="border px-4 py-2">{result.obtainedMarks}</td>
                 <td className="border px-4 py-2">{calculatePercentage(result.obtainedMarks, result.totalMarks)}%</td>
@@ -370,22 +289,32 @@ const Result = () => {
       <div className="flex justify-end mt-6">
         <button
           onClick={async () => {
-            const input = document.getElementById('result-section');
-            if (!input) return;
-            const canvas = await html2canvas(input, { scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-              orientation: 'portrait',
-              unit: 'pt',
-              format: 'a4',
-            });
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            // const pageHeight = pdf.internal.pageSize.getHeight();
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pageWidth;
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save('Result.pdf');
+            const resultSection = document.getElementById('result-section');
+            if (resultSection) {
+              resultSection.querySelectorAll('*').forEach(el => {
+                const style = getComputedStyle(el);
+                if (style.backgroundColor.includes('oklch')) {
+                  (el as HTMLElement).style.backgroundColor = '#ffffff';
+                }
+                if (style.color.includes('oklch')) {
+                  (el as HTMLElement).style.color = '#000000';
+                }
+              });
+              const canvas = await html2canvas(resultSection, { scale: 2 });
+              const imgData = canvas.toDataURL('image/png');
+              const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'pt',
+                format: 'a4',
+              });
+              const pageWidth = pdf.internal.pageSize.getWidth();
+              // const pageHeight = pdf.internal.pageSize.getHeight();
+              const imgProps = pdf.getImageProperties(imgData);
+              const pdfWidth = pageWidth;
+              const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+              pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+              pdf.save('Result.pdf');
+            }
           }}
           className="px-6 py-2 bg-green-700 text-white rounded shadow hover:bg-green-800"
         >

@@ -627,7 +627,7 @@ const StudentDetails = () => {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700">Batch</h3>
-                <p>{student.batch}</p>
+                <p>{student.batch.replace(/_/g, ' ')}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700">Admission Type</h3>
@@ -691,10 +691,6 @@ const StudentDetails = () => {
                   <div>
                     <h3 className="font-semibold text-gray-700">Percentage</h3>
                     <p>{((result.obtainedMarks / result.totalMarks) * 100).toFixed(2)}%</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-700">Date</h3>
-                    <p>{formatDate(result.createdAt)}</p>
                   </div>
                 </div>
 
