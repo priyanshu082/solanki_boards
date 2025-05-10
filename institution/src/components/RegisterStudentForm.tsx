@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { admissionFormState,sameAsPermanentState,lastPassedExamState} from '@/store/atoms/formDataAtoms';
-import { AdmissionType, StudentCategory, Gender, BatchType, IndianState, Country, LastPassedExam, SubjectType, CourseType } from '../lib/Interfaces';
+import { AdmissionType, StudentCategory, Gender, BatchType, IndianState, LastPassedExam, SubjectType, CourseType } from '../lib/Interfaces';
 import dummyAvatar from '../assets/dummy.jpeg'; // Updated import for dummy image
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -127,12 +127,10 @@ const RegisterStudentForm: React.FC<RegisterStudentFormProps> = ({
     name: key.replace(/_/g, ' ')
   }));
 
-  //@ts-ignore
-
-  const countries = Object.entries(Country).map(([key, value]) => ({
-    id: value.toString(),
-    name: key
-  }));
+  // const countries = Object.entries(Country).map(([key, value]) => ({
+  //   id: value.toString(),
+  //   name: key
+  // }));
 
   // Handle form updates
   const updateField = (field: keyof typeof formData, value: any) => {

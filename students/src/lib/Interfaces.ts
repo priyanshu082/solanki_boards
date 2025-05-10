@@ -17,7 +17,7 @@ export enum Gender {
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS', 
+  SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
   DECLINED = 'DECLINED',
   PROCESSING = 'PROCESSING',
@@ -43,10 +43,14 @@ export enum AdmissionType {
 }
 
 export enum BatchType {
-  MORNING = 'MORNING',
-  AFTERNOON = 'AFTERNOON',
-  EVENING = 'EVENING',
-  WEEKEND = 'WEEKEND'
+  BATCH_1_2022_O_22 = "BATCH_1_2022_O_22",
+  BATCH_2_2022_M_23 = "BATCH_2_2022_M_23",
+  BATCH_1_2023_O_23 = "BATCH_1_2023_O_23",
+  BATCH_2_2023_M_24 = "BATCH_2_2023_M_24",
+  BATCH_1_2024_O_24 = "BATCH_1_2024_O_24",
+  BATCH_2_2024_M_25 = "BATCH_2_2024_M_25",
+  BATCH_1_2025_O_25 = "BATCH_1_2025_O_25",
+  BATCH_2_2025_M_26 = "BATCH_2_2025_M_26",
 }
 
 export enum ExaminationType {
@@ -65,12 +69,12 @@ export enum SubjectType {
 }
 
 export enum ResultStatus {
-    PASS = 'PASS',
-    FAIL = 'FAIL',
-    PENDING = 'PENDING',
-    INCOMPLETE = 'INCOMPLETE',
-    WITHHELD = 'WITHHELD',
-    CANCELLED = 'CANCELLED'
+  PASS = 'PASS',
+  FAIL = 'FAIL',
+  PENDING = 'PENDING',
+  INCOMPLETE = 'INCOMPLETE',
+  WITHHELD = 'WITHHELD',
+  CANCELLED = 'CANCELLED'
 }
 
 export enum Grade {
@@ -195,15 +199,15 @@ export interface CoursePreview {
 }
 
 export interface SubjectPreview {
-    id: string;
+  id: string;
+  name: string;
+  code: string;
+  type: string;
+  courseId: string;
+  course?: {
     name: string;
-    code: string;
-    type: string;
-    courseId: string;
-    course?: {
-      name: string;
-    };
-  }
+  };
+}
 
 export interface CourseDetails {
   id: string;
@@ -225,7 +229,7 @@ export interface StudentPreview {
   name: string;
   enrollmentNumber?: string;
   applicationNumber: string;
-  courseId:string
+  courseId: string
 }
 
 export interface InterfaceStudentDetails {

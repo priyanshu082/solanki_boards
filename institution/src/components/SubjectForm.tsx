@@ -7,12 +7,22 @@ import {
 import { useRecoilState } from 'recoil';
 import { admissionFormState } from '@/store/atoms/formDataAtoms';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { InterfaceSubject } from '@/lib/Interfaces';
 
-const SubjectForm = ({ courses }: any) => {
+interface SubjectFormProps {
+  courses?: {
+    name: string;
+    subjects: InterfaceSubject[];
+  };
+  setIsDeclarationComplete?: (complete: boolean) => void;
+}
+
+const SubjectForm = ({ courses, setIsDeclarationComplete }: SubjectFormProps) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [formData, setFormData] = useRecoilState(admissionFormState);
+  // Add state for declaration
+  const [declarationChecked, setDeclarationChecked] = useState(false);
+  const [declarationName, setDeclarationName] = useState('');
 
   // Use the course passed from props directly
   const availableSubjects = courses?.subjects || [];
@@ -29,20 +39,26 @@ const SubjectForm = ({ courses }: any) => {
     }));
   }, [formData.courseId, setFormData]);
 
-  const handleSubjectChange = (subjectId: string) => {
-    setSelectedSubjects(prevSelected =>
-      prevSelected.includes(subjectId)
-        ? prevSelected.filter(id => id !== subjectId)
-        : [...prevSelected, subjectId]
-    );
-  };
+  useEffect(() => {
+    if (setIsDeclarationComplete) {
+      setIsDeclarationComplete(declarationChecked && !!declarationName.trim());
+    }
+  }, [declarationChecked, declarationName, setIsDeclarationComplete]);
 
-  const handleAddSubjects = () => {
-    // Update the subjectIds in the main form data
-    setFormData(prevData => ({
-      ...prevData,
-      subjectIds: selectedSubjects
-    }));
+  const handleSubjectChange = (subjectId: string) => {
+    setSelectedSubjects(prevSelected => {
+      const newSelected = prevSelected.includes(subjectId)
+        ? prevSelected.filter(id => id !== subjectId)
+        : [...prevSelected, subjectId];
+
+      // Update the subjectIds in the main form data
+      setFormData(prevData => ({
+        ...prevData,
+        subjectIds: newSelected
+      }));
+
+      return newSelected;
+    });
   };
 
   // Group subjects by type
@@ -110,13 +126,33 @@ const SubjectForm = ({ courses }: any) => {
                     ))}
                   </div>
                 )}
-                <Button
+                {/* <Button
                   onClick={handleAddSubjects}
                   className="mt-4"
                   disabled={selectedSubjects.length === 0}
                 >
                   Add Selected Subjects
-                </Button>
+                </Button> */}
+              </div>
+
+              {/* Declaration Section */}
+              <div className="border rounded-lg p-4 flex items-start space-x-2 bg-gray-50">
+                <input
+                  type="checkbox"
+                  id="declaration"
+                  checked={declarationChecked}
+                  onChange={e => setDeclarationChecked(e.target.checked)}
+                  className="mt-1 h-4 w-4"
+                />
+                <label htmlFor="declaration" className="text-sm flex-1">
+                  I <input
+                    type="text"
+                    value={declarationName}
+                    onChange={e => setDeclarationName(e.target.value)}
+                    placeholder="Your Name"
+                    className="border-b border-gray-400 outline-none px-1 w-40 mx-1"
+                  />, Applicant for Secondary Course at the SBCODL (Solanki Brothers Council for Open and Distance Learning), Schooling certify that I am literate, I can read and write HINDI/ENGLISH (Medium of Instruction). I understand that self learning is important in the open schooling system and I take the responsibility of my own studies.
+                </label>
               </div>
 
               {/* Display currently selected subjects from form data */}

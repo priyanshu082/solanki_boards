@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { studentDetailsUrl } from '../Config';
+import { studentDetailsUrl, courseFetchUrl } from '../Config';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { Printer, Download } from 'lucide-react';
 import { motion } from "framer-motion";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 
 import { ResultStatus, Grade, Month, Year } from "../lib/Interfaces";
 
@@ -42,6 +40,8 @@ export interface Result {
   student: {
     name: string;
     rollNumber: string;
+    enrollmentNumber?: string;
+    applicationNumber?: string;
   };
 }
 
@@ -49,26 +49,41 @@ const Result = () => {
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [student, setStudent] = useState<any>(null);
+  const [student, setStudent] = useState<Result['student'] | null>(null);
+  const [courseName, setCourseName] = useState('');
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
         setLoading(true);
         const studentId = localStorage.getItem('id');
-        
+
         if (!studentId) {
           throw new Error("Student ID not found");
         }
-        
+
         // Fetch student details which includes results
-        const response = await axios.get(`${studentDetailsUrl}/${studentId}`,{
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+        const response = await axios.get(`${studentDetailsUrl}/${studentId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
         });
         const studentData = response.data;
         setStudent(studentData);
+        // Fetch course name
+        if (studentData && studentData.courseId) {
+          try {
+            const courseRes = await fetch(`${courseFetchUrl}/${studentData.courseId}`, {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+              }
+            });
+            const course = await courseRes.json();
+            setCourseName(course.name);
+          } catch {
+            setCourseName('');
+          }
+        }
         // Check if student has results
         if (studentData.results && studentData.results.length > 0) {
           // Get the most recent result
@@ -77,13 +92,13 @@ const Result = () => {
         } else {
           // If no results found in API, use dummy data for testing
           console.warn("No results found for student, using dummy data");
-          
+
         }
       } catch (err) {
         console.error("Error fetching student data:", err);
         setError("Failed to load result. Please try again later.");
         // Use dummy data as fallback
-        
+
       } finally {
         setLoading(false);
       }
@@ -92,44 +107,37 @@ const Result = () => {
     fetchStudentData();
   }, []);
 
-  const getStatusColor = (status: ResultStatus) => {
-    switch (status) {
-      case ResultStatus.PASS: return 'bg-emerald-500';
-      case ResultStatus.FAIL: return 'bg-red-500';
-      case ResultStatus.PENDING: return 'bg-amber-500';
-      case ResultStatus.INCOMPLETE: return 'bg-orange-500';
-      case ResultStatus.WITHHELD: return 'bg-purple-500';
-      case ResultStatus.CANCELLED: return 'bg-gray-500';
-      default: return 'bg-gray-500';
-    }
-  };
+  // const getStatusColor = (status: ResultStatus) => {
+  //   switch (status) {
+  //     case ResultStatus.PASS: return 'bg-emerald-500';
+  //     case ResultStatus.FAIL: return 'bg-red-500';
+  //     case ResultStatus.PENDING: return 'bg-amber-500';
+  //     case ResultStatus.INCOMPLETE: return 'bg-orange-500';
+  //     case ResultStatus.WITHHELD: return 'bg-purple-500';
+  //     case ResultStatus.CANCELLED: return 'bg-gray-500';
+  //     default: return 'bg-gray-500';
+  //   }
+  // };
 
-  const getGradeColor = (grade: Grade) => {
-    switch (grade) {
-      case Grade.A_PLUS: return 'bg-emerald-500';
-      case Grade.A: return 'bg-emerald-600';
-      case Grade.B_PLUS: return 'bg-blue-500';
-      case Grade.B: return 'bg-blue-600';
-      case Grade.C_PLUS: return 'bg-amber-500';
-      case Grade.C: return 'bg-amber-600';
-      case Grade.D: return 'bg-orange-500';
-      case Grade.F: return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
+  // const getGradeColor = (grade: Grade) => {
+  //   switch (grade) {
+  //     case Grade.A_PLUS: return 'bg-emerald-500';
+  //     case Grade.A: return 'bg-emerald-600';
+  //     case Grade.B_PLUS: return 'bg-blue-500';
+  //     case Grade.B: return 'bg-blue-600';
+  //     case Grade.C_PLUS: return 'bg-amber-500';
+  //     case Grade.C: return 'bg-amber-600';
+  //     case Grade.D: return 'bg-orange-500';
+  //     case Grade.F: return 'bg-red-500';
+  //     default: return 'bg-gray-500';
+  //   }
+  // };
 
-  const formatGrade = (grade: Grade) => {
-    switch (grade) {
-      case Grade.A_PLUS: return 'A+';
-      case Grade.A: return 'A';
-      case Grade.B_PLUS: return 'B+';
-      case Grade.B: return 'B';
-      case Grade.C_PLUS: return 'C+';
-      case Grade.C: return 'C';
-      case Grade.D: return 'D';
-      case Grade.F: return 'F';
-      default: return grade;
-    }
+  const formatGrade = (grade: string) => {
+    if (grade === 'A_PLUS') return 'A+';
+    if (grade === 'B_PLUS') return 'B+';
+    if (grade === 'C_PLUS') return 'C+';
+    return grade;
   };
 
   const formatMonth = (month: Month) => {
@@ -137,89 +145,89 @@ const Result = () => {
   };
 
   const calculatePercentage = (obtained: number, total: number) => {
-    return ((obtained / total) * 100).toFixed(2);
+    return ((obtained / total) * 100).toFixed(1);
   };
 
-  const handleDownloadPDF = () => {
-    if (!result) return;
+  // const handleDownloadPDF = () => {
+  //   if (!result) return;
 
-    try {
-      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  //   try {
+  //     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
-      // Header
-      doc.setFontSize(24);
-      doc.setTextColor(0, 48, 87);
-      doc.text("STUDENT RESULT CARD", 105, 15, { align: "center" });
+  //     // Header
+  //     doc.setFontSize(24);
+  //     doc.setTextColor(0, 48, 87);
+  //     doc.text("STUDENT RESULT CARD", 105, 15, { align: "center" });
 
-      // Institution details
-      doc.setFontSize(12);
-      doc.setTextColor(100);
-      doc.text(`Academic Year: ${result.year}`, 20, 25);
-      doc.text(`Examination: ${formatMonth(result.month)} ${result.year}`, 20, 32);
+  //     // Institution details
+  //     doc.setFontSize(12);
+  //     doc.setTextColor(100);
+  //     doc.text(`Academic Year: ${result.year}`, 20, 25);
+  //     doc.text(`Examination: ${formatMonth(result.month)} ${result.year}`, 20, 32);
 
-      // Student details
-      doc.setDrawColor(0, 48, 87);
-      doc.rect(15, 38, 180, 30);
-      doc.setFontSize(11);
-      doc.setTextColor(0);
-      doc.text([
-        `Student Name: ${student.name  || 'N/A'}`,
-        `Total Marks: ${result.totalMarks}`,
-        `Marks Obtained: ${result.obtainedMarks}`,
-        `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
-        `Final Result: ${result.status}`
-      ], 20, 45);
+  //     // Student details
+  //     doc.setDrawColor(0, 48, 87);
+  //     doc.rect(15, 38, 180, 30);
+  //     doc.setFontSize(11);
+  //     doc.setTextColor(0);
+  //     doc.text([
+  //       `Student Name: ${student?.name || 'N/A'}`,
+  //       `Total Marks: ${result.totalMarks}`,
+  //       `Marks Obtained: ${result.obtainedMarks}`,
+  //       `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
+  //       `Final Result: ${result.status}`
+  //     ], 20, 45);
 
-      // Subject-wise results table
-      const headers = [["Code", "Subject", "Total", "Obtained", "Grade", "Status"]];
-      const data = result.details.map(sub => [
-        sub.code,
-        sub.name,
-        sub.totalMarks.toString(),
-        sub.obtainedMarks.toString(),
-        formatGrade(sub.grade),
-        sub.status
-      ]);
+  //     // Subject-wise results table
+  //     const headers = [["Code", "Subject", "Total", "Obtained", "Grade", "Status"]];
+  //     const data = result.details.map(sub => [
+  //       sub.code,
+  //       sub.name,
+  //       sub.totalMarks.toString(),
+  //       sub.obtainedMarks.toString(),
+  //       formatGrade(sub.grade),
+  //       sub.status
+  //     ]);
 
-      // @ts-ignore - Using autoTable from the imported jspdf-autotable
-      doc.autoTable({
-        startY: 72,
-        head: headers,
-        body: data,
-        theme: 'striped',
-        headStyles: { fillColor: [0, 48, 87], textColor: 255, fontSize: 10 },
-        styles: { fontSize: 9, cellPadding: 2 },
-        columnStyles: { 1: { cellWidth: 60 } },
-        margin: { left: 15, right: 15 }
-      });
+  //     // @ts-ignore - Using autoTable from the imported jspdf-autotable
+  //     doc.autoTable({
+  //       startY: 72,
+  //       head: headers,
+  //       body: data,
+  //       theme: 'striped',
+  //       headStyles: { fillColor: [0, 48, 87], textColor: 255, fontSize: 10 },
+  //       styles: { fontSize: 9, cellPadding: 2 },
+  //       columnStyles: { 1: { cellWidth: 60 } },
+  //       margin: { left: 15, right: 15 }
+  //     });
 
-      // Get the final Y position from autoTable
-      // @ts-ignore
-      let finalY = doc.lastAutoTable.finalY + 5;
-      
-      // Summary section after the table
-      doc.setFontSize(11);
-      doc.setDrawColor(0, 48, 87);
-      doc.rect(15, finalY, 180, 25);
-      doc.text([
-        "Final Summary",
-        `Total Marks: ${result.totalMarks}`,
-        `Marks Obtained: ${result.obtainedMarks}`,
-        `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
-        `Overall Grade: ${result.status}`
-      ], 20, finalY + 7);
+  //     // Get the final Y position from autoTable
+  //     // @ts-ignore
+  //     let finalY = doc.lastAutoTable.finalY + 5;
 
-      // Footer
-      doc.setFontSize(8);
-      doc.text("This is a computer-generated document", 105, 290, { align: "center" });
+  //     // Summary section after the table
+  //     doc.setFontSize(11);
+  //     doc.setDrawColor(0, 48, 87);
+  //     doc.rect(15, finalY, 180, 25);
+  //     doc.text([
+  //       "Final Summary",
+  //       `Total Marks: ${result.totalMarks}`,
+  //       `Marks Obtained: ${result.obtainedMarks}`,
+  //       `Percentage: ${calculatePercentage(result.obtainedMarks, result.totalMarks)}%`,
+  //       `Overall Grade: ${result.status}`
+  //     ], 20, finalY + 7);
 
-      // Save PDF
-      doc.save(`Result_${result.month}${result.year}.pdf`);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Failed to generate PDF. Please try again later.");
-    }
-  };
+  //     // Footer
+  //     doc.setFontSize(8);
+  //     doc.text("This is a computer-generated document", 105, 290, { align: "center" });
+
+  //     // Save PDF
+  //     doc.save(`Result_${result.month}${result.year}.pdf`);
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+  //     alert("Failed to generate PDF. Please try again later.");
+  //   }
+  // };
 
   if (loading) {
     return (
@@ -259,8 +267,8 @@ const Result = () => {
               <p className="text-red-600 text-lg">{error}</p>
             </CardContent>
             <CardFooter className="bg-gray-50 p-6 rounded-b-lg">
-              <Button 
-                onClick={() => window.location.reload()} 
+              <Button
+                onClick={() => window.location.reload()}
                 className="bg-blue-800 hover:bg-blue-700 text-lg px-6 py-3"
               >
                 Try Again
@@ -289,142 +297,101 @@ const Result = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-6xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card className="mb-8 border-none shadow-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-blue-900 to-indigo-900 text-white p-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <CardTitle className="text-4xl font-bold">Examination Result</CardTitle>
-                <CardDescription className="text-blue-100 text-xl mt-2">
-                  {formatMonth(result.month)} {result.year}
-                </CardDescription>
-              </div>
-              <Badge className={`${getStatusColor(result.status)} text-white px-6 py-2 text-lg font-medium rounded-full`}>
-                {result.status}
-              </Badge>
-            </div>
-          </CardHeader>
-          
-          <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              {[
-                { label: "Student Name", value: student?.name || 'N/A' },
-                { label: "Roll Number", value: student?.rollNumber || 'N/A' },
-                { label: "Percentage", value: `${calculatePercentage(result.obtainedMarks, result.totalMarks)}%` },
-                { label: "Result Status", value: result.status, isBadge: true }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
-                >
-                  <p className="text-sm text-blue-800 font-medium mb-2">{item.label}</p>
-                  {item.isBadge ? (
-                    <Badge className={`${getStatusColor(result.status)} text-white px-4 py-1.5 text-base`}>
-                      {item.value}
-                    </Badge>
-                  ) : (
-                    <p className="text-gray-700 text-xl font-semibold">{item.value}</p>
-                  )}
-                </motion.div>
+    <div className="max-w-3xl mx-auto my-10">
+      <div id="result-section" className="bg-white p-6 rounded-lg shadow-lg border">
+        <h1 className="text-2xl font-bold text-center text-blue-900 mb-6">Result</h1>
+        {/* Top Info Box */}
+        <div className="border rounded-md p-4 mb-8 bg-gray-50 flex flex-col md:flex-row md:justify-between md:items-center">
+          <div className="flex-1 mb-2 md:mb-0">
+            <span className="font-bold">Course :</span> <span className="ml-2">{courseName}</span>
+          </div>
+          <div className="flex-1 mb-2 md:mb-0">
+            <span className="font-bold">Name :</span> <span className="ml-2">{student?.name}</span>
+          </div>
+          <div className="flex-1">
+            <span className="font-bold">Registration No :</span> <span className="ml-2">{student?.enrollmentNumber || student?.applicationNumber}</span>
+          </div>
+        </div>
+
+        {/* Result Summary */}
+        <h2 className="text-xl font-semibold text-center mb-2 mt-6">Result Summary</h2>
+        <div className="overflow-x-auto mb-8">
+          <table className="min-w-full border text-center bg-white">
+            <thead className="bg-blue-50">
+              <tr>
+                <th className="border px-4 py-2">EXAM MONTH & YEAR</th>
+                <th className="border px-4 py-2">TOTAL MARKS</th>
+                <th className="border px-4 py-2">OBTAINED MARKS</th>
+                <th className="border px-4 py-2">% OF MARKS</th>
+                <th className="border px-4 py-2">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="bg-gray-50">
+                <td className="border px-4 py-2">{formatMonth(result.month)} {result.year}</td>
+                <td className="border px-4 py-2">{result.totalMarks}</td>
+                <td className="border px-4 py-2">{result.obtainedMarks}</td>
+                <td className="border px-4 py-2">{calculatePercentage(result.obtainedMarks, result.totalMarks)}%</td>
+                <td className="border px-4 py-2 font-semibold">{result.status}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Result Details */}
+        <h2 className="text-xl font-semibold text-center mb-2 mt-8">Result Details</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border text-center bg-white">
+            <thead className="bg-blue-50">
+              <tr>
+                <th className="border px-4 py-2">SUBJECT CODE</th>
+                <th className="border px-4 py-2">SUBJECT</th>
+                <th className="border px-4 py-2">TOTAL MARKS</th>
+                <th className="border px-4 py-2">OBTAINED MARKS</th>
+                <th className="border px-4 py-2">GRADE</th>
+                <th className="border px-4 py-2">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {result.details.map((subject, idx) => (
+                <tr key={subject.id} className={idx % 2 === 0 ? 'bg-gray-50' : ''}>
+                  <td className="border px-4 py-2">{subject.code}</td>
+                  <td className="border px-4 py-2">{subject.name}</td>
+                  <td className="border px-4 py-2">{subject.totalMarks}</td>
+                  <td className="border px-4 py-2">{subject.obtainedMarks}</td>
+                  <td className="border px-4 py-2">{formatGrade(subject.grade)}</td>
+                  <td className="border px-4 py-2">{subject.status}</td>
+                </tr>
               ))}
-            </div>
-            
-            <div className="bg-white rounded-xl border border-gray-100 shadow-lg overflow-hidden">
-              <Table>
-                <TableCaption className="py-4 text-lg">Subject-wise Result Details</TableCaption>
-                <TableHeader className="bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
-                  <TableRow>
-                    <TableHead className="text-white font-bold">Subject Code</TableHead>
-                    <TableHead className="text-white font-bold">Subject Name</TableHead>
-                    <TableHead className="text-white font-bold text-right">Total Marks</TableHead>
-                    <TableHead className="text-white font-bold text-right">Obtained Marks</TableHead>
-                    <TableHead className="text-white font-bold">Grade</TableHead>
-                    <TableHead className="text-white font-bold">Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {result.details.map((subject, index) => (
-                    <motion.tr
-                      key={subject.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="hover:bg-slate-50"
-                    >
-                      <TableCell className="font-medium">{subject.code}</TableCell>
-                      <TableCell>{subject.name}</TableCell>
-                      <TableCell className="text-right">{subject.totalMarks}</TableCell>
-                      <TableCell className="text-right">{subject.obtainedMarks}</TableCell>
-                      <TableCell>
-                        <Badge className={`${getGradeColor(subject.grade)} text-white px-3 py-1`}>
-                          {formatGrade(subject.grade)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={`${getStatusColor(subject.status)} text-white px-3 py-1`}>
-                          {subject.status}
-                        </Badge>
-                      </TableCell>
-                    </motion.tr>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-8 p-8 bg-gradient-to-r from-slate-100 to-slate-200 rounded-xl shadow-inner"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  { label: "Total Marks", value: result.totalMarks },
-                  { label: "Marks Obtained", value: result.obtainedMarks },
-                  { label: "Percentage", value: `${calculatePercentage(result.obtainedMarks, result.totalMarks)}%` }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="bg-white p-6 rounded-xl border border-gray-100 shadow-md hover:shadow-lg transition-all duration-300 text-center"
-                  >
-                    <p className="text-sm text-blue-800 font-medium mb-2">{item.label}</p>
-                    <p className="text-3xl font-bold text-gray-800">{item.value}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </CardContent>
-          
-          <CardFooter className="flex flex-wrap justify-end gap-4 p-8 bg-gradient-to-r from-slate-100 to-slate-200">
-            <Button 
-              variant="outline" 
-              onClick={() => window.print()} 
-              className="border-blue-800 text-blue-800 hover:bg-blue-50 text-base px-6"
-            >
-              <Printer className="mr-2 h-5 w-5" />
-              Print
-            </Button>
-            <Button 
-              onClick={handleDownloadPDF} 
-              className="bg-green-700 hover:bg-green-600 text-white px-6"
-            >
-              <Download className="mr-2 h-5 w-5" />
-              Download PDF
-            </Button>
-          </CardFooter>
-        </Card>
-      </motion.div>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={async () => {
+            const input = document.getElementById('result-section');
+            if (!input) return;
+            const canvas = await html2canvas(input, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+              orientation: 'portrait',
+              unit: 'pt',
+              format: 'a4',
+            });
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            // const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pageWidth;
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('Result.pdf');
+          }}
+          className="px-6 py-2 bg-green-700 text-white rounded shadow hover:bg-green-800"
+        >
+          Download PDF
+        </button>
+      </div>
     </div>
   );
 };

@@ -29,6 +29,7 @@ const RegisterPage = () => {
   const [selectedCourse, setSelectedCourse] = useState<InterfaceCourse | null>(null);
   const [courseType, setCourseType] = useState<string | null>(null);
   const [courses, setCourses] = useState<InterfaceCourse[]>([]);
+  const [isDeclarationComplete, setIsDeclarationComplete] = useState(false);
 
 
   // Validation functions remain the same...
@@ -137,15 +138,13 @@ const RegisterPage = () => {
 
   const validateEducationalQualifications = (): boolean => {
     if (formData.educationalQualifications.length === 0) {
-      return false;
+      return true;
     }
-
     return formData.educationalQualifications.every(qual => {
       const hasExamination = Boolean(qual.examination);
       const hasSubjects = Boolean(qual.subjects);
       const hasYearOfPassing = Boolean(qual.yearOfPassing);
       const hasPercentage = typeof qual.percentage === 'number' && !isNaN(qual.percentage);
-
       return hasExamination && hasSubjects && hasYearOfPassing && hasPercentage;
     });
   };
@@ -305,7 +304,7 @@ const RegisterPage = () => {
     //@ts-ignore
     student: <RegisterStudentForm setCourseType={setCourseType} courses={courses} courseError={courseError} courseType={courseType} isLoadingCourses={isLoadingCourses} setSelectedCourse={setSelectedCourse} />,
     EducationalQualification: <EducationQualificationForm />,
-    Subjects: <SubjectForm courses={selectedCourse} />
+    Subjects: <SubjectForm courses={selectedCourse ?? undefined} setIsDeclarationComplete={setIsDeclarationComplete} />
   };
 
   return (
@@ -350,7 +349,7 @@ const RegisterPage = () => {
         ) : (
           <Button
             onClick={handleSubmit}
-            disabled={!validateAllForms() || isSubmitting}
+            disabled={!validateAllForms() || isSubmitting || !isDeclarationComplete}
             className="bg-green-600 hover:bg-green-700"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Application'}

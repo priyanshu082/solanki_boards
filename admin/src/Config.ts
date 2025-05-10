@@ -60,4 +60,6 @@ export const getResult = ADMIN_URL + "/result/list";
 
 export const getPaymentDetails = BASE_URL + "/payment/get-payment-details";
 
+export const paymentApproved = ADMIN_URL + "/payment/approved";
+
 export const changePassword = ADMIN_URL + "/auth/changePassword";

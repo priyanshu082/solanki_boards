@@ -4,6 +4,7 @@ import frontCardBg from '../assets/idfront.png';
 import backCardBg from '../assets/idback.png';
 import dummy from "../assets/idcard.jpg";
 import { studentDetailsUrl } from '../Config';
+import { courseFetchUrl } from '../Config';
 import Swal from 'sweetalert2';
 
 interface Address {
@@ -27,6 +28,7 @@ interface StudentData {
 const StudentIDCard = () => {
     const [studentData, setStudentData] = useState<StudentData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [courseName, setCourseName] = useState('');
 
     useEffect(() => {
         const fetchStudentData = async () => {
@@ -50,6 +52,21 @@ const StudentIDCard = () => {
                 });
                 const data = await response.json();
                 setStudentData(data);
+
+                // Fetch course name
+                if (data && data.courseId) {
+                    try {
+                        const courseRes = await fetch(`${courseFetchUrl}/${data.courseId}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        const course = await courseRes.json();
+                        setCourseName(course.name);
+                    } catch {
+                        setCourseName('');
+                    }
+                }
                 Swal.close();
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -112,7 +129,7 @@ const StudentIDCard = () => {
                                 </div>
                             )}
                             <h2 className="text-lg font-bold text-white">{studentData.name}</h2>
-                            <p className="text-sm text-white">{studentData.courseId}</p>
+                            <p className="text-sm text-white">{courseName}</p>
                         </div>
 
                         {/* Bottom left content */}

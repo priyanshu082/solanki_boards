@@ -18,6 +18,7 @@ const RegisterPage = () => {
   const formData = useRecoilValue(admissionFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
+  const [isDeclarationComplete, setIsDeclarationComplete] = useState(false);
   const navigate = useNavigate();
 
   // Validation functions remain the same...
@@ -58,15 +59,13 @@ const RegisterPage = () => {
 
   const validateEducationalQualifications = (): boolean => {
     if (formData.educationalQualifications.length === 0) {
-      return false;
+      return true;
     }
-
     return formData.educationalQualifications.every(qual => {
       const hasExamination = Boolean(qual.examination);
       const hasSubjects = Boolean(qual.subjects);
       const hasYearOfPassing = Boolean(qual.yearOfPassing);
       const hasPercentage = typeof qual.percentage === 'number' && !isNaN(qual.percentage);
-
       return hasExamination && hasSubjects && hasYearOfPassing && hasPercentage;
     });
   };
@@ -233,7 +232,7 @@ const RegisterPage = () => {
   const forms: Record<FormType, JSX.Element> = {
     student: <RegisterStudentForm />,
     EducationalQualification: <EducationalQualificationForm />,
-    Subjects: <SubjectForm />
+    Subjects: <SubjectForm setIsDeclarationComplete={setIsDeclarationComplete} />
   };
 
   return (
@@ -278,7 +277,7 @@ const RegisterPage = () => {
         ) : (
           <Button
             onClick={handleSubmit}
-            disabled={!validateAllForms() || isSubmitting}
+            disabled={!validateAllForms() || isSubmitting || !isDeclarationComplete}
             className="bg-green-600 hover:bg-green-700"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Application'}

@@ -2,10 +2,10 @@ import { useEffect, useState, ChangeEvent } from 'react'
 import axios from 'axios'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getstudentbyid, updateAdmission, deleteAdmission, getcoursebyid } from '@/Config'
+import { getstudentbyid, updateAdmission, deleteAdmission, getcoursebyid, paymentApproved } from '@/Config'
 import Swal from 'sweetalert2'
 import { Button } from '@/components/ui/button'
-import { InterfaceStudentDetails, ResultDetails, ResultStatus, IndianState, Country, ExaminationType, SubjectType, StudentCategory, Gender, BatchType, AdmissionType } from '@/lib/Interfaces'
+import { InterfaceStudentDetails, ResultDetails, ResultStatus, IndianState, Country, ExaminationType, SubjectType, StudentCategory, Gender, BatchType, AdmissionType, PaymentStatus, PaymentType } from '@/lib/Interfaces'
 import { format } from 'date-fns'
 import { Table, TableHeader, TableBody, TableCell, TableRow, TableHead } from "@/components/ui/table"
 import { Input } from '@/components/ui/input'
@@ -288,6 +288,65 @@ const StudentDetails = () => {
     }
   }
 
+  const handleApprovePayment = async () => {
+    try {
+      const token = localStorage.getItem('token') || '';
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to approve this payment?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, approve it!'
+      });
+
+      if (result.isConfirmed) {
+        const response = await axios.post(paymentApproved, {
+          paymentStatus: PaymentStatus.SUCCESS,
+          paymentType: PaymentType.STUDENT,
+          id: student?.id
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (response.data) {
+          // Refresh student data
+          const updatedStudent = await axios.get(`${getstudentbyid}/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          setStudent(updatedStudent.data);
+          setEditData(updatedStudent.data);
+
+          await Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Payment has been approved successfully',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error approving payment:', error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to approve payment',
+        confirmButtonColor: '#3085d6'
+      });
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>
   }
@@ -320,6 +379,15 @@ const StudentDetails = () => {
               <Button variant="destructive" className='cursor-pointer' onClick={handleDelete} size="icon" title="Delete Student">
                 <Trash2 className="h-5 w-5 text-white" />
               </Button>
+              {student?.paymentStatus && (student.paymentStatus === PaymentStatus.FAILED || student.paymentStatus === PaymentStatus.PENDING) && (
+                <Button
+                  variant="default"
+                  className='cursor-pointer bg-green-600 hover:bg-green-700'
+                  onClick={handleApprovePayment}
+                >
+                  Approve Payment
+                </Button>
+              )}
             </>
           )}
           {isEditing && (

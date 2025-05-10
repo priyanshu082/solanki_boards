@@ -8,14 +8,21 @@ import { useRecoilState } from 'recoil';
 import { admissionFormState } from '../Atoms/FormDataAtoms';
 import { staticDataAtoms, SubjectType } from '../Atoms/staticDataAtoms';
 import { useState, useEffect } from 'react';
-import { Button } from '../components/ui/button';
 import axios from "axios";
 import { fetchAllSubjectsByCourseIdUrl } from "../data/config";
 
-const SubjectForm = () => {
+// Add prop type for setIsDeclarationComplete
+interface SubjectFormProps {
+  setIsDeclarationComplete?: (complete: boolean) => void;
+}
+
+const SubjectForm = ({ setIsDeclarationComplete }: SubjectFormProps) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [formData, setFormData] = useRecoilState(admissionFormState);
   const [subjectsList, setSubjectsList] = useRecoilState(staticDataAtoms.subjectsAtom);
+  // Add state for declaration
+  const [declarationChecked, setDeclarationChecked] = useState(false);
+  const [declarationName, setDeclarationName] = useState('');
 
   // Fetch subjects based on the selected course
   useEffect(() => {
@@ -34,27 +41,19 @@ const SubjectForm = () => {
   }, [formData.courseId, setSubjectsList]);
 
   const handleSubjectChange = (subjectId: string) => {
-    setSelectedSubjects(prevSelected =>
-      prevSelected.includes(subjectId)
+    setSelectedSubjects(prevSelected => {
+      const newSelected = prevSelected.includes(subjectId)
         ? prevSelected.filter(id => id !== subjectId)
-        : [...prevSelected, subjectId]
-    );
-  };
+        : [...prevSelected, subjectId];
 
-  const handleAddSubjects = () => {
-    // Update both atoms
-    setSubjectsList(
-      subjectsList.filter(subject => selectedSubjects.includes(subject.id))
-    );
+      // Update the subjectIds in the main form data
+      setFormData(prevData => ({
+        ...prevData,
+        subjectIds: newSelected
+      }));
 
-    // Update the subjectIds in the main form data
-    setFormData(prevData => ({
-      ...prevData,
-      subjectIds: selectedSubjects
-    }));
-
-    // Reset selected subjects after adding
-    setSelectedSubjects([]);
+      return newSelected;
+    });
   };
 
   const groupSubjectsByType = (subjects: typeof subjectsList) => {
@@ -77,6 +76,12 @@ const SubjectForm = () => {
   const selectedSubjectsGrouped = groupSubjectsByType(
     subjectsList.filter(subject => formData.subjectIds.includes(subject.id))
   );
+
+  useEffect(() => {
+    if (setIsDeclarationComplete) {
+      setIsDeclarationComplete(declarationChecked && !!declarationName.trim());
+    }
+  }, [declarationChecked, declarationName, setIsDeclarationComplete]);
 
   return (
     <Card className="w-full mx-auto bg-white rounded-lg shadow-md text-primary">
@@ -112,13 +117,26 @@ const SubjectForm = () => {
                 </div>
               ))}
             </div>
-            <Button
-              onClick={handleAddSubjects}
-              className="mt-4"
-              disabled={selectedSubjects.length === 0}
-            >
-              Add Selected Subjects
-            </Button>
+          </div>
+
+          {/* Declaration Section */}
+          <div className="border rounded-lg p-4 flex items-start space-x-2 bg-gray-50">
+            <input
+              type="checkbox"
+              id="declaration"
+              checked={declarationChecked}
+              onChange={e => setDeclarationChecked(e.target.checked)}
+              className="mt-1 h-4 w-4"
+            />
+            <label htmlFor="declaration" className="text-sm flex-1">
+              I <input
+                type="text"
+                value={declarationName}
+                onChange={e => setDeclarationName(e.target.value)}
+                placeholder="Your Name"
+                className="border-b border-gray-400 outline-none px-1 w-40 mx-1"
+              />, Applicant for Secondary Course at the SBCODL (Solanki Brothers Council for Open and Distance Learning), Schooling certify that I am literate, I can read and write HINDI/ENGLISH (Medium of Instruction). I understand that self learning is important in the open schooling system and I take the responsibility of my own studies.
+            </label>
           </div>
 
           {/* Display currently selected subjects from form data */}
